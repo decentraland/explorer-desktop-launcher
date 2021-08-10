@@ -7,7 +7,18 @@ const electronDl = require('electron-dl');
 const DecompressZip = require('decompress-zip');
 const fs = require('fs');
 
+const rendererPath = app.getAppPath() + "/renderer"
+const executablePath = rendererPath + "/unity-renderer-linux"
+const versionPath = rendererPath + "/version.json"
+
 electronDl();
+
+let version = null
+if (fs.existsSync(versionPath)) {
+  const rawData = fs.readFileSync(versionPath);
+  const body = JSON.parse(rawData);
+  version = body.version;
+}
 
 const unzip = (zipFilePath, destinationPath, onCompleted) => {
     const unzipper = new DecompressZip(zipFilePath);
@@ -36,8 +47,7 @@ const unzip = (zipFilePath, destinationPath, onCompleted) => {
 
 var child = require('child_process').execFile;
 
-ipcMain.on('execute-process', (event) => {
-  const executablePath = app.getAppPath() + "/renderer/unity-renderer-linux"
+ipcMain.on('executeProcess', (event) => {
   child(executablePath, (err, data) => {
     if(err) {
        console.error(err);
@@ -48,12 +58,15 @@ ipcMain.on('execute-process', (event) => {
   });
 })
 
-ipcMain.on('download-button', async (event, {url}) => {
-  const rendererDir = app.getAppPath() + "/renderer"
-  fs.rmdirSync(rendererDir, { recursive: true });
+ipcMain.on('getVersion', (event) => {
+  event.sender.send("getVersion", version)
+})
+
+ipcMain.on('downloadButton', async (event, {url, remoteVersion}) => {
+  fs.rmdirSync(rendererPath, { recursive: true });
   const win = BrowserWindow.getFocusedWindow();
   const res = await electronDl.download(win, url, {
-    directory: rendererDir,
+    directory: rendererPath,
     onStarted: (item) => {
       console.log("onStarted:", item)
       event.sender.send("downloadStart")
@@ -64,8 +77,15 @@ ipcMain.on('download-button', async (event, {url}) => {
     },
     onCompleted: (file) => {
       console.log("onCompleted:", file)
-      unzip(file.path, app.getAppPath() + "/renderer", () => {
+      unzip(file.path, rendererPath, () => {
         fs.unlinkSync(file.path)
+
+        const versionData = { 
+          version: remoteVersion
+        };
+       
+        fs.writeFileSync(versionPath, JSON.stringify(versionData));
+
         event.sender.send("downloadCompleted")
       })
     }
