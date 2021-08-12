@@ -25,7 +25,9 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           release: false
-      - name: Search
-        run: |
-          ls -la
-          find .
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: |
+            dist/explorer-desktop-launcher*
