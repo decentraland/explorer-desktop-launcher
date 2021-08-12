@@ -52,7 +52,7 @@ const App = () => {
 
   const downloadArtifacts = () => {
     console.log("downloadArtifacts", remoteVersion)
-    ipcRenderer.send('downloadButton', { url: "https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-linux.zip", remoteVersion })
+    ipcRenderer.send('download', { remoteVersion })
   }
 
   const playGame = () => {
@@ -69,10 +69,10 @@ const App = () => {
         <p>
           Progress: {progress}%
         </p>
-        <button onClick={downloadArtifacts} disabled={downloadState != DownloadState.NewVersion}>
+        <button onClick={downloadArtifacts} disabled={downloadState !== DownloadState.NewVersion}>
           Download
         </button>
-        <button onClick={playGame} disabled={downloadState != DownloadState.ReadyToPlay}>
+        <button onClick={playGame} disabled={downloadState !== DownloadState.ReadyToPlay}>
           Play
         </button>
       </header>
