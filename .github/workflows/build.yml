@@ -22,8 +22,10 @@ jobs:
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
 
-          release: ${{ github.ref == 'refs/heads/ci' }}
+          release: false
+      - name: Search
+        run: |
+          ls -la
+          find .
