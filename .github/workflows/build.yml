@@ -38,7 +38,7 @@ jobs:
           ls -la dist/
 
       - name: upload
-      - runs: |
+      - run: |
           npx @dcl/cdn-uploader@next \
             --bucket "$S3_BUCKET" \
             --local-folder "dist/decentraland-launcher.${{ matrix.ext }}" \
