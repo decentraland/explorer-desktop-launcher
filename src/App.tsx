@@ -25,7 +25,7 @@ const App = () => {
 
         if (version === localVersion) {
           setDownloadState(DownloadState.ReadyToPlay)
-          setDescription("Your client is up to date!")
+          setDescription("Decentraland is up to date!")
         } else {
           remoteVersion = version
           setDescription("There are new updates.")
@@ -43,7 +43,7 @@ const App = () => {
         ipcRenderer.on("downloadCompleted", (event: any) => {
           setProgress(100)
           setDownloadState(DownloadState.ReadyToPlay)
-          setDescription("Your client is up to date!")
+          setDescription("Decentraland is up to date!")
         })
       })
     })
