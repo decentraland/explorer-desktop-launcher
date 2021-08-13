@@ -39,7 +39,10 @@ jobs:
 
       - name: upload
         run: |
+          AWS_DEFAULT_REGION="us-east-1" \
+          AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+          AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
           npx @dcl/cdn-uploader@next \
-            --bucket ${{ env.S3_BUCKET }} \
+            --bucket ${{ secrets.S3_BUCKET }} \
             --local-folder "dist/decentraland-launcher.${{ matrix.ext }}" \
             --bucket-folder "launcher-branch/${{ github.head_ref }}"
