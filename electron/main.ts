@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { remote, app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
@@ -14,10 +14,12 @@ if (getOSName() === null) {
   exit(1)
 }
 
-const rendererPath = app.getAppPath() + "/renderer"
+const rendererPath = app.getPath("appData") + "/decentraland/renderer"
 const executablePath = `${ rendererPath }/unity-renderer-${ osName }`
 const versionPath = `${ rendererPath }/version.json`
 const artifactUrl = `https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-${ osName }.zip`
+
+console.log("rendererPath:", rendererPath)
 registerUpdaterEvents(rendererPath, versionPath, executablePath, artifactUrl)
 
 function createWindow() {

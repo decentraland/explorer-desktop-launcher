@@ -30,4 +30,6 @@ jobs:
         with:
           name: dist
           path: |
-            dist/explorer-desktop-launcher*
+            dist/explorer-desktop-launcher*.dmg
+            dist/explorer-desktop-launcher*.AppImage
+            dist/explorer-desktop-launcher*.exe

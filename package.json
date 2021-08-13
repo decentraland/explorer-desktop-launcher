@@ -42,7 +42,8 @@
     "productName": "explorer-desktop-launcher",
     "extends": null,
     "files": [
-      "build/**/*"
+      "build/**/*",
+      "!src"
     ],
     "directories": {
       "buildResources": "assets"
