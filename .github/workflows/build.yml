@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
+        ext: [dmg, AppImage, exe]
 
     steps:
       - name: Check out Git repository
@@ -25,11 +26,20 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           release: false
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v2
+      - uses: shallwefootball/s3-upload-action@master
+        name: Upload S3
+        id: S3
         with:
-          name: dist
-          path: |
-            dist/explorer-desktop-launcher*.dmg
-            dist/explorer-desktop-launcher*.AppImage
-            dist/explorer-desktop-launcher*.exe
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_bucket: ${{ secrets.S3_BUCKET }}
+          destination_dir: 'launcher/${{ github.head_ref }}'
+          source_dir: 'dist/decentraland-launcher.${{ matrix.ext }}'
+      # - name: Archive production artifacts
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: dist
+      #     path: |
+      #       dist/explorer-desktop-launcher*.dmg
+      #       dist/explorer-desktop-launcher*.AppImage
+      #       dist/explorer-desktop-launcher*.exe

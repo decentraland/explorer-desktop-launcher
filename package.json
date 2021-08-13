@@ -41,6 +41,8 @@
     "appId": "decentraland.desktop.launcher",
     "productName": "explorer-desktop-launcher",
     "extends": null,
+    "artifactName": "decentraland-launcher.${ext}",
+    "compression": "maximum",
     "files": [
       "build/**/*",
       "!src"
