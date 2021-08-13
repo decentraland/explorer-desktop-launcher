@@ -8,8 +8,13 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        ext: [dmg, AppImage, exe]
+        include:
+          - os: macos-latest
+            ext: dmg
+          - os: ubuntu-latest
+            ext: AppImage
+          - os: windows-latest
+            ext: exe
 
     steps:
       - name: Check out Git repository
