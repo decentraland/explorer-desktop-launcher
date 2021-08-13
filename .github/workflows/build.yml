@@ -30,27 +30,18 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
 
-          release: "false"
+          release: ${{ false }}
       - name: Tree
         run: |
           pwd
           ls -la
           ls -la dist/
-          find .
-      - uses: shallwefootball/s3-upload-action@master
-        name: Upload S3
-        id: S3
-        with:
-          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_bucket: ${{ secrets.S3_BUCKET }}
-          destination_dir: 'launcher/${{ github.head_ref }}'
-          source_dir: 'dist/decentraland-launcher.${{ matrix.ext }}'
-      # - name: Archive production artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: dist
-      #     path: |
-      #       dist/explorer-desktop-launcher*.dmg
-      #       dist/explorer-desktop-launcher*.AppImage
-      #       dist/explorer-desktop-launcher*.exe
+    - uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        SOURCE_DIR: 'dist/decentraland-launcher.${{ matrix.ext }}'
+        DEST_DIR: 'launcher/${{ github.head_ref }}'

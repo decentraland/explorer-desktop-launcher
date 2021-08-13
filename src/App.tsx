@@ -25,7 +25,7 @@ const App = () => {
 
         if (version === localVersion) {
           setDownloadState(DownloadState.ReadyToPlay)
-          setDescription("Your game is up to date!")
+          setDescription("Your client is up to date!")
         } else {
           remoteVersion = version
           setDescription("There are new updates.")
@@ -43,7 +43,7 @@ const App = () => {
         ipcRenderer.on("downloadCompleted", (event: any) => {
           setProgress(100)
           setDownloadState(DownloadState.ReadyToPlay)
-          setDescription("Your game is up to date!")
+          setDescription("Your client is up to date!")
         })
       })
     })
@@ -56,7 +56,7 @@ const App = () => {
     ipcRenderer.send('download', { remoteVersion })
   }
 
-  const playGame = () => {
+  const executeDecentraland = () => {
     ipcRenderer.send('executeProcess')
   }
 
@@ -78,7 +78,7 @@ const App = () => {
         <button onClick={downloadArtifacts} disabled={downloadState !== DownloadState.NewVersion}>
           Download
         </button>
-        <button onClick={playGame} disabled={downloadState !== DownloadState.ReadyToPlay}>
+        <button onClick={executeDecentraland} disabled={downloadState !== DownloadState.ReadyToPlay}>
           Play
         </button>
         <button onClick={clearCache} disabled={downloadState === DownloadState.Loading}>
