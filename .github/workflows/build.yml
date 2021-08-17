@@ -9,12 +9,12 @@ jobs:
     strategy:
       matrix:
         include:
-          # - os: macos-latest
-          #   ext: dmg
+          - os: macos-latest
+            ext: dmg
           - os: ubuntu-latest
             ext: AppImage
-          # - os: windows-latest
-          #   ext: exe
+          - os: windows-latest
+            ext: exe
 
     steps:
       - name: Check out Git repository
