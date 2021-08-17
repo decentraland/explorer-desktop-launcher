@@ -30,7 +30,7 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
 
-          release: ${{ false }}
+          release: never
       - name: Tree
         run: |
           pwd
