@@ -31,12 +31,6 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           release: never
-      - name: Tree
-        run: |
-          pwd
-          ls -la
-          ls -la dist/
-
       - name: upload
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
