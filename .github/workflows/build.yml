@@ -38,13 +38,13 @@ jobs:
           ls -la dist/
 
       - name: upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           mkdir -p output/
           mv dist/decentraland-launcher.${{ matrix.ext }} output/
-          AWS_DEFAULT_REGION="us-east-1" \
-          AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-          AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
           npx @dcl/cdn-uploader@next \
             --bucket ${{ secrets.S3_BUCKET }} \
             --local-folder "output/" \
-            --bucket-folder "launcher-branch/${{ github.head_ref }}"
+            --bucket-folder "launcher/${{ github.head_ref }}"
