@@ -38,7 +38,7 @@ const registerExecuteProcessEvent = (executablePath : string) => {
 }
 
 const registerDownloadEvent = (rendererPath : string, versionPath : string, artifactUrl : string) => {
-    electronDl();
+    //electronDl();
     ipcMain.on('download', async (event, {remoteVersion}) => {
         fs.rmdirSync(rendererPath, { recursive: true });
         const win = BrowserWindow.getFocusedWindow() as BrowserWindow
@@ -82,6 +82,11 @@ export const registerUpdaterEvents = (rendererPath : string, versionPath : strin
 
     // Register event to download
     registerDownloadEvent(rendererPath, versionPath, artifactUrl)
+
+    // Register clear cache
+    ipcMain.on('clearCache', async (event) => {
+      fs.rmdirSync(rendererPath, { recursive: true });
+    })
 }
 
 export const getOSName = () : string | null => {

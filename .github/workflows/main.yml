@@ -1,0 +1,22 @@
+name: Deployment Notification
+
+on:
+  pull_request:
+    types: [ opened ]
+
+jobs:
+  deployment_notification:
+    runs-on: ubuntu-latest
+    name: Decentraland Unity-Renderer Deployment Notification
+    steps:
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@master
+        with:
+          message: |
+            After the CI passes:
+
+            This branch can be downloaded with the following links:
+            - Windows: https://renderer-artifacts.decentraland.org/launcher-branch/${{ github.head_ref }}/decentraland-launcher.exe
+            - Linux: https://renderer-artifacts.decentraland.org/launcher-branch/${{ github.head_ref }}/decentraland-launcher.AppImage
+            - Mac: https://renderer-artifacts.decentraland.org/launcher-branch/${{ github.head_ref }}/decentraland-launcher.dmg
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -33,7 +33,7 @@
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"cross-env BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "build": "npm run react:build && tsc -p electron",
-    "electron:build": "npm run build && electron-builder",
+    "electron:build": "npm run build && electron-builder --publish never",
     "electron:cross-build": "npm run build && electron-builder",
     "eject": "react-scripts eject"
   },
@@ -41,11 +41,23 @@
     "appId": "decentraland.desktop.launcher",
     "productName": "explorer-desktop-launcher",
     "extends": null,
+    "artifactName": "decentraland-launcher.${ext}",
+    "compression": "maximum",
     "files": [
-      "build/**/*"
+      "build/**/*",
+      "!src"
     ],
     "directories": {
       "buildResources": "assets"
+    },
+    "win": {
+      "icon": "public/logo512.png"
+    },
+    "linux": {
+      "icon": "public/logo512.png"
+    },
+    "mac": {
+      "icon": "public/logo512.png"
     }
   },
   "eslintConfig": {

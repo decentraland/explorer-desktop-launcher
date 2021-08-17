@@ -25,25 +25,26 @@ const App = () => {
 
         if (version === localVersion) {
           setDownloadState(DownloadState.ReadyToPlay)
-          setDescription("Your game is up to date!")
+          setDescription("Decentraland is up to date!")
         } else {
           remoteVersion = version
           setDescription("There are new updates.")
           setDownloadState(DownloadState.NewVersion)
-          ipcRenderer.on("downloadStart", (event: any) => {
-            setProgress(0)
-            setDownloadState(DownloadState.Downloading)
-            setDescription("Downloading")
-          })
-          ipcRenderer.on("downloadProgress", (event: any, percent: number) => {
-            setProgress(Math.round(percent))
-          })
-          ipcRenderer.on("downloadCompleted", (event: any) => {
-            setProgress(100)
-            setDownloadState(DownloadState.ReadyToPlay)
-            setDescription("Your game is up to date!")
-          })
         }
+
+        ipcRenderer.on("downloadStart", (event: any) => {
+          setProgress(0)
+          setDownloadState(DownloadState.Downloading)
+          setDescription("Downloading")
+        })
+        ipcRenderer.on("downloadProgress", (event: any, percent: number) => {
+          setProgress(Math.round(percent))
+        })
+        ipcRenderer.on("downloadCompleted", (event: any) => {
+          setProgress(100)
+          setDownloadState(DownloadState.ReadyToPlay)
+          setDescription("Decentraland is up to date!")
+        })
       })
     })
 
@@ -55,8 +56,13 @@ const App = () => {
     ipcRenderer.send('download', { remoteVersion })
   }
 
-  const playGame = () => {
+  const executeDecentraland = () => {
     ipcRenderer.send('executeProcess')
+  }
+
+  const clearCache = () => {
+    ipcRenderer.send('clearCache')
+    setDownloadState(DownloadState.NewVersion)
   }
 
   return (
@@ -72,8 +78,11 @@ const App = () => {
         <button onClick={downloadArtifacts} disabled={downloadState !== DownloadState.NewVersion}>
           Download
         </button>
-        <button onClick={playGame} disabled={downloadState !== DownloadState.ReadyToPlay}>
+        <button onClick={executeDecentraland} disabled={downloadState !== DownloadState.ReadyToPlay}>
           Play
+        </button>
+        <button onClick={clearCache} disabled={downloadState === DownloadState.Loading}>
+          Clear Cache
         </button>
       </header>
     </div>
