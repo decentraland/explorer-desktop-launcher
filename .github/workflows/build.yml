@@ -36,8 +36,9 @@ jobs:
       #     github_token: ${{ secrets.github_token }}
       - name: upload
         env:
+          AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           node scripts/prepare-artifacts.js ${{ matrix.ext }}
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} && AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} && npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder "./output/" --bucket-folder "launcher/main"
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder output --bucket-folder "launcher/main"
