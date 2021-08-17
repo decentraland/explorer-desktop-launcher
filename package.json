@@ -51,7 +51,7 @@
       "buildResources": "assets"
     },
     "win": {
-      "icon": "public/favicon.ico"
+      "icon": "public/logo512.png"
     },
     "linux": {
       "icon": "public/logo512.png"
