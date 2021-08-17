@@ -26,11 +26,11 @@ jobs:
           node-version: 14
 
       - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
+        uses: kuruk-mm/action-electron-builder@master
         with:
           github_token: ${{ secrets.github_token }}
 
-          release: never
+          publish: never
       - name: upload
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
