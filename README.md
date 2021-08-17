@@ -48,8 +48,8 @@ my-app/
 
 ## Artifacts
 
-- Windows: https://renderer-artifacts.decentraland.org/launcher/main/decentraland-launcher.exe
-- Linux: https://renderer-artifacts.decentraland.org/launcher/main/decentraland-launcher.AppImage
-- Mac: https://renderer-artifacts.decentraland.org/launcher/main/decentraland-launcher.dmg
+- Windows: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.exe
+- Linux: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.AppImage
+- Mac: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.dmg
 
-The format is the following: https://renderer-artifacts.decentraland.org/launcher/{branch}/decentraland-launcher.{extension}
+The format is the following: https://renderer-artifacts.decentraland.org/launcher-branch/{branch}/decentraland-launcher.{extension}

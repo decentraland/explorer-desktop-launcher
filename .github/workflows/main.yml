@@ -16,7 +16,7 @@ jobs:
             After the CI passes:
 
             This branch can be downloaded with the following links:
-            - Windows: https://renderer-artifacts.decentraland.org/launcher/${{ github.head_ref }}/decentraland-launcher.exe
-            - Linux: https://renderer-artifacts.decentraland.org/launcher/${{ github.head_ref }}/decentraland-launcher.AppImage
-            - Mac: https://renderer-artifacts.decentraland.org/launcher/${{ github.head_ref }}/decentraland-launcher.dmg
+            - Windows: https://renderer-artifacts.decentraland.org/launcher-branch/${{ github.head_ref }}/decentraland-launcher.exe
+            - Linux: https://renderer-artifacts.decentraland.org/launcher-branch/${{ github.head_ref }}/decentraland-launcher.AppImage
+            - Mac: https://renderer-artifacts.decentraland.org/launcher-branch/${{ github.head_ref }}/decentraland-launcher.dmg
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
