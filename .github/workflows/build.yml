@@ -9,12 +9,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
-            ext: dmg
+          # - os: macos-latest
+          #   ext: dmg
           - os: ubuntu-latest
             ext: AppImage
-          - os: windows-latest
-            ext: exe
+          # - os: windows-latest
+          #   ext: exe
 
     steps:
       - name: Check out Git repository
@@ -40,4 +40,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           node scripts/prepare-artifacts.js ${{ matrix.ext }}
-          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder "output/" --bucket-folder "launcher/${{ github.head_ref }}"
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder "output/" --bucket-folder "launcher/main"
