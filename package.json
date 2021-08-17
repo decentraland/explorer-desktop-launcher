@@ -49,6 +49,15 @@
     ],
     "directories": {
       "buildResources": "assets"
+    },
+    "win": {
+      "icon": "public/favicon.ico"
+    },
+    "linux": {
+      "icon": "public/logo512.png"
+    },
+    "mac": {
+      "icon": "public/logo512.png"
     }
   },
   "eslintConfig": {

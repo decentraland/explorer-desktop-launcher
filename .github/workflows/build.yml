@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 14
       - name: build electron app
-        with:
+        env:
           github_token: ${{ secrets.github_token }}
         run: |
           npm install
