@@ -32,14 +32,7 @@ jobs:
           npm install
           npm run electron:build
 
-      - name: Extract branch name (Linux & Mac)
-        shell: bash
-        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
-        if: ${{ matrix.os != "windows-latest "}}
-      - name: Extract branch name (Windows)
-        shell: bash
-        run: echo ("::set-env name=BRANCH_NAME::" + $env:GITHUB_REF.replace('refs/heads/', ''))
-        if: ${{ matrix.os == "windows-latest "}}
+      - uses: nelonoel/branch-name@v1.0.1
 
       - name: Upload artifacts
         env:
