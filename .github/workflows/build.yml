@@ -32,8 +32,9 @@ jobs:
           npm install
           npm run electron:build
 
-      - uses: nelonoel/branch-name@v1.0.1
-
+      - name: Extract branch name
+        uses: vazco/github-actions-branch-name@v1
+        id: branch
       - name: Upload artifacts
         env:
           AWS_DEFAULT_REGION: us-east-1
@@ -41,4 +42,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           node scripts/prepare-artifacts.js ${{ matrix.ext }}
-          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder output --bucket-folder "launcher-branch/$BRANCH_NAME"
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder output --bucket-folder "launcher-branch/${{ steps.branch.outputs.branch_name }}"
