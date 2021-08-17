@@ -40,7 +40,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           node scripts/prepare-artifacts.js ${{ matrix.ext }}
-          npx @dcl/cdn-uploader@next \
-            --bucket ${{ secrets.S3_BUCKET }} \
-            --local-folder "output/" \
-            --bucket-folder "launcher/${{ github.head_ref }}"
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder "output/" --bucket-folder "launcher/${{ github.head_ref }}"
