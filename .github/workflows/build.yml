@@ -24,21 +24,28 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14
-      - name: build electron app
+
+      - name: Build Electron App
         env:
           github_token: ${{ secrets.github_token }}
         run: |
           npm install
           npm run electron:build
-      # - name: Build/release Electron app
-      #   uses: samuelmeuli/action-electron-builder@v1
-      #   with:
-      #     github_token: ${{ secrets.github_token }}
-      - name: upload
+
+      - name: Extract branch name (Linux & Mac)
+        shell: bash
+        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
+        if: ${{ matrix.os != "windows-latest "}}
+      - name: Extract branch name (Windows)
+        shell: bash
+        run: echo ("::set-env name=BRANCH_NAME::" + $env:GITHUB_REF.replace('refs/heads/', ''))
+        if: ${{ matrix.os == "windows-latest "}}
+
+      - name: Upload artifacts
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           node scripts/prepare-artifacts.js ${{ matrix.ext }}
-          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder output --bucket-folder "launcher-branch/${GITHUB_REF#refs/heads/}"
+          npx @dcl/cdn-uploader@next --bucket ${{ secrets.S3_BUCKET }} --local-folder output --bucket-folder "launcher-branch/${BRANCH_NAME}"
