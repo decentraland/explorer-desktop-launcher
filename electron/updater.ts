@@ -56,7 +56,7 @@ const registerDownloadEvent = (rendererPath : string, versionPath : string, arti
           onCompleted: (file) => {
             console.log("onCompleted:", file)
             unzip(file.path, rendererPath, () => {
-              fs.unlinkSync(file.path)
+              fs.rmSync(file.path)
       
               const versionData = { 
                 version: remoteVersion
@@ -78,7 +78,7 @@ export const registerUpdaterEvents = (rendererPath : string, versionPath : strin
     registerVersionEvent(versionPath)
 
     // Register event to execute process
-    registerExecuteProcessEvent(executablePath)
+    registerExecuteProcessEvent(executablePath + getOSExtension())
 
     // Register event to download
     registerDownloadEvent(rendererPath, versionPath, artifactUrl)
@@ -100,4 +100,17 @@ export const getOSName = () : string | null => {
         default:
             return null
     }
+}
+
+export const getOSExtension = () : string | null => {
+  switch(process.platform) {
+      case "darwin":
+          return ".dmg"
+      case "linux":
+          return ""
+      case "win32":
+          return ".exe"
+      default:
+          return null
+  }
 }

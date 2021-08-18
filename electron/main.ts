@@ -14,12 +14,17 @@ if (getOSName() === null) {
   exit(1)
 }
 
-const rendererPath = app.getPath("appData") + "/decentraland/renderer"
-const executablePath = `${ rendererPath }/unity-renderer-${ osName }`
-const versionPath = `${ rendererPath }/version.json`
+let rendererPath = app.getPath("appData") + "/decentraland/renderer"
+let executablePath = `${ rendererPath }/unity-renderer-${ osName }`
+let versionPath = `${ rendererPath }/version.json`
 const artifactUrl = `https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-${ osName }.zip`
 
-console.log("rendererPath:", rendererPath)
+if (getOSName() === "windows") {
+  rendererPath = rendererPath.replace(/\//gi, "\\")
+  versionPath = versionPath.replace(/\//gi, "\\")
+  executablePath = executablePath.replace(/\//gi, "\\")
+}
+
 registerUpdaterEvents(rendererPath, versionPath, executablePath, artifactUrl)
 
 function createWindow() {

@@ -1,6 +1,7 @@
 const DecompressZip = require('decompress-zip');
 
 export const unzip = (zipFilePath : string, destinationPath : string, onCompleted : () => void) => {
+    console.log("zipFilePath", zipFilePath, "destinationPath", destinationPath)
     const unZipper = new DecompressZip(zipFilePath);
 
     // Add the error event listener

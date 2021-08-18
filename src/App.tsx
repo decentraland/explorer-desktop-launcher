@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
-import { useEffect, useState } from 'react';
-const { ipcRenderer } = window.require('electron');
+import logo from "./logo.svg"
+import "./App.css"
+import { useEffect, useState } from "react"
+const { ipcRenderer } = window.require("electron")
 
 enum DownloadState {
   Loading = 0,
   NewVersion,
   Downloading,
-  ReadyToPlay
+  ReadyToPlay,
 }
 
-let remoteVersion : string | null = null
+let remoteVersion: string | null = null
 
 const App = () => {
   const [progress, setProgress] = useState<number>(0)
   const [description, setDescription] = useState<string>("")
-  const [downloadState, setDownloadState] = useState<DownloadState>(DownloadState.Loading)
+  const [downloadState, setDownloadState] = useState<DownloadState>(
+    DownloadState.Loading
+  )
   useEffect(() => {
     setDescription("Checking for updates")
-    ipcRenderer.on("getVersion", (event: any, localVersion: string | null) => {
-      fetch('https://renderer-artifacts.decentraland.org/desktop/main/version.json').then(async (response) => {
+    ipcRenderer.on(
+      "getVersion",
+      async (event: any, localVersion: string | null) => {
+        const init: RequestInit = {
+          method: "GET", // Method
+          mode: "no-cors", // Options: no-cors, cors, same-origin
+          credentials: "omit", // Options: include, same-origin, omit
+        }
+
+        const response = await fetch(
+          "https://renderer-artifacts.decentraland.org/desktop/main/version.json",
+          init
+        )
+
         const body = await response.json()
         const version = body.version
 
@@ -45,23 +59,23 @@ const App = () => {
           setDownloadState(DownloadState.ReadyToPlay)
           setDescription("Decentraland is up to date!")
         })
-      })
-    })
+      }
+    )
 
-    ipcRenderer.send('getVersion')
+    ipcRenderer.send("getVersion")
   }, [])
 
   const downloadArtifacts = () => {
     console.log("downloadArtifacts", remoteVersion)
-    ipcRenderer.send('download', { remoteVersion })
+    ipcRenderer.send("download", { remoteVersion })
   }
 
   const executeDecentraland = () => {
-    ipcRenderer.send('executeProcess')
+    ipcRenderer.send("executeProcess")
   }
 
   const clearCache = () => {
-    ipcRenderer.send('clearCache')
+    ipcRenderer.send("clearCache")
     setDownloadState(DownloadState.NewVersion)
   }
 
@@ -69,24 +83,29 @@ const App = () => {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          {description}
-        </p>
-        <p>
-          Progress: {progress}%
-        </p>
-        <button onClick={downloadArtifacts} disabled={downloadState !== DownloadState.NewVersion}>
+        <p>{description}</p>
+        <p>Progress: {progress}%</p>
+        <button
+          onClick={downloadArtifacts}
+          disabled={downloadState !== DownloadState.NewVersion}
+        >
           Download
         </button>
-        <button onClick={executeDecentraland} disabled={downloadState !== DownloadState.ReadyToPlay}>
+        <button
+          onClick={executeDecentraland}
+          disabled={downloadState !== DownloadState.ReadyToPlay}
+        >
           Play
         </button>
-        <button onClick={clearCache} disabled={downloadState === DownloadState.Loading}>
+        <button
+          onClick={clearCache}
+          disabled={downloadState === DownloadState.Loading}
+        >
           Clear Cache
         </button>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
