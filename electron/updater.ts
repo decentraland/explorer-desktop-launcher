@@ -105,7 +105,7 @@ export const getOSName = () : string | null => {
 export const getOSExtension = () : string | null => {
   switch(process.platform) {
       case "darwin":
-          return ".dmg"
+          return ".app"
       case "linux":
           return ""
       case "win32":
