@@ -1,27 +1,27 @@
-const DecompressZip = require('decompress-zip');
+const DecompressZip = require('decompress-zip')
 
-export const unzip = (zipFilePath : string, destinationPath : string, onCompleted : () => void) => {
-    console.log("zipFilePath", zipFilePath, "destinationPath", destinationPath)
-    const unZipper = new DecompressZip(zipFilePath);
+export const unzip = (zipFilePath: string, destinationPath: string, onCompleted: () => void) => {
+  console.log('zipFilePath', zipFilePath, 'destinationPath', destinationPath)
+  const unZipper = new DecompressZip(zipFilePath)
 
-    // Add the error event listener
-    unZipper.on('error', (err : any) => {
-        console.log('Caught an error', err);
-    });
-    
-    // Notify when everything is extracted
-    unZipper.on('extract', (log : string) => {
-        console.log('Finished extracting', log);
-        onCompleted()
-    });
-    
-    // Notify "progress" of the decompressed files
-    unZipper.on('progress', (fileIndex : number, fileCount : number) => {
-        console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount);
-    });
-    
-    // Unzip !
-    unZipper.extract({
-        path: destinationPath
-    });
+  // Add the error event listener
+  unZipper.on('error', (err: any) => {
+    console.log('Caught an error', err)
+  })
+
+  // Notify when everything is extracted
+  unZipper.on('extract', (log: string) => {
+    console.log('Finished extracting', log)
+    onCompleted()
+  })
+
+  // Notify "progress" of the decompressed files
+  unZipper.on('progress', (fileIndex: number, fileCount: number) => {
+    console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount)
+  })
+
+  // Unzip !
+  unZipper.extract({
+    path: destinationPath
+  })
 }

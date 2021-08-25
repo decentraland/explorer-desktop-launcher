@@ -1,28 +1,28 @@
-import { remote, app, BrowserWindow } from 'electron';
-import * as path from 'path';
-import * as isDev from 'electron-is-dev';
-import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
+import { remote, app, BrowserWindow } from 'electron'
+import * as path from 'path'
+import * as isDev from 'electron-is-dev'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import { registerUpdaterEvents, getOSName } from './updater'
-import { exit } from 'process';
+import { exit } from 'process'
 
-const osName = getOSName();
+const osName = getOSName()
 
-console.log("OS:", osName)
+console.log('OS:', osName)
 
 if (getOSName() === null) {
-  console.error("OS not supported")
+  console.error('OS not supported')
   exit(1)
 }
 
-let rendererPath = app.getPath("appData") + "/decentraland/renderer"
-let executablePath = `${ rendererPath }/unity-renderer-${ osName }`
-let versionPath = `${ rendererPath }/version.json`
-const artifactUrl = `https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-${ osName }.zip`
+let rendererPath = app.getPath('appData') + '/decentraland/renderer'
+let executablePath = `${rendererPath}/unity-renderer-${osName}`
+let versionPath = `${rendererPath}/version.json`
+const artifactUrl = `https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-${osName}.zip`
 
-if (getOSName() === "windows") {
-  rendererPath = rendererPath.replace(/\//gi, "\\")
-  versionPath = versionPath.replace(/\//gi, "\\")
-  executablePath = executablePath.replace(/\//gi, "\\")
+if (getOSName() === 'windows') {
+  rendererPath = rendererPath.replace(/\//gi, '\\')
+  versionPath = versionPath.replace(/\//gi, '\\')
+  executablePath = executablePath.replace(/\//gi, '\\')
 }
 
 registerUpdaterEvents(rendererPath, versionPath, executablePath, artifactUrl)
@@ -33,8 +33,9 @@ function createWindow() {
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule:true,
+      enableRemoteModule: true,
       contextIsolation: false,
+      webSecurity: isDev,
       preload: path.join(__dirname, 'preload.js')
     }
   })
@@ -42,29 +43,31 @@ function createWindow() {
   win.setMenuBarVisibility(false)
 
   if (isDev) {
-    win.loadURL('http://localhost:3000/index.html');
+    win.loadURL('http://localhost:3000/index.html')
   } else {
     // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`);
+    win.loadURL(`file://${__dirname}/../index.html`)
   }
 
   // Hot Reloading
   if (isDev) {
     // 'node_modules/.bin/electronPath'
     require('electron-reload')(__dirname, {
-      electron: path.join(__dirname,
+      electron: path.join(
+        __dirname,
         '..',
         '..',
         'node_modules',
         '.bin',
-        'electron' + (process.platform === "win32" ? ".cmd" : "")),
+        'electron' + (process.platform === 'win32' ? '.cmd' : '')
+      ),
       forceHardReset: true,
       hardResetMethod: 'exit'
-    });
+    })
   }
 
   if (isDev) {
-    win.webContents.openDevTools({ mode: 'detach' });
+    win.webContents.openDevTools({ mode: 'detach' })
   }
 }
 
@@ -72,19 +75,19 @@ app.whenReady().then(() => {
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err));
+    .catch((err) => console.log('An error occurred: ', err))
 
-  createWindow();
+  createWindow()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow()
     }
-  });
+  })
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-      app.quit();
+      app.quit()
     }
-  });
-});
+  })
+})

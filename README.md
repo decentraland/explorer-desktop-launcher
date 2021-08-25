@@ -1,3 +1,7 @@
+# Decentraland Explorer Desktop Launcher
+
+A launcher to auto update the `explorer-desktop` (https://github.com/decentraland/explorer-desktop)
+
 ## Available Scripts
 
 ### `npm run electron:dev`
