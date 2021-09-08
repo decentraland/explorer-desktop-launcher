@@ -5,8 +5,29 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 import { registerUpdaterEvents, getOSName } from './updater'
 import { exit } from 'process'
 
+const config = {
+  urlParams: '',
+  openBrowser: true
+}
+
+process.argv.shift() // Skip process name
+while (process.argv.length != 0) {
+  switch (process.argv[0]) {
+    case '--url-params':
+      process.argv.shift()
+      config.urlParams = process.argv[0]
+      break
+    case '--browser':
+      process.argv.shift()
+      config.openBrowser = process.argv[0].toString() === 'true'
+      break
+  }
+  process.argv.shift()
+}
+
 const osName = getOSName()
 
+console.log('Config:', config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
@@ -14,10 +35,12 @@ if (getOSName() === null) {
   exit(1)
 }
 
-let rendererPath = app.getPath('appData') + '/decentraland/renderer'
-let executablePath = `${rendererPath}/unity-renderer-${osName}`
-let versionPath = `${rendererPath}/version.json`
-const artifactUrl = `https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-${osName}.zip`
+let rendererPath = `${app.getPath('appData')}/decentraland/renderer/`
+let executablePath = `/unity-renderer-${osName}`
+let versionPath = `/version.json`
+const baseUrl = `https://renderer-artifacts.decentraland.org/desktop/`
+const artifactUrl = `/unity-renderer-${osName}.zip`
+const remoteVersionUrl = `/version.json`
 
 if (getOSName() === 'windows') {
   rendererPath = rendererPath.replace(/\//gi, '\\')
@@ -25,7 +48,7 @@ if (getOSName() === 'windows') {
   executablePath = executablePath.replace(/\//gi, '\\')
 }
 
-registerUpdaterEvents(rendererPath, versionPath, executablePath, artifactUrl)
+registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -35,7 +58,7 @@ function createWindow() {
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
-      webSecurity: isDev,
+      webSecurity: !isDev,
       preload: path.join(__dirname, 'preload.js')
     }
   })

@@ -3,10 +3,18 @@ import { unzip } from './decompress'
 import { BrowserWindow, ipcMain } from 'electron'
 import * as fs from 'fs'
 
-const getCurrentVersion = (versionPath: string): string | null => {
+const developerMode = true
+
+const branches = {
+  kernelBranch: 'main',
+  rendererBranch: 'main'
+}
+
+const getCurrentVersion = (rendererPath: string, versionPath: string): string | null => {
+  const path = rendererPath + getBranchName() + versionPath
   let version: string | null = null
-  if (fs.existsSync(versionPath)) {
-    const rawData = fs.readFileSync(versionPath)
+  if (fs.existsSync(path)) {
+    const rawData = fs.readFileSync(path)
     const body = JSON.parse(rawData.toString())
     version = body.version
   }
@@ -14,15 +22,25 @@ const getCurrentVersion = (versionPath: string): string | null => {
   return version
 }
 
-const registerVersionEvent = (versionPath: string) => {
-  const version = getCurrentVersion(versionPath)
+const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl: string, remoteVersionUrl: string) => {
+  ipcMain.on('getVersion', (event, kernelBranch?: string, rendererBranch?: string) => {
+    if (kernelBranch) branches.kernelBranch = kernelBranch
+    if (rendererBranch) branches.rendererBranch = rendererBranch
 
-  ipcMain.on('getVersion', (event) => {
-    event.sender.send('getVersion', version)
+    const version = getCurrentVersion(rendererPath, versionPath)
+    event.sender.send('getVersion', version, baseUrl + rendererBranch + remoteVersionUrl)
+  })
+
+  ipcMain.on('rendererReady', (event) => {
+    event.sender.send('init', developerMode)
   })
 }
 
-const registerExecuteProcessEvent = (executablePath: string) => {
+const getBranchName = () => {
+  return branches.rendererBranch.replace(/\//gi, '-')
+}
+
+const registerExecuteProcessEvent = (rendererPath: string, executablePath: string, config: any) => {
   ipcMain.on('executeProcess', (event) => {
     const onExecute = (err: any, data: any) => {
       if (err) {
@@ -33,24 +51,44 @@ const registerExecuteProcessEvent = (executablePath: string) => {
       console.log(data.toString())
     }
 
+    let path = rendererPath + getBranchName() + executablePath
+
+    let params = config.urlParams
+
+    if (branches.kernelBranch) {
+      params = `"kernel-branch=${branches.kernelBranch}"`
+    }
+
+    if (params) {
+      path = `${path} --url-params ${params}`
+    }
+
+    if (typeof config.openBrowser === 'boolean') {
+      path = `${path} --browser ${config.openBrowser ? 'true' : 'false'}`
+    }
+
+    console.log('Execute path: ', path)
+
     if (getOSName() === 'mac') {
       const { exec } = require('child_process')
-      exec('open "' + executablePath + '"', onExecute)
+      exec('open "' + path + '"', onExecute)
     } else {
-      const { execFile } = require('child_process')
-      execFile(executablePath, onExecute)
+      const { exec } = require('child_process')
+      exec(path, onExecute)
     }
   })
 }
 
-const registerDownloadEvent = (rendererPath: string, versionPath: string, artifactUrl: string) => {
+const registerDownloadEvent = (rendererPath: string, versionPath: string, baseUrl: string, artifactUrl: string) => {
   //electronDl();
   ipcMain.on('download', async (event, { remoteVersion }) => {
-    fs.rmdirSync(rendererPath, { recursive: true })
+    const branchPath = rendererPath + getBranchName()
+    fs.rmdirSync(branchPath, { recursive: true })
     const win = BrowserWindow.getFocusedWindow() as BrowserWindow
-    console.log('artifactUrl: ', artifactUrl)
-    const res = await electronDl.download(win, artifactUrl, {
-      directory: rendererPath,
+    const url = baseUrl + branches.rendererBranch + artifactUrl
+    console.log('artifactUrl: ', url)
+    const res = await electronDl.download(win, url, {
+      directory: branchPath,
       onStarted: (item) => {
         console.log('onStarted:', item)
         event.sender.send('downloadStart')
@@ -61,14 +99,16 @@ const registerDownloadEvent = (rendererPath: string, versionPath: string, artifa
       },
       onCompleted: (file) => {
         console.log('onCompleted:', file)
-        unzip(file.path, rendererPath, () => {
+        unzip(file.path, branchPath, () => {
           fs.rmSync(file.path)
 
           const versionData = {
             version: remoteVersion
           }
 
-          fs.writeFileSync(versionPath, JSON.stringify(versionData))
+          const path = branchPath + versionPath
+
+          fs.writeFileSync(path, JSON.stringify(versionData))
 
           event.sender.send('downloadCompleted')
         })
@@ -80,19 +120,22 @@ const registerDownloadEvent = (rendererPath: string, versionPath: string, artifa
 }
 
 export const registerUpdaterEvents = (
+  baseUrl: string,
   rendererPath: string,
   versionPath: string,
   executablePath: string,
-  artifactUrl: string
+  artifactUrl: string,
+  remoteVersionUrl: string,
+  config: any
 ) => {
   // Get version
-  registerVersionEvent(versionPath)
+  registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
 
   // Register event to execute process
-  registerExecuteProcessEvent(executablePath + getOSExtension())
+  registerExecuteProcessEvent(rendererPath, executablePath + getOSExtension(), config)
 
   // Register event to download
-  registerDownloadEvent(rendererPath, versionPath, artifactUrl)
+  registerDownloadEvent(rendererPath, versionPath, baseUrl, artifactUrl)
 
   // Register clear cache
   ipcMain.on('clearCache', async (event) => {
