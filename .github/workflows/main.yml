@@ -13,7 +13,7 @@ jobs:
         uses: vazco/github-actions-branch-name@v1
         id: branch
       - name: Comment PR
-        uses: thollander/actions-comment-pull-request@master
+        uses: thollander/actions-comment-pull-request@main
         with:
           message: |
             After the CI passes:
