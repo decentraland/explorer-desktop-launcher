@@ -7,7 +7,8 @@ import { exit } from 'process'
 
 const config = {
   urlParams: '',
-  openBrowser: true
+  openBrowser: true,
+  developerMode: false
 }
 
 process.argv.shift() // Skip process name
@@ -20,6 +21,9 @@ while (process.argv.length != 0) {
     case '--browser':
       process.argv.shift()
       config.openBrowser = process.argv[0].toString() === 'true'
+      break
+    case '--developer-mode':
+      config.developerMode = true
       break
   }
   process.argv.shift()

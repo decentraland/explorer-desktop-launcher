@@ -3,8 +3,6 @@ import { unzip } from './decompress'
 import { BrowserWindow, ipcMain } from 'electron'
 import * as fs from 'fs'
 
-const developerMode = true
-
 const branches = {
   kernelBranch: 'main',
   rendererBranch: 'main'
@@ -22,7 +20,13 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
   return version
 }
 
-const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl: string, remoteVersionUrl: string) => {
+const registerVersionEvent = (
+  rendererPath: string,
+  versionPath: string,
+  baseUrl: string,
+  remoteVersionUrl: string,
+  config: any
+) => {
   ipcMain.on('getVersion', (event, kernelBranch?: string, rendererBranch?: string) => {
     if (kernelBranch) branches.kernelBranch = kernelBranch
     if (rendererBranch) branches.rendererBranch = rendererBranch
@@ -32,7 +36,7 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
   })
 
   ipcMain.on('rendererReady', (event) => {
-    event.sender.send('init', developerMode)
+    event.sender.send('init', config.developerMode)
   })
 }
 
@@ -129,7 +133,7 @@ export const registerUpdaterEvents = (
   config: any
 ) => {
   // Get version
-  registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
+  registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl, config)
 
   // Register event to execute process
   registerExecuteProcessEvent(rendererPath, executablePath + getOSExtension(), config)
