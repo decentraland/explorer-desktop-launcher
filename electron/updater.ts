@@ -32,7 +32,7 @@ const registerVersionEvent = (
     if (rendererBranch) branches.rendererBranch = rendererBranch
 
     const version = getCurrentVersion(rendererPath, versionPath)
-    event.sender.send('getVersion', version, baseUrl + rendererBranch + remoteVersionUrl)
+    event.sender.send('getVersion', version, baseUrl + branches.rendererBranch + remoteVersionUrl)
   })
 
   ipcMain.on('rendererReady', (event) => {
