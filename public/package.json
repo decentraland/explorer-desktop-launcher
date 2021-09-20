@@ -1,0 +1,19 @@
+{
+  "name": "@dcl/explorer-website",
+  "version": "0.0.1",
+  "description": "The website for decentraland's explorer ",
+  "main": "website.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/decentraland/explorer-website.git"
+  },
+  "author": "Decentraland contributors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/decentraland/explorer-website/issues"
+  },
+  "homepage": ""
+}

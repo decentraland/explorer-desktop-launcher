@@ -1,12 +1,41 @@
-import { remote, app, BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
-import { registerUpdaterEvents, getOSName } from './updater'
+import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
+import * as serve from 'electron-serve'
+
+
+const loadURL = serve({directory: `${__dirname}/../`});
+
+const config = {
+  urlParams: '',
+  openBrowser: false,
+  developerMode: false
+}
+
+process.argv.shift() // Skip process name
+while (process.argv.length != 0) {
+  switch (process.argv[0]) {
+    case '--url-params':
+      process.argv.shift()
+      config.urlParams = process.argv[0]
+      break
+    case '--browser':
+      process.argv.shift()
+      config.openBrowser = process.argv[0].toString() === 'true'
+      break
+    case '--developer-mode':
+      config.developerMode = true
+      break
+  }
+  process.argv.shift()
+}
 
 const osName = getOSName()
 
+console.log('Config:', config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
@@ -14,10 +43,12 @@ if (getOSName() === null) {
   exit(1)
 }
 
-let rendererPath = app.getPath('appData') + '/decentraland/renderer'
-let executablePath = `${rendererPath}/unity-renderer-${osName}`
-let versionPath = `${rendererPath}/version.json`
-const artifactUrl = `https://renderer-artifacts.decentraland.org/desktop/main/unity-renderer-${osName}.zip`
+let rendererPath = `${app.getPath('appData')}/decentraland/renderer/`
+let executablePath = `/unity-renderer-${osName}`
+let versionPath = `/version.json`
+const baseUrl = `https://renderer-artifacts.decentraland.org/desktop/`
+const artifactUrl = `/unity-renderer-${osName}.zip`
+const remoteVersionUrl = `/version.json`
 
 if (getOSName() === 'windows') {
   rendererPath = rendererPath.replace(/\//gi, '\\')
@@ -25,32 +56,40 @@ if (getOSName() === 'windows') {
   executablePath = executablePath.replace(/\//gi, '\\')
 }
 
-registerUpdaterEvents(rendererPath, versionPath, executablePath, artifactUrl)
+registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
-function createWindow() {
+const createWindow = async () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 900,
+    height: 720,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
-      webSecurity: isDev,
-      preload: path.join(__dirname, 'preload.js')
+      //webSecurity: !isDev,
+      webSecurity: false,
+      preload: path.join(__dirname, 'preload.js'),
     }
   })
 
   win.setMenuBarVisibility(false)
-
-  if (isDev) {
-    win.loadURL('http://localhost:3000/index.html')
-  } else {
-    // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`)
+  try {
+    const port = await getFreePort()
+    if (isDev) {
+      win.loadURL(`http://localhost:3000/index.html?ws=ws://localhost:${port}/dcl&${config.urlParams}`)
+    } else {
+      loadURL(win).then(() => {
+        win.loadURL(`app://-?ws=ws://localhost:${port}/dcl&kernel-branch=feat/ws-reconnect&${config.urlParams}`)
+      })
+      // 'build/index.html'
+      //win.loadURL(`file://${__dirname}/../index.html?ws=ws://localhost:5000/dcl`)
+    }
+  } catch(err) {
+    console.error('err:', err)
   }
 
   // Hot Reloading
-  if (isDev) {
+  /*if (isDev) {
     // 'node_modules/.bin/electronPath'
     require('electron-reload')(__dirname, {
       electron: path.join(
@@ -64,9 +103,9 @@ function createWindow() {
       forceHardReset: true,
       hardResetMethod: 'exit'
     })
-  }
+  }*/
 
-  if (isDev) {
+  if (isDev || true) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
 }

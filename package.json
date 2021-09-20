@@ -1,42 +1,103 @@
 {
-  "name": "explorer-desktop-launcher",
-  "version": "0.1.0",
-  "author": "decentraland",
-  "description": "Decentraland Desktop Launcher",
-  "homepage": ".",
-  "main": "build/electron/main.js",
+  "name": "@dcl/explorer-website",
+  "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "react:start": "react-scripts start",
+    "react:start:linked": "NODE_ENV=development react-scripts start",
+    "react:build": "react-scripts build",
+    "react:build:full": "npm run react:build && npm run copy-cdn",
+    "react:test": "react-scripts test",
+    "react:eject": "react-scripts eject",
+    "postinstall": "node ./scripts/hash_generator.js",
+    "copy-cdn": "node ./scripts/copy_cdn.js",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public",
+    "electron:dev": "NODE_ENV=development concurrently \"cross-env BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "build": "npm run react:build:full && tsc -p electron",
+    "electron:build": "npm run build && electron-builder --publish never",
+    "electron:cross-build": "npm run build && electron-builder"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 120,
+    "trailingComma": "none"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
-    "@testing-library/jest-dom": "^5.12.0",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^13.1.9",
-    "@types/electron-devtools-installer": "^2.2.0",
-    "@types/jest": "^26.0.23",
+    "@dcl/feature-flags": "^1.0.0",
+    "@dcl/kernel": "^1.0.0-1263234792.commit-0c8a373",
+    "@dcl/kernel-interface": "^2.0.0-20210922153939.commit-017905d",
+    "@dcl/schemas": "^1.6.1",
+    "@dcl/unity-renderer": "^1.0.11513-20210824110223.commit-c8ba20b",
+    "@dcl/urn-resolver": "^1.2.1",
     "@types/node": "^15.6.1",
-    "@types/react": "^17.0.8",
-    "@types/react-dom": "^17.0.5",
+    "axios": "^0.21.4",
+    "decentraland-connect": "^2.20.1",
+    "decentraland-dapps": "^9.7.1",
     "decompress-zip": "^0.3.3",
+    "detect-browser": "^5.2.0",
     "electron-devtools-installer": "^3.2.0",
     "electron-dl": "^3.2.1",
     "electron-is-dev": "^2.0.0",
     "electron-reload": "^1.5.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "typescript": "^4.3.2",
-    "web-vitals": "^1.1.2"
+    "electron-serve": "^1.1.0",
+    "eth-connect": "^6.0.0",
+    "find-free-port": "^2.0.0",
+    "md5-file": "^5.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.1",
+    "react-scripts": "^4.0.0",
+    "redux": "^4.0.5"
   },
-  "scripts": {
-    "react:start": "react-scripts start",
-    "react:build": "react-scripts build",
-    "react:test": "react-scripts test",
-    "postinstall": "electron-builder install-app-deps",
-    "electron:dev": "concurrently \"cross-env BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "build": "npm run react:build && tsc -p electron",
-    "electron:build": "npm run build && electron-builder --publish never",
-    "electron:cross-build": "npm run build && electron-builder",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@storybook/addon-essentials": "^6.0.26",
+    "@storybook/addon-links": "^6.0.26",
+    "@storybook/addon-storyshots": "^6.0.26",
+    "@storybook/node-logger": "^6.0.26",
+    "@storybook/preset-create-react-app": "^3.1.4",
+    "@storybook/react": "^6.0.26",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/jest": "^24.0.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-redux": "^7.1.9",
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "babel-loader": "^8.1.0",
+    "fs-extra": "^10.0.0",
+    "git-rev-sync": "^1.12.0",
+    "react-is": "^16.13.1",
+    "react-test-renderer": "^16.13.1",
+    "redux-devtools-extension": "^2.13.8",
+    "typescript": "~3.7.2",
+    "concurrently": "^6.2.0",
+    "cross-env": "^7.0.3",
+    "electron": "^13.0.1",
+    "electron-builder": "^22.10.5",
+    "wait-on": "^5.3.0"
   },
+  "homepage": "./",
+  "main": "build/electron/main.js",
   "build": {
     "appId": "decentraland.desktop.launcher",
     "productName": "explorer-desktop-launcher",
@@ -52,40 +113,21 @@
     },
     "win": {
       "icon": "public/logo512.png",
-      "target": ["portable"]
+      "target": [
+        "portable"
+      ]
     },
     "linux": {
       "icon": "public/logo512.png",
-      "target": ["AppImage"]
+      "target": [
+        "AppImage"
+      ]
     },
     "mac": {
       "icon": "public/logo512.png",
-      "target": ["dmg"]
+      "target": [
+        "dmg"
+      ]
     }
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "concurrently": "^6.2.0",
-    "cross-env": "^7.0.3",
-    "electron": "^13.0.1",
-    "electron-builder": "^22.10.5",
-    "wait-on": "^5.3.0"
   }
 }

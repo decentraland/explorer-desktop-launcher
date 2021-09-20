@@ -1,59 +1,36 @@
-# Decentraland Explorer Desktop Launcher
+# Decentraland explorer-website
 
-A launcher to auto update the `explorer-desktop` (https://github.com/decentraland/explorer-desktop)
+This repository holds the application shell that launches the web version of Decentraland Explorer.
 
-## Available Scripts
+The responsibility of this repository is to generate the React UI to configure the ethereum providers, handle analytics and ultimately load and start the [kernel](https://github.com/decentraland/kernel) and Renderer.
 
-### `npm run electron:dev`
+Keep in mind that the interaction with the Wallet the user's using is partly being handled by the [kernel](https://github.com/decentraland/kernel) and it's dependencies (like [eth-connect](https://github.com/decentraland/eth-connect)). This repository is reponsible for creating a provider using [decentraland-connect](https://github.com/decentraland/decentraland-connect) and handing that down to the kernel.
 
-Runs the Electron app in the development mode.
-
-The Electron app will reload if you make edits in the `electron` directory.<br>
-You will also see any lint errors in the console.
-
-### `npm run electron:build`
-
-Builds the Electron app package for production to the `dist` folder.
-
-Your Electron app is ready to be distributed!
-
-## Project directory structure
+## How to test
 
 ```bash
-my-app/
-├── package.json
-│
-## render process
-├── tsconfig.json
-├── public/
-├── src/
-│
-## main process
-├── electron/
-│   ├── main.ts
-│   └── tsconfig.json
-│
-## build output
-├── build/
-│   ├── index.html
-│   ├── static/
-│   │   ├── css/
-│   │   └── js/
-│   │
-│   └── electron/
-│      └── main.js
-│
-## distribution packges
-└── dist/
-    ├── mac/
-    │   └── my-app.app
-    └── my-app-0.1.0.dmg
+npm ci
+npm run start
 ```
 
-## Artifacts
+You must test that the application works both in http://localhost:3000 and in http://localhost:3000/cdn/packages/website/index.html since it provides a CDN-like environment.
 
-- Windows: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.exe
-- Linux: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.AppImage
-- Mac: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.dmg
+## How to test with local Kernel
 
-The format is the following: https://renderer-artifacts.decentraland.org/launcher-branch/{branch}/decentraland-launcher.{extension}
+The website has the [kernel](https://github.com/decentraland/kernel) as a dependency. To be able to run the site locally, you have a few options:
+
+1. Edit `.env.development` to point the `KERNEL_PATH` env var to your local kernel folder
+2. Run `npm run postinstall` to update the .env files
+3. Run `npm run start:linked`
+
+If the linking is not working you can try one of two things:
+
+1. Check the path the build is trying to use to find the Kernel by reading the error page. It might look something like `../kernel/static/index.js`
+2. Create the directory structure needed, in this case `mkdir ../kernel/static`
+3. Get the index.js from the kernel dependency installed on node_modules: `cp ./node_modules/@dcl/kernel/index.js ../kernel/static`
+
+Another choice is to:
+
+1. Clone the [kernel](https://github.com/decentraland/kernel) project
+2. Make sure the folder is located where the linking error is trying to find it, usually `../kernel`
+3. Build it locally (check the [kernel README](https://github.com/decentraland/kernel#running-the-explorer))
