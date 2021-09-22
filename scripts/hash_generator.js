@@ -17,6 +17,7 @@ const kernelVersion = JSON.parse(fs.readFileSync(require.resolve('@dcl/kernel/pa
 ENV_CONTENT['KERNEL_PATH'] = path.dirname(require.resolve('@dcl/kernel/package.json'))
 ENV_CONTENT['REACT_APP_WEBSITE_VERSION'] = packageJson.version
 ENV_CONTENT['REACT_APP_KERNEL_VERSION'] = kernelVersion
+ENV_CONTENT['REACT_APP_DESKTOP'] = 'true'
 
 Object.assign(ENV_CONTENT, getPublicUrls())
 
@@ -44,7 +45,7 @@ fs.writeFileSync('./package.json', JSON.stringify(packageJson, null, 2))
 fs.writeFileSync('./public/package.json', JSON.stringify(publicPackageJson, null, 2))
 
 function getPublicUrls() {
-  if (!process.env.GEN_STATIC_LOCAL) {
+  /*if (!process.env.GEN_STATIC_LOCAL) {
     if (process.env.GITHUB_BASE_REF) {
       // Pull request
       return {
@@ -58,7 +59,7 @@ function getPublicUrls() {
         REACT_APP_KERNEL_BASE_URL: ``
       }
     }
-  }
+  }*/
   // localhost
   return {
     PUBLIC_URL: ``,

@@ -1,5 +1,5 @@
 {
-  "name": "@dcl/explorer-website",
+  "name": "@dcl/explorer-desktop-launcher",
   "version": "0.0.1",
   "private": true,
   "scripts": {
