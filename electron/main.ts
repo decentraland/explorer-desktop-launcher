@@ -79,10 +79,8 @@ const createWindow = async () => {
       win.loadURL(`http://localhost:3000/index.html?ws=ws://localhost:${port}/dcl&${config.urlParams}`)
     } else {
       loadURL(win).then(() => {
-        win.loadURL(`app://-?ws=ws://localhost:${port}/dcl&kernel-branch=feat/ws-reconnect&${config.urlParams}`)
+        win.loadURL(`app://-?ws=ws://localhost:${port}/dcl&${config.urlParams}`)
       })
-      // 'build/index.html'
-      //win.loadURL(`file://${__dirname}/../index.html?ws=ws://localhost:5000/dcl`)
     }
   } catch(err) {
     console.error('err:', err)
