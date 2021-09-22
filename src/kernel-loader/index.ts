@@ -1,4 +1,4 @@
-import { disconnect, getEthereumProvider, restoreConnection } from '../eth/provider'
+import { disconnect, getEthereumProvider } from '../eth/provider'
 import { internalTrackEvent, identifyUser, trackCriticalError, disableAnalytics } from '../integration/analytics'
 import { injectKernel } from './injector'
 import {
@@ -14,7 +14,6 @@ import { FeatureFlagsResult, fetchFlags } from '@dcl/feature-flags'
 import { resolveUrlFromUrn } from '@dcl/urn-resolver'
 import { defaultWebsiteErrorTracker, track } from '../utils/tracking'
 import { injectVersions } from '../utils/rolloutVersions'
-import { KernelResult } from '@dcl/kernel-interface'
 import { ENV, NETWORK } from '../integration/queryParamsConfig'
 import { RequestManager } from 'eth-connect'
 
