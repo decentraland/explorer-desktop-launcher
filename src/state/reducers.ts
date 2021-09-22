@@ -1,5 +1,5 @@
 import { AnyAction } from 'redux'
-import { KernelAccountState, KernelResult, KernelError, LoginState } from '@dcl/kernel-interface'
+import { KernelResult, KernelError, LoginState } from '@dcl/kernel-interface'
 import {
   SET_BANNER,
   SET_DOWNLOAD_PROGRESS,

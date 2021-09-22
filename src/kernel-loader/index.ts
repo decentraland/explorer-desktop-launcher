@@ -284,21 +284,21 @@ async function initKernel() {
   return kernel
 }
 
-async function initLogin(kernel: KernelResult) {
+/*async function initLogin(kernel: KernelResult) {
   const provider = await restoreConnection()
   if (provider && provider.account) {
     const providerChainId = await getChainIdFromProvider(provider.provider)
 
     // BUG OF decentraland-connect:
     // provider.chainId DOES NOT reflect the selected chain in the real provider
-    //const storedSession = await kernel.hasStoredSession(provider.account, providerChainId /* provider.chainId */)
+    const storedSession = await kernel.hasStoredSession(provider.account, providerChainId)
 
-    /*if (storedSession) {
+    if (storedSession) {
       track('automatic_relogin', { provider_type: provider.providerType })
       authenticate(provider.providerType).catch(defaultWebsiteErrorTracker)
-    }*/
+    }
   }
-}
+}*/
 
 export function startKernel() {
   if (NETWORK && NETWORK !== 'mainnet' && NETWORK !== 'ropsten') {
@@ -329,7 +329,7 @@ export function startKernel() {
     .then((kernel) => {
       store.dispatch(setKernelLoaded(kernel))
 
-      return initLogin(kernel)
+      //return initLogin(kernel)
     })
     .catch((error) => {
       store.dispatch(setKernelError({ error }))
