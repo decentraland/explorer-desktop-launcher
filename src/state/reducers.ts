@@ -89,8 +89,6 @@ export function bannerReducer(state: BannerState | undefined, action: AnyAction)
   return state || { banner: null }
 }
 
-const CHANGE_LOGIN_STAGE = '[LOGIN_STAGE] change login stage' // TODO: Importar de kernel
-
 export function downloadReducer(state: DownloadState | undefined, action: AnyAction): DownloadState {
   console.log('downloadReducer: ', state, action)
 
@@ -119,7 +117,7 @@ export function downloadReducer(state: DownloadState | undefined, action: AnyAct
 
   console.log('downloadReducer State: ', state)
 
-  if (state.authCompleted && state.currentState == DownloadCurrentState.READY) {
+  if (state.authCompleted && state.currentState === DownloadCurrentState.READY) {
     const { ipcRenderer } = window.require('electron')
     ipcRenderer.send('executeProcess')
     state = { ...state, currentState: DownloadCurrentState.EXECUTED }
