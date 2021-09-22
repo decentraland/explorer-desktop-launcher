@@ -15,7 +15,7 @@
     "build-storybook": "build-storybook -s public",
     "electron:dev": "NODE_ENV=development concurrently \"cross-env BROWSER=none npm run react:start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "build": "npm run react:build:full && tsc -p electron",
-    "electron:build": "npm run build && electron-builder --publish never",
+    "electron:build": "npm run postinstall && npm run build && electron-builder --publish never",
     "electron:cross-build": "npm run build && electron-builder"
   },
   "prettier": {
@@ -95,7 +95,7 @@
     "electron-builder": "^22.10.5",
     "wait-on": "^5.3.0"
   },
-  "homepage": "./",
+  "homepage": "",
   "main": "build/electron/main.js",
   "build": {
     "appId": "decentraland.desktop.launcher",
