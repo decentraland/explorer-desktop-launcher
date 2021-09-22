@@ -34,7 +34,6 @@ function copyPackage(packageName, envValueToCheck) {
   console.log('\n')
 }
 
-copyPackage('@dcl/unity-renderer', process.env.REACT_APP_RENDERER_BASE_URL)
 copyPackage('@dcl/kernel', process.env.REACT_APP_KERNEL_BASE_URL)
 
 console.log('copy-cdn SUCCEED')

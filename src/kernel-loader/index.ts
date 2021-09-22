@@ -124,7 +124,6 @@ declare var globalThis: {
 }
 
 globalThis.KERNEL_BASE_URL = process.env.REACT_APP_KERNEL_BASE_URL
-globalThis.RENDERER_BASE_URL = process.env.REACT_APP_RENDERER_BASE_URL
 
 async function resolveBaseUrl(urn: string): Promise<string> {
   if (urn.startsWith('urn:')) {

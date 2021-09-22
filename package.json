@@ -44,7 +44,6 @@
     "@dcl/kernel": "^1.0.0-1263234792.commit-0c8a373",
     "@dcl/kernel-interface": "^2.0.0-20210922153939.commit-017905d",
     "@dcl/schemas": "^1.6.1",
-    "@dcl/unity-renderer": "^1.0.11513-20210824110223.commit-c8ba20b",
     "@dcl/urn-resolver": "^1.2.1",
     "@types/node": "^15.6.1",
     "axios": "^0.21.4",
