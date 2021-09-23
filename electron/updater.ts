@@ -75,24 +75,25 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
     let path = rendererPath + getBranchName() + executablePath
 
     let params = config.urlParams
+    let extraParams = ''
 
     if (branches.kernelBranch) {
       params = `kernel-branch=${branches.kernelBranch}`
     }
 
     if (params) {
-      path = `${path} --url-params ${params}`
+      extraParams = `${extraParams} --url-params ${params}`
     }
 
     if (typeof config.openBrowser === 'boolean') {
-      path = `${path} --browser ${config.openBrowser ? 'true' : 'false'}`
+      extraParams = `${extraParams} --browser ${config.openBrowser ? 'true' : 'false'}`
     }
 
-    console.log('Execute path: ', path)
+    console.log('Execute path: ', path + extraParams)
 
     if (getOSName() === 'mac') {
       const { exec } = require('child_process')
-      exec('open ' + path, onExecute)
+      exec('open "' + path + '"' + extraParams, onExecute)
     } else {
       const { exec } = require('child_process')
       exec(path, onExecute)
