@@ -77,7 +77,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
     let params = config.urlParams
 
     if (branches.kernelBranch) {
-      params = `"kernel-branch=${branches.kernelBranch}"`
+      params = `kernel-branch=${branches.kernelBranch}`
     }
 
     if (params) {
