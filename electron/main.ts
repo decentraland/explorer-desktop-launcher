@@ -1,29 +1,29 @@
-import { remote, app, BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
-import { registerUpdaterEvents, getOSName } from './updater'
+import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
 
 const config = {
-  urlParams: '',
-  openBrowser: true,
-  developerMode: false
+  developerMode: false,
+  customUrl: '',
+  desktopBranch: 'main'
 }
 
 process.argv.shift() // Skip process name
 while (process.argv.length != 0) {
   switch (process.argv[0]) {
-    case '--url-params':
-      process.argv.shift()
-      config.urlParams = process.argv[0]
-      break
-    case '--browser':
-      process.argv.shift()
-      config.openBrowser = process.argv[0].toString() === 'true'
-      break
     case '--developer-mode':
       config.developerMode = true
+      break
+    case '--custom-url':
+      process.argv.shift()
+      config.customUrl = process.argv[0]
+      break
+    case '--desktop-branch':
+      process.argv.shift()
+      config.desktopBranch = process.argv[0]
       break
   }
   process.argv.shift()
@@ -54,10 +54,10 @@ if (getOSName() === 'windows') {
 
 registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
-function createWindow() {
+const createWindow = async () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 900,
+    height: 720,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -68,32 +68,29 @@ function createWindow() {
   })
 
   win.setMenuBarVisibility(false)
+  try {
+    const port = await getFreePort()
+    if (isDev) {
+      win.loadURL(`http://localhost:3000/index.html?ws=ws://localhost:${port}/dcl`)
+    } else {
+      const stage = config.developerMode ? 'zone' : 'org'
+      let url = `http://play.decentraland.${stage}/?`
 
-  if (isDev) {
-    win.loadURL('http://localhost:3000/index.html')
-  } else {
-    // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`)
+      if (config.customUrl) {
+        url = config.customUrl
+      }
+
+      url = `${url}ws=ws://localhost:${port}/dcl`
+
+      console.log(`Opening: ${url}`)
+
+      win.loadURL(url)
+    }
+  } catch (err) {
+    console.error('err:', err)
   }
 
-  // Hot Reloading
-  if (isDev) {
-    // 'node_modules/.bin/electronPath'
-    require('electron-reload')(__dirname, {
-      electron: path.join(
-        __dirname,
-        '..',
-        '..',
-        'node_modules',
-        '.bin',
-        'electron' + (process.platform === 'win32' ? '.cmd' : '')
-      ),
-      forceHardReset: true,
-      hardResetMethod: 'exit'
-    })
-  }
-
-  if (isDev) {
+  if (isDev || config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
 }
