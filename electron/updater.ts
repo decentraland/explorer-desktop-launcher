@@ -93,7 +93,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
     if (getOSName() === 'mac') {
       const { exec } = require('child_process')
-      exec('open "' + path + '"', onExecute)
+      exec('open "' + path + '" --args' + extraParams, onExecute)
     } else {
       const { exec } = require('child_process')
       exec(path + extraParams, onExecute)
