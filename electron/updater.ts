@@ -1,11 +1,12 @@
 import * as electronDl from 'electron-dl'
 import { unzip } from './decompress'
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import * as fs from 'fs'
+import axios from 'axios'
 
-const branches = {
-  kernelBranch: 'main',
-  rendererBranch: 'main'
+const globalConfig = {
+  remoteVersion: '',
+  desktopBranch: ''
 }
 
 const getCurrentVersion = (rendererPath: string, versionPath: string): string | null => {
@@ -20,32 +21,40 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
   return version
 }
 
-const registerVersionEvent = (
-  rendererPath: string,
-  versionPath: string,
-  baseUrl: string,
-  remoteVersionUrl: string,
-  config: any
-) => {
-  ipcMain.on('getVersion', (event, kernelBranch?: string, rendererBranch?: string) => {
-    if (kernelBranch) branches.kernelBranch = kernelBranch
-    if (rendererBranch) branches.rendererBranch = rendererBranch
-
+const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl: string, remoteVersionUrl: string) => {
+  ipcMain.on('checkVersion', async (event) => {
     const version = getCurrentVersion(rendererPath, versionPath)
-    event.sender.send('getVersion', version, baseUrl + branches.rendererBranch + remoteVersionUrl)
-  })
+    const url = baseUrl + globalConfig.desktopBranch + remoteVersionUrl
 
-  ipcMain.on('rendererReady', (event) => {
-    event.sender.send('init', config.developerMode)
+    console.log('checkVersion', url)
+
+    const response = await axios.get(url)
+    const remoteVersion = response.data.version
+
+    const regex = /[0-9a-f]{40}/g
+    const validVersion = remoteVersion.match(regex)
+
+    globalConfig.remoteVersion = remoteVersion
+
+    if (!validVersion) {
+      // error
+      event.sender.send('downloadState', { type: 'ERROR' })
+    } else if (version === remoteVersion) {
+      // ready
+      event.sender.send('downloadState', { type: 'READY' })
+    } else {
+      // download please
+      event.sender.send('downloadState', { type: 'NEW_VERSION' })
+    }
   })
 }
 
 const getBranchName = () => {
-  return branches.rendererBranch.replace(/\//gi, '-')
+  return globalConfig.desktopBranch.replace(/\//gi, '-')
 }
 
 const registerExecuteProcessEvent = (rendererPath: string, executablePath: string, config: any) => {
-  ipcMain.on('executeProcess', (event) => {
+  ipcMain.once('executeProcess', (event) => {
     const onExecute = (err: any, data: any) => {
       if (err) {
         console.error(err)
@@ -57,49 +66,40 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
     let path = rendererPath + getBranchName() + executablePath
 
-    let params = config.urlParams
-
-    if (branches.kernelBranch) {
-      params = `"kernel-branch=${branches.kernelBranch}"`
-    }
-
-    if (params) {
-      path = `${path} --url-params ${params}`
-    }
+    let extraParams = ''
 
     if (typeof config.openBrowser === 'boolean') {
-      path = `${path} --browser ${config.openBrowser ? 'true' : 'false'}`
+      extraParams = `${extraParams} --browser false`
     }
 
-    console.log('Execute path: ', path)
+    console.log('Execute path: ', path + extraParams)
 
     if (getOSName() === 'mac') {
       const { exec } = require('child_process')
-      exec('open "' + path + '"', onExecute)
+      exec('open "' + path + '" --args' + extraParams, onExecute)
     } else {
       const { exec } = require('child_process')
-      exec(path, onExecute)
+      exec(path + extraParams, onExecute)
     }
   })
 }
-
 const registerDownloadEvent = (rendererPath: string, versionPath: string, baseUrl: string, artifactUrl: string) => {
   //electronDl();
-  ipcMain.on('download', async (event, { remoteVersion }) => {
+  ipcMain.on('download', async (event) => {
     const branchPath = rendererPath + getBranchName()
     fs.rmdirSync(branchPath, { recursive: true })
     const win = BrowserWindow.getFocusedWindow() as BrowserWindow
-    const url = baseUrl + branches.rendererBranch + artifactUrl
+    const url = baseUrl + globalConfig.desktopBranch + artifactUrl
     console.log('artifactUrl: ', url)
     const res = await electronDl.download(win, url, {
       directory: branchPath,
       onStarted: (item) => {
         console.log('onStarted:', item)
-        event.sender.send('downloadStart')
+        event.sender.send('downloadState', { type: 'PROGRESS', progress: 0 })
       },
       onProgress: (progress) => {
         console.log('onProgress:', progress)
-        event.sender.send('downloadProgress', progress.percent * 100)
+        event.sender.send('downloadState', { type: 'PROGRESS', progress: progress.percent * 100 })
       },
       onCompleted: (file) => {
         console.log('onCompleted:', file)
@@ -107,14 +107,13 @@ const registerDownloadEvent = (rendererPath: string, versionPath: string, baseUr
           fs.rmSync(file.path)
 
           const versionData = {
-            version: remoteVersion
+            version: globalConfig.remoteVersion
           }
 
           const path = branchPath + versionPath
 
           fs.writeFileSync(path, JSON.stringify(versionData))
-
-          event.sender.send('downloadCompleted')
+          event.sender.send('downloadState', { type: 'READY' })
         })
       }
     })
@@ -132,8 +131,10 @@ export const registerUpdaterEvents = (
   remoteVersionUrl: string,
   config: any
 ) => {
+  globalConfig.desktopBranch = config.desktopBranch
+
   // Get version
-  registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl, config)
+  registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
 
   // Register event to execute process
   registerExecuteProcessEvent(rendererPath, executablePath + getOSExtension(), config)
@@ -171,4 +172,14 @@ export const getOSExtension = (): string | null => {
     default:
       return null
   }
+}
+
+export const getFreePort = (): Promise<number> => {
+  return new Promise<number>((resolve, reject) => {
+    var fp = require('find-free-port')
+    fp(5000, 5100, (err: any, freePort: number) => {
+      if (err) reject(err)
+      resolve(freePort)
+    })
+  })
 }
