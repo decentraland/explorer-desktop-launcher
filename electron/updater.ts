@@ -66,11 +66,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
     let path = rendererPath + getBranchName() + executablePath
 
-    let extraParams = ''
-
-    if (typeof config.openBrowser === 'boolean') {
-      extraParams = `${extraParams} --browser false`
-    }
+    let extraParams = ' --browser false'
 
     console.log('Execute path: ', path + extraParams)
 
