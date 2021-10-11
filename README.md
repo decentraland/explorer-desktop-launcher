@@ -4,18 +4,22 @@ A launcher to auto update the `explorer-desktop` (https://github.com/decentralan
 
 ## Available Scripts
 
-### `npm run electron:dev`
+### `npm run start`
 
 Runs the Electron app in the development mode.
 
 The Electron app will reload if you make edits in the `electron` directory.<br>
 You will also see any lint errors in the console.
 
-### `npm run electron:build`
+### `npm run build`
 
 Builds the Electron app package for production to the `dist` folder.
 
 Your Electron app is ready to be distributed!
+
+### `npm run publish`
+
+Build and publish
 
 ## Project directory structure
 
@@ -26,7 +30,6 @@ my-app/
 ## render process
 ├── tsconfig.json
 ├── public/
-├── src/
 │
 ## main process
 ├── electron/
