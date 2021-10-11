@@ -55,8 +55,8 @@ my-app/
 
 ## Artifacts
 
-- Windows: https://renderer-artifacts.decentraland.org/launcher-branch/main/Install Decentraland.exe
-- Linux: https://renderer-artifacts.decentraland.org/launcher-branch/main/Decentraland.AppImage
-- Mac: https://renderer-artifacts.decentraland.org/launcher-branch/main/Decentraland.dmg
+- Windows: [https://renderer-artifacts.decentraland.org/launcher-branch/main/Install Decentraland.exe]()
+- Linux: [https://renderer-artifacts.decentraland.org/launcher-branch/main/Decentraland.AppImage]()
+- Mac: [https://renderer-artifacts.decentraland.org/launcher-branch/main/Decentraland.dmg]()
 
 The format is the following: https://renderer-artifacts.decentraland.org/launcher-branch/{branch}/decentraland-launcher.{extension}
