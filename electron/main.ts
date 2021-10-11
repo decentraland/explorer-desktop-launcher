@@ -1,9 +1,10 @@
 import { app, BrowserWindow } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
+import { autoUpdater } from 'electron-updater'
+
 
 const config = {
   developerMode: false,
@@ -54,12 +55,43 @@ if (getOSName() === 'windows') {
 
 registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
+
+// TEST
+
+let globalWin : BrowserWindow | null = null
+function sendStatusToWindow(text: string) {
+  globalWin?.webContents.send('message', text);
+}
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Checking for update...');
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow('Update available.');
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow('Update not available.');
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow('Error in auto-updater. ' + err);
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow(log_message);
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('Update downloaded');
+});
+
+// TEST
+
 const createWindow = async () => {
   const win = new BrowserWindow({
+    title: "Decentraland",
     width: 900,
     height: 720,
     webPreferences: {
-      nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
       webSecurity: !isDev,
@@ -67,7 +99,18 @@ const createWindow = async () => {
     }
   })
 
+  globalWin = win
+
   win.setMenuBarVisibility(false)
+
+  win.loadURL(`file://${__dirname}/../public/index.html#v${app.getVersion()}`);
+
+  if (isDev || config.developerMode) {
+    win.webContents.openDevTools({ mode: 'detach' })
+  }
+}
+
+const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
     const port = await getFreePort()
     if (isDev) {
@@ -89,17 +132,10 @@ const createWindow = async () => {
   } catch (err) {
     console.error('err:', err)
   }
-
-  if (isDev || config.developerMode) {
-    win.webContents.openDevTools({ mode: 'detach' })
-  }
 }
 
 app.whenReady().then(() => {
-  // DevTools
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err))
+  autoUpdater.checkForUpdatesAndNotify();
 
   createWindow()
 
