@@ -5,7 +5,7 @@
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
   "main": "build/electron/main.js",
-  "private": true,
+  "private": false,
   "dependencies": {
     "axios": "^0.21.4",
     "decompress-zip": "^0.3.3",
