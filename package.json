@@ -29,7 +29,7 @@
     "start": "tsc -p electron -w && tsc -p electron && electron .",
     "start:local": "echo 'Please execute `BROWSER=none npm run start` at `explorer-website`' && concurrently \"cross-env wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "build": "tsc -p electron && electron-builder --publish never",
-    "publish": "tsc -p electron && electron-builder --publish always"
+    "publish": "tsc -p electron && electron-builder --publish onTagOrDraft"
   },
   "build": {
     "appId": "decentraland.desktop.launcher",
