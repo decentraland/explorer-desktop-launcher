@@ -75,7 +75,8 @@
     "publish": {
       "provider": "github",
       "owner": "decentraland",
-      "repo": "electron-desktop-launcher"
+      "repo": "electron-desktop-launcher",
+      "private": false
     }
   },
   "browserslist": {
