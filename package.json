@@ -45,7 +45,7 @@
       "buildResources": "assets"
     },
     "win": {
-      "icon": "public/logo512.png",
+      "icon": "public/decentraland.png",
       "target": [
         "nsis"
       ]
@@ -55,7 +55,7 @@
       "artifactName": "Install Decentraland.${ext}"
     },
     "linux": {
-      "icon": "public/logo512.png",
+      "icon": "public/decentraland.png",
       "target": [
         "AppImage"
       ]
@@ -64,7 +64,7 @@
       "artifactName": "Decentraland.${ext}"
     },
     "mac": {
-      "icon": "public/logo512.png",
+      "icon": "public/decentraland.png",
       "target": [
         "dmg"
       ]
