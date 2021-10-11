@@ -27,7 +27,8 @@ jobs:
 
       - name: Build Electron App
         env:
-          github_token: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GH_TOKEN: ${{ secrets.github_token }}
         run: |
           npm install
           npm run publish
