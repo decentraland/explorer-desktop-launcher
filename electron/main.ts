@@ -33,7 +33,6 @@ const osName = getOSName()
 
 console.log('Config:', config)
 console.log('OS:', osName)
-console.log('Test version')
 
 if (getOSName() === null) {
   console.error('OS not supported')
@@ -55,38 +54,7 @@ if (getOSName() === 'windows') {
 
 registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
-// TEST
-
-let globalWin: BrowserWindow | null = null
-function sendStatusToWindow(text: string) {
-  console.log('sendStatusToWindow', text)
-  globalWin?.webContents.send('message', text)
-}
-autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow('Checking for update...')
-})
-autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow('Update available.')
-})
-autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow('Update not available.')
-})
-autoUpdater.on('error', (err) => {
-  sendStatusToWindow('Error in auto-updater. ' + err)
-})
-autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = 'Download speed: ' + progressObj.bytesPerSecond
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
-  log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
-  sendStatusToWindow(log_message)
-})
-autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded')
-})
-
-// TEST
-
-const createWindow = () => {
+const createWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
     title: 'Decentraland',
     width: 900,
@@ -100,21 +68,19 @@ const createWindow = () => {
     }
   })
 
-  globalWin = win
-
   win.setMenuBarVisibility(false)
 
   if (isDev) {
-    win.loadURL(`http://localhost:9000/index.html`)
+    await win.loadURL(`http://localhost:9000/index.html`)
   } else {
-    win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
+    await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
   }
 
   if (isDev || config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
 
-  return win
+  return Promise.resolve(win)
 }
 
 const loadDecentralandWeb = async (win: BrowserWindow) => {
@@ -137,23 +103,38 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
   }
 }
 
-ipcMain.on('loadDecentralandWeb', () => {
-  loadDecentralandWeb(globalWin!)
-})
-
-app.whenReady().then(() => {
-  createWindow()
+const startApp = async (): Promise<void> => {
+  const win = await createWindow()
 
   if (!isDev) {
-    autoUpdater.checkForUpdatesAndNotify().then((result) => {
-      console.log('Result:', result)
-      loadDecentralandWeb(globalWin!)
-    })
+    const result = await autoUpdater.checkForUpdatesAndNotify()
+    console.log('Result:', result)
+    if (result === null || result.downloadPromise === null) {
+      loadDecentralandWeb(win)
+    } else {
+      if (result.downloadPromise) {
+        await result.downloadPromise
+
+        console.log('Download completed')
+        const silent = process.platform === 'darwin' // Silent=true only on Mac
+        autoUpdater.quitAndInstall(silent, true)
+      }
+    }
   }
+
+  ipcMain.on('loadDecentralandWeb', () => {
+    loadDecentralandWeb(win)
+  })
+
+  return Promise.resolve()
+}
+
+app.whenReady().then(async () => {
+  await startApp()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+      startApp()
     }
   })
 

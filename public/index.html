@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Electron Updater Example</title>
+  <title>Decentraland</title>
+
+  <style>
+    body {
+      background-color: black;
+    }
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: transparent;
+    }
+  </style>
 </head>
 <body>
-  Current version: <span id="version">vX.Y.Z</span>
-  <div id="messages">None</div>
-  <button onclick="next()">Next</button>
+  <img src="decentraland-loading.gif" alt="Decentraland">
 <script>
-// Display the current version
+// TODO: Implement launcher `dev-mode` here
+/*// Display the current version
 let version = window.location.hash.substring(1);
 document.getElementById('version').innerText = version;
 
@@ -24,7 +35,7 @@ ipcRenderer.on('message', function(event, text) {
 
 const next = () => {
   ipcRenderer.send('loadDecentralandWeb')
-}
+}*/
 </script>
 </body>
 </html>
