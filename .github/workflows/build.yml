@@ -26,6 +26,14 @@ jobs:
           node-version: 14
 
       - name: Build Electron App
+        if: github.ref != 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          npm install
+          npm run build
+      - name: Publish Electron App
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         run: |
