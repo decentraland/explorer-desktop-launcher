@@ -6,5 +6,9 @@ if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }
 
-fs.copyFileSync(`dist/decentraland-launcher.${ext}`, `output/decentraland-launcher.${ext}`)
+if (ext === 'exe') {
+    fs.copyFileSync(`dist/Install Decentraland.${ext}`, `output/Install Decentraland.${ext}`)
+} else {
+    fs.copyFileSync(`dist/Decentraland.${ext}`, `output/Decentraland.${ext}`)
+}
 console.log('Done');

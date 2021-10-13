@@ -26,11 +26,19 @@ jobs:
           node-version: 14
 
       - name: Build Electron App
+        if: github.ref != 'refs/heads/main'
         env:
-          github_token: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.github_token }}
         run: |
           npm install
-          npm run electron:build
+          npm run build
+      - name: Publish Electron App
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          npm install
+          npm run publish
 
       - name: Extract branch name
         uses: vazco/github-actions-branch-name@v1

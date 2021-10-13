@@ -4,18 +4,22 @@ A launcher to auto update the `explorer-desktop` (https://github.com/decentralan
 
 ## Available Scripts
 
-### `npm run electron:dev`
+### `npm run start`
 
 Runs the Electron app in the development mode.
 
 The Electron app will reload if you make edits in the `electron` directory.<br>
 You will also see any lint errors in the console.
 
-### `npm run electron:build`
+### `npm run build`
 
 Builds the Electron app package for production to the `dist` folder.
 
 Your Electron app is ready to be distributed!
+
+### `npm run publish`
+
+Build and publish
 
 ## Project directory structure
 
@@ -26,7 +30,6 @@ my-app/
 ## render process
 ├── tsconfig.json
 ├── public/
-├── src/
 │
 ## main process
 ├── electron/
@@ -52,8 +55,8 @@ my-app/
 
 ## Artifacts
 
-- Windows: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.exe
-- Linux: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.AppImage
-- Mac: https://renderer-artifacts.decentraland.org/launcher-branch/main/decentraland-launcher.dmg
+- Windows: [https://renderer-artifacts.decentraland.org/launcher-branch/main/Install Decentraland.exe]()
+- Linux: [https://renderer-artifacts.decentraland.org/launcher-branch/main/Decentraland.AppImage]()
+- Mac: [https://renderer-artifacts.decentraland.org/launcher-branch/main/Decentraland.dmg]()
 
 The format is the following: https://renderer-artifacts.decentraland.org/launcher-branch/{branch}/decentraland-launcher.{extension}

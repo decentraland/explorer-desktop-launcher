@@ -1,9 +1,9 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
+import { autoUpdater } from 'electron-updater'
 
 const config = {
   developerMode: false,
@@ -54,8 +54,9 @@ if (getOSName() === 'windows') {
 
 registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
-const createWindow = async () => {
+const createWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
+    title: 'Decentraland',
     width: 900,
     height: 720,
     webPreferences: {
@@ -68,44 +69,72 @@ const createWindow = async () => {
   })
 
   win.setMenuBarVisibility(false)
-  try {
-    const port = await getFreePort()
-    if (isDev) {
-      win.loadURL(`http://localhost:3000/index.html?ws=ws://localhost:${port}/dcl`)
-    } else {
-      const stage = config.developerMode ? 'zone' : 'org'
-      let url = `http://play.decentraland.${stage}/?`
 
-      if (config.customUrl) {
-        url = config.customUrl
-      }
-
-      url = `${url}ws=ws://localhost:${port}/dcl`
-
-      console.log(`Opening: ${url}`)
-
-      win.loadURL(url)
-    }
-  } catch (err) {
-    console.error('err:', err)
+  if (isDev) {
+    await win.loadURL(`http://localhost:9000/index.html`)
+  } else {
+    await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
   }
 
   if (isDev || config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
+
+  return Promise.resolve(win)
 }
 
-app.whenReady().then(() => {
-  // DevTools
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err))
+const loadDecentralandWeb = async (win: BrowserWindow) => {
+  try {
+    const port = await getFreePort()
+    const stage = config.developerMode ? 'zone' : 'org'
+    let url = `http://play.decentraland.${stage}/?`
 
-  createWindow()
+    if (config.customUrl) {
+      url = config.customUrl
+    }
+
+    url = `${url}ws=ws://localhost:${port}/dcl`
+
+    console.log(`Opening: ${url}`)
+
+    win.loadURL(url)
+  } catch (err) {
+    console.error('err:', err)
+  }
+}
+
+const startApp = async (): Promise<void> => {
+  const win = await createWindow()
+
+  if (!isDev) {
+    const result = await autoUpdater.checkForUpdatesAndNotify()
+    console.log('Result:', result)
+    if (result === null || !result.downloadPromise) {
+      loadDecentralandWeb(win)
+    } else {
+      if (result.downloadPromise) {
+        await result.downloadPromise
+
+        console.log('Download completed')
+        const silent = process.platform === 'darwin' // Silent=true only on Mac
+        autoUpdater.quitAndInstall(silent, true)
+      }
+    }
+  }
+
+  ipcMain.on('loadDecentralandWeb', () => {
+    loadDecentralandWeb(win)
+  })
+
+  return Promise.resolve()
+}
+
+app.whenReady().then(async () => {
+  await startApp()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+      startApp()
     }
   })
 

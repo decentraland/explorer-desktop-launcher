@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Decentraland</title>
+
+  <style>
+    @import url('https://rsms.me/inter/inter.css');
+    html { font-family: 'Inter', sans-serif; }
+    @supports (font-variation-settings: normal) {
+      html { font-family: 'Inter var', sans-serif; }
+    }
+    body {
+      background-color: black;
+      color: white;
+      margin-top: 200px;
+    }
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: transparent;
+    }
+    p {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <img src="decentraland-loading.gif" alt="Decentraland" width="128px">
+  <p>Loading Decentraland</p>
+<script>
+// TODO: Implement launcher `dev-mode` here
+/*// Display the current version
+let version = window.location.hash.substring(1);
+document.getElementById('version').innerText = version;
+
+// Listen for messages
+const { ipcRenderer } = window.require('electron')
+
+ipcRenderer.on('message', function(event, text) {
+  var container = document.getElementById('messages');
+  var message = document.createElement('div');
+  message.innerHTML = text;
+  container.appendChild(message);
+})
+
+const next = () => {
+  ipcRenderer.send('loadDecentralandWeb')
+}*/
+</script>
+</body>
+</html>
