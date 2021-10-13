@@ -1,10 +1,9 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
-
 
 const config = {
   developerMode: false,
@@ -55,43 +54,44 @@ if (getOSName() === 'windows') {
 
 registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
-
 // TEST
 
-let globalWin : BrowserWindow | null = null
+let globalWin: BrowserWindow | null = null
 function sendStatusToWindow(text: string) {
-  globalWin?.webContents.send('message', text);
+  console.log('sendStatusToWindow', text)
+  globalWin?.webContents.send('message', text)
 }
 autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow('Checking for update...');
+  sendStatusToWindow('Checking for update...')
 })
 autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow('Update available.');
+  sendStatusToWindow('Update available.')
 })
 autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow('Update not available.');
+  sendStatusToWindow('Update not available.')
 })
 autoUpdater.on('error', (err) => {
-  sendStatusToWindow('Error in auto-updater. ' + err);
+  sendStatusToWindow('Error in auto-updater. ' + err)
 })
 autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  sendStatusToWindow(log_message);
+  let log_message = 'Download speed: ' + progressObj.bytesPerSecond
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
+  log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+  sendStatusToWindow(log_message)
 })
 autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded');
-});
+  sendStatusToWindow('Update downloaded')
+})
 
 // TEST
 
-const createWindow = async () => {
+const createWindow = () => {
   const win = new BrowserWindow({
-    title: "Decentraland",
+    title: 'Decentraland',
     width: 900,
     height: 720,
     webPreferences: {
+      nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
       webSecurity: !isDev,
@@ -103,41 +103,52 @@ const createWindow = async () => {
 
   win.setMenuBarVisibility(false)
 
-  win.loadURL(`file://${__dirname}/../public/index.html#v${app.getVersion()}`);
+  if (isDev) {
+    win.loadURL(`http://localhost:9000/index.html`)
+  } else {
+    win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
+  }
 
   if (isDev || config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
+
+  return win
 }
 
 const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
     const port = await getFreePort()
-    if (isDev) {
-      win.loadURL(`http://localhost:3000/index.html?ws=ws://localhost:${port}/dcl`)
-    } else {
-      const stage = config.developerMode ? 'zone' : 'org'
-      let url = `http://play.decentraland.${stage}/?`
+    const stage = config.developerMode ? 'zone' : 'org'
+    let url = `http://play.decentraland.${stage}/?`
 
-      if (config.customUrl) {
-        url = config.customUrl
-      }
-
-      url = `${url}ws=ws://localhost:${port}/dcl`
-
-      console.log(`Opening: ${url}`)
-
-      win.loadURL(url)
+    if (config.customUrl) {
+      url = config.customUrl
     }
+
+    url = `${url}ws=ws://localhost:${port}/dcl`
+
+    console.log(`Opening: ${url}`)
+
+    win.loadURL(url)
   } catch (err) {
     console.error('err:', err)
   }
 }
 
-app.whenReady().then(() => {
-  autoUpdater.checkForUpdatesAndNotify();
+ipcMain.on('loadDecentralandWeb', () => {
+  loadDecentralandWeb(globalWin!)
+})
 
+app.whenReady().then(() => {
   createWindow()
+
+  if (!isDev) {
+    autoUpdater.checkForUpdatesAndNotify().then((result) => {
+      console.log('Result:', result)
+      loadDecentralandWeb(globalWin!)
+    })
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
