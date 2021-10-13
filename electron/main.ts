@@ -109,7 +109,7 @@ const startApp = async (): Promise<void> => {
   if (!isDev) {
     const result = await autoUpdater.checkForUpdatesAndNotify()
     console.log('Result:', result)
-    if (result === null || result.downloadPromise === null) {
+    if (result === null || !result.downloadPromise) {
       loadDecentralandWeb(win)
     } else {
       if (result.downloadPromise) {
