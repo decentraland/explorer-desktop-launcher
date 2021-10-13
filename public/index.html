@@ -4,8 +4,15 @@
   <title>Decentraland</title>
 
   <style>
+    @import url('https://rsms.me/inter/inter.css');
+    html { font-family: 'Inter', sans-serif; }
+    @supports (font-variation-settings: normal) {
+      html { font-family: 'Inter var', sans-serif; }
+    }
     body {
       background-color: black;
+      color: white;
+      margin-top: 200px;
     }
     img {
       display: block;
@@ -13,10 +20,14 @@
       margin-right: auto;
       background-color: transparent;
     }
+    p {
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <img src="decentraland-loading.gif" alt="Decentraland">
+  <img src="decentraland-loading.gif" alt="Decentraland" width="128px">
+  <p>Loading Decentraland</p>
 <script>
 // TODO: Implement launcher `dev-mode` here
 /*// Display the current version
