@@ -33,6 +33,7 @@ const osName = getOSName()
 
 console.log('Config:', config)
 console.log('OS:', osName)
+console.log('Test version')
 
 if (getOSName() === null) {
   console.error('OS not supported')
