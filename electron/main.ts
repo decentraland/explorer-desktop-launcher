@@ -57,8 +57,8 @@ registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifa
 const createWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
     title: 'Decentraland',
-    width: 900,
-    height: 720,
+    width: 990,
+    height: 790,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
@@ -120,6 +120,8 @@ const startApp = async (): Promise<void> => {
         autoUpdater.quitAndInstall(silent, true)
       }
     }
+  } else {
+    loadDecentralandWeb(win)
   }
 
   ipcMain.on('loadDecentralandWeb', () => {
