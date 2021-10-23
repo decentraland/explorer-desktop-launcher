@@ -52,8 +52,6 @@ if (getOSName() === 'windows') {
   executablePath = executablePath.replace(/\//gi, '\\')
 }
 
-registerUpdaterEvents(baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
-
 const createWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
     title: 'Decentraland',
@@ -67,6 +65,8 @@ const createWindow = async (): Promise<BrowserWindow> => {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  registerUpdaterEvents(win, baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
   win.setMenuBarVisibility(false)
 
