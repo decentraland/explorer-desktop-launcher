@@ -58,7 +58,8 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
     try {
       const onExecute = (err: any, data: any) => {
         if (err) {
-          console.error(err)
+          console.error('Execute error: ', err)
+          event.sender.send('downloadState', { type: 'ERROR' })
           return
         }
 
