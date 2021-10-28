@@ -38,7 +38,7 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
 
     if (!validVersion) {
       // error
-      event.sender.send('downloadState', { type: 'ERROR' })
+      event.sender.send('downloadState', { type: 'ERROR', message: 'Invalid remote version' })
     } else if (version === remoteVersion) {
       // ready
       event.sender.send('downloadState', { type: 'READY' })
@@ -59,7 +59,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       const onExecute = (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          event.sender.send('downloadState', { type: 'ERROR' })
+          event.sender.send('downloadState', { type: 'ERROR', message: err })
           return
         }
 
@@ -81,7 +81,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       }
     } catch (e) {
       console.error('Execute error: ', e)
-      event.sender.send('downloadState', { type: 'ERROR' })
+      event.sender.send('downloadState', { type: 'ERROR', message: e })
     }
   })
 }
