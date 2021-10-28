@@ -38,7 +38,7 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
 
     if (!validVersion) {
       // error
-      event.sender.send('downloadState', { type: 'ERROR' })
+      event.sender.send('downloadState', { type: 'ERROR', message: 'Invalid remote version' })
     } else if (version === remoteVersion) {
       // ready
       event.sender.send('downloadState', { type: 'READY' })
@@ -55,36 +55,47 @@ const getBranchName = () => {
 
 const registerExecuteProcessEvent = (rendererPath: string, executablePath: string, config: any) => {
   ipcMain.once('executeProcess', (event) => {
-    const onExecute = (err: any, data: any) => {
-      if (err) {
-        console.error(err)
-        return
+    try {
+      const onExecute = (err: any, data: any) => {
+        if (err) {
+          console.error('Execute error: ', err)
+          event.sender.send('downloadState', { type: 'ERROR', message: err })
+          return
+        }
+
+        console.log(data.toString())
       }
 
-      console.log(data.toString())
-    }
+      let path = rendererPath + getBranchName() + executablePath
 
-    let path = rendererPath + getBranchName() + executablePath
+      let extraParams = ' --browser false'
 
-    let extraParams = ' --browser false'
+      console.log('Execute path: ', path + extraParams)
 
-    console.log('Execute path: ', path + extraParams)
-
-    if (getOSName() === 'mac') {
-      const { exec } = require('child_process')
-      exec('open "' + path + '" --args' + extraParams, onExecute)
-    } else {
-      const { exec } = require('child_process')
-      exec(path + extraParams, onExecute)
+      if (getOSName() === 'mac') {
+        const { exec } = require('child_process')
+        exec('open "' + path + '" --args' + extraParams, onExecute)
+      } else {
+        const { exec } = require('child_process')
+        exec(path + extraParams, onExecute)
+      }
+    } catch (e) {
+      console.error('Execute error: ', e)
+      event.sender.send('downloadState', { type: 'ERROR', message: e })
     }
   })
 }
-const registerDownloadEvent = (rendererPath: string, versionPath: string, baseUrl: string, artifactUrl: string) => {
+const registerDownloadEvent = (
+  win: BrowserWindow,
+  rendererPath: string,
+  versionPath: string,
+  baseUrl: string,
+  artifactUrl: string
+) => {
   //electronDl();
   ipcMain.on('download', async (event) => {
     const branchPath = rendererPath + getBranchName()
     fs.rmdirSync(branchPath, { recursive: true })
-    const win = BrowserWindow.getFocusedWindow() as BrowserWindow
     const url = baseUrl + globalConfig.desktopBranch + artifactUrl
     console.log('artifactUrl: ', url)
     const res = await electronDl.download(win, url, {
@@ -119,6 +130,7 @@ const registerDownloadEvent = (rendererPath: string, versionPath: string, baseUr
 }
 
 export const registerUpdaterEvents = (
+  win: BrowserWindow,
   baseUrl: string,
   rendererPath: string,
   versionPath: string,
@@ -127,21 +139,25 @@ export const registerUpdaterEvents = (
   remoteVersionUrl: string,
   config: any
 ) => {
-  globalConfig.desktopBranch = config.desktopBranch
+  try {
+    globalConfig.desktopBranch = config.desktopBranch
 
-  // Get version
-  registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
+    // Get version
+    registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
 
-  // Register event to execute process
-  registerExecuteProcessEvent(rendererPath, executablePath + getOSExtension(), config)
+    // Register event to execute process
+    registerExecuteProcessEvent(rendererPath, executablePath + getOSExtension(), config)
 
-  // Register event to download
-  registerDownloadEvent(rendererPath, versionPath, baseUrl, artifactUrl)
+    // Register event to download
+    registerDownloadEvent(win, rendererPath, versionPath, baseUrl, artifactUrl)
 
-  // Register clear cache
-  ipcMain.on('clearCache', async (event) => {
-    fs.rmdirSync(rendererPath, { recursive: true })
-  })
+    // Register clear cache
+    ipcMain.on('clearCache', async (event) => {
+      fs.rmdirSync(rendererPath, { recursive: true })
+    })
+  } catch (e) {
+    console.error('registerUpdaterEvents error: ', e)
+  }
 }
 
 export const getOSName = (): string | null => {
