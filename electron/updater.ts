@@ -54,7 +54,7 @@ const getBranchName = () => {
 }
 
 const registerExecuteProcessEvent = (rendererPath: string, executablePath: string, config: any) => {
-  ipcMain.once('executeProcess', (event) => {
+  ipcMain.on('executeProcess', (event) => {
     try {
       const onExecute = (err: any, data: any) => {
         if (err) {

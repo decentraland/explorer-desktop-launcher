@@ -19,7 +19,7 @@ jobs:
             After the CI passes:
 
             This branch can be downloaded with the following links:
-            - Windows: https://renderer-artifacts.decentraland.org/launcher-branch/${{ steps.branch.outputs.branch_name }}/Install Decentraland.exe
-            - Linux: https://renderer-artifacts.decentraland.org/launcher-branch/${{ steps.branch.outputs.branch_name }}/Decentraland.AppImage
-            - Mac: https://renderer-artifacts.decentraland.org/launcher-branch/${{ steps.branch.outputs.branch_name }}/Decentraland.dmg
+            - Windows: [https://renderer-artifacts.decentraland.org/launcher-branch/${{ steps.branch.outputs.branch_name }}/Install Decentraland.exe]()
+            - Linux: [https://renderer-artifacts.decentraland.org/launcher-branch/${{ steps.branch.outputs.branch_name }}/Decentraland.AppImage]()
+            - Mac: [https://renderer-artifacts.decentraland.org/launcher-branch/${{ steps.branch.outputs.branch_name }}/Decentraland.dmg]()
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
