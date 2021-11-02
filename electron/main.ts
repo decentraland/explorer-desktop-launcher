@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { shell, app, BrowserWindow, ipcMain } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
@@ -105,6 +105,11 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
 
 const startApp = async (): Promise<void> => {
   const win = await createWindow()
+
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url)
+    return { action: 'deny' }
+  })
 
   if (!isDev) {
     const result = await autoUpdater.checkForUpdatesAndNotify()
