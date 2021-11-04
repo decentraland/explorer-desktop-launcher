@@ -42,10 +42,17 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
     } else if (version === remoteVersion) {
       // ready
       event.sender.send('downloadState', { type: 'READY' })
-      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${globalConfig.desktopBranch}.commit-${globalConfig.remoteVersion.substr(0, 6)}\";`)
     } else {
       // download please
       event.sender.send('downloadState', { type: 'NEW_VERSION' })
+    }
+
+    if (validVersion) {
+      event.sender.executeJavaScript(
+        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${
+          globalConfig.desktopBranch
+        }.commit-${globalConfig.remoteVersion.substr(0, 6)}\";`
+      )
     }
   })
 }
