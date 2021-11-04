@@ -51,7 +51,7 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
       event.sender.executeJavaScript(
         `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${
           globalConfig.desktopBranch
-        }.commit-${globalConfig.remoteVersion.substr(0, 6)}\";`
+        }.commit-${globalConfig.remoteVersion.substr(0, 7)}\";`
       )
     }
   })
