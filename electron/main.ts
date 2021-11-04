@@ -91,6 +91,8 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
 
     if (config.customUrl) {
       url = config.customUrl
+    } else {
+      url = `${url}renderer-version=loading&`
     }
 
     url = `${url}ws=ws://localhost:${port}/dcl`
