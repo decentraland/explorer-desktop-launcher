@@ -43,6 +43,7 @@ if (getOSName() === null) {
   exit(1)
 }
 
+let isExitAllowed = false
 let rendererPath = `${app.getPath('appData')}/decentraland/renderer/`
 let executablePath = `/unity-renderer-${osName}`
 let versionPath = `/version.json`
@@ -115,39 +116,65 @@ const getIconByPlatform = () => {
   return 'decentraland-tray.png';
 };
 
-const createTray = (win: BrowserWindow): void => {
-  ipcMain.on('executeProcess', (event) => {
-
+const hideWindowInTray = (win: BrowserWindow) => {
+  if (tray == null) {
     const iconPath = `${__dirname}/../../public/${getIconByPlatform()}`
+    tray = new Tray(iconPath)
 
-    console.log(`Icon Path: ${iconPath}`)
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: 'Exit',
+        accelerator: 'CmdOrCtrl+Q',
+        type: 'normal',
+        click: () => onExit()
+      },
+    ])
 
-    if (tray == null) {
-      tray = new Tray(iconPath)
-      const contextMenu = Menu.buildFromTemplate([
-        { label: 'Show', type: 'normal', click: () => { win.show() } },
-        //{ label: 'Logout', type: 'normal', click: () => { event.sender.send("Logout") } }
-        { label: 'Quit', role: 'quit' },
-      ])
+    tray.setToolTip('Decentraland Launcher')
+    tray.setContextMenu(contextMenu)
+    tray.on('click', (event) => showWindowAndHideTray(win))
+    tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
+  }
+  win.hide()
+}
 
-      tray.setToolTip('Decentraland Launcher')
-      tray.setContextMenu(contextMenu)
-      tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
-    }
+const onExit = () => {
+  isExitAllowed = true;
+  exit(0)
+}
 
-    win.hide()
-
-  })
+const showWindowAndHideTray = (win: BrowserWindow) => {
+  win.show()
+  if (tray != null) {
+    tray.destroy()
+    tray = null
+  }
 }
 
 const startApp = async (): Promise<void> => {
 
   const win = await createWindow()
-  try {
-    createTray(win)
-  } catch (error) {
-    console.error(error)
-  }
+
+  ipcMain.on('checkVersion', async (event) => {
+    showWindowAndHideTray(win)
+  })
+
+  ipcMain.on('executeProcess', (event) => {
+    hideWindowInTray(win)
+  })
+
+  win.on('close', (event: { preventDefault: () => void }) => {
+    // this prevents the launcher from closing when using the X button on the window
+    if (!isExitAllowed) {
+      hideWindowInTray(win)
+      event.preventDefault();
+    }
+  })
+
+  win.on('minimize', function (event: { preventDefault: () => void }) {
+    event.preventDefault()
+    win.hide()
+  })
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
@@ -193,4 +220,9 @@ app.whenReady().then(async () => {
       app.quit()
     }
   })
+
+  app.on('before-quit', function () {
+    //this allows exiting the launcher through command+Q or alt+f4
+    isExitAllowed = true;
+  });
 })
