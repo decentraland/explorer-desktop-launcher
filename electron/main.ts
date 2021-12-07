@@ -1,4 +1,4 @@
-import { shell, app, BrowserWindow, ipcMain, Tray, Menu, systemPreferences, nativeTheme, ipcRenderer } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu, nativeTheme, nativeImage } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
@@ -109,22 +109,24 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
   }
 }
 
-const getIcon = () => {
-  if (process.platform === 'win32') return 'decentraland.ico';
-  if (nativeTheme.shouldUseDarkColors) return 'decentraland.png';
-  return 'decentraland.png';
+const getIconByPlatform = () => {
+  if (process.platform === 'win32') return 'decentraland-tray.ico';
+  if (nativeTheme.shouldUseDarkColors) return 'decentraland-tray.png';
+  return 'decentraland-tray.png';
 };
 
 const createTray = (win: BrowserWindow): void => {
-
   ipcMain.on('executeProcess', (event) => {
 
-    const iconPath = path.join(__dirname, '/images/' + getIcon());
+    const iconPath = `${__dirname}/../../public/${getIconByPlatform()}`
+
+    console.log(`Icon Path: ${iconPath}`)
+
     if (tray == null) {
       tray = new Tray(iconPath)
       const contextMenu = Menu.buildFromTemplate([
         { label: 'Show', type: 'normal', click: () => { win.show() } },
-        { label: 'Logout', type: 'normal', click: () => { event.sender.send("Logout") } },
+        //{ label: 'Logout', type: 'normal', click: () => { event.sender.send("Logout") } }
         { label: 'Quit', role: 'quit' },
       ])
 
@@ -141,7 +143,11 @@ const createTray = (win: BrowserWindow): void => {
 const startApp = async (): Promise<void> => {
 
   const win = await createWindow()
-  createTray(win)
+  try {
+    createTray(win)
+  } catch (error) {
+    console.error(error)
+  }
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
