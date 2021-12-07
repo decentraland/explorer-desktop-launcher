@@ -1,15 +1,19 @@
-import { shell, app, BrowserWindow, ipcMain } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu, systemPreferences, nativeTheme, ipcRenderer } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
+import { create } from 'domain'
 
 const config = {
   developerMode: false,
   customUrl: '',
   desktopBranch: 'main'
 }
+
+
+let tray: Tray | null = null;
 
 process.argv.shift() // Skip process name
 while (process.argv.length != 0) {
@@ -105,8 +109,39 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
   }
 }
 
+const getIcon = () => {
+  if (process.platform === 'win32') return 'decentraland.ico';
+  if (nativeTheme.shouldUseDarkColors) return 'decentraland.png';
+  return 'decentraland.png';
+};
+
+const createTray = (win: BrowserWindow): void => {
+
+  ipcMain.on('executeProcess', (event) => {
+
+    const iconPath = path.join(__dirname, '/images/' + getIcon());
+    if (tray == null) {
+      tray = new Tray(iconPath)
+      const contextMenu = Menu.buildFromTemplate([
+        { label: 'Show', type: 'normal', click: () => { win.show() } },
+        { label: 'Logout', type: 'normal', click: () => { event.sender.send("Logout") } },
+        { label: 'Quit', role: 'quit' },
+      ])
+
+      tray.setToolTip('Decentraland Launcher')
+      tray.setContextMenu(contextMenu)
+      tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
+    }
+
+    win.hide()
+
+  })
+}
+
 const startApp = async (): Promise<void> => {
+
   const win = await createWindow()
+  createTray(win)
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
