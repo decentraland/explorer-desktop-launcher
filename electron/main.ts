@@ -1,19 +1,15 @@
-import { shell, app, BrowserWindow, ipcMain, Tray, Menu, nativeTheme, nativeImage } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu, nativeTheme } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
-import { create } from 'domain'
 
 const config = {
   developerMode: false,
   customUrl: '',
   desktopBranch: 'main'
 }
-
-
-let tray: Tray | null = null;
 
 process.argv.shift() // Skip process name
 while (process.argv.length != 0) {
@@ -50,6 +46,7 @@ let versionPath = `/version.json`
 const baseUrl = `https://renderer-artifacts.decentraland.org/desktop/`
 const artifactUrl = `/unity-renderer-${osName}.zip`
 const remoteVersionUrl = `/version.json`
+let tray: Tray | null = null;
 
 if (getOSName() === 'windows') {
   rendererPath = rendererPath.replace(/\//gi, '\\')
@@ -172,8 +169,8 @@ const startApp = async (): Promise<void> => {
   })
 
   win.on('minimize', function (event: { preventDefault: () => void }) {
+    hideWindowInTray(win)
     event.preventDefault()
-    win.hide()
   })
 
   win.webContents.setWindowOpenHandler(({ url }) => {
