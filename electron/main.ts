@@ -108,14 +108,14 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
 }
 
 const getIconByPlatform = () => {
-  if (process.platform === 'win32') return 'decentraland-tray.ico';
-  if (nativeTheme.shouldUseDarkColors) return 'decentraland-tray.png';
-  return 'decentraland-tray.png';
+  if (process.platform === 'win32') return 'Windows/Icon.ico';
+  //if (nativeTheme.shouldUseDarkColors) return 'decentraland-tray.png';
+  return 'iOS/Icon.png';
 };
 
 const hideWindowInTray = (win: BrowserWindow) => {
   if (tray == null) {
-    const iconPath = `${__dirname}/../../public/${getIconByPlatform()}`
+    const iconPath = `${__dirname}/../../public/systray/${getIconByPlatform()}`
     tray = new Tray(iconPath)
 
     const contextMenu = Menu.buildFromTemplate([
