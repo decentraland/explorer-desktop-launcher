@@ -115,23 +115,30 @@ const getIconByPlatform = () => {
 
 const hideWindowInTray = (win: BrowserWindow) => {
   if (tray == null) {
-    const iconPath = `${__dirname}/../../public/systray/${getIconByPlatform()}`
-    tray = new Tray(iconPath)
 
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: 'Exit',
-        accelerator: 'CmdOrCtrl+Q',
-        type: 'normal',
-        click: () => onExit()
-      },
-    ])
+    const iconPath = path.join(path.dirname(__dirname), "../public/systray", getIconByPlatform())
 
-    tray.setToolTip('Decentraland Launcher')
-    tray.setContextMenu(contextMenu)
-    tray.on('click', (event) => showWindowAndHideTray(win))
-    tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
+    try {
+      tray = new Tray(iconPath)
+
+      const contextMenu = Menu.buildFromTemplate([
+        {
+          label: 'Exit',
+          accelerator: 'CmdOrCtrl+Q',
+          type: 'normal',
+          click: () => onExit()
+        },
+      ])
+
+      tray.setToolTip('Decentraland Launcher')
+      tray.setContextMenu(contextMenu)
+      tray.on('click', (event) => showWindowAndHideTray(win))
+      tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
+    } catch (e) {
+      throw e;
+    }
   }
+
   win.hide()
 }
 
