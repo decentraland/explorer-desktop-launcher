@@ -40,7 +40,9 @@
     "compression": "maximum",
     "files": [
       "build/**/*",
-      "public/**/*"
+      "public/**/*",
+      "public/systray/iOS/**/*",
+      "public/systray/Windows/**/*"
     ],
     "directories": {
       "buildResources": "assets"
