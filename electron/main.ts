@@ -180,8 +180,8 @@ const startApp = async (): Promise<void> => {
     event.preventDefault()
   })
 
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url)
+  win.webContents.setWindowOpenHandler(({ url }: any) => {
+    shell.openExternal(url, { activate: true })
     return { action: 'deny' }
   })
 
