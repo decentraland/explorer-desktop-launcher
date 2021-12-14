@@ -1,4 +1,4 @@
-import { shell, app, BrowserWindow, ipcMain } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu, nativeTheme } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
@@ -39,12 +39,14 @@ if (getOSName() === null) {
   exit(1)
 }
 
+let isExitAllowed = false
 let rendererPath = `${app.getPath('appData')}/decentraland/renderer/`
 let executablePath = `/unity-renderer-${osName}`
 let versionPath = `/version.json`
 const baseUrl = `https://renderer-artifacts.decentraland.org/desktop/`
 const artifactUrl = `/unity-renderer-${osName}.zip`
 const remoteVersionUrl = `/version.json`
+let tray: Tray | null = null;
 
 if (getOSName() === 'windows') {
   rendererPath = rendererPath.replace(/\//gi, '\\')
@@ -105,8 +107,78 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
   }
 }
 
+const getIconByPlatform = () => {
+  if (process.platform === 'win32') return 'Windows/Icon.ico';
+  //if (nativeTheme.shouldUseDarkColors) return 'decentraland-tray.png';
+  return 'iOS/Icon.png';
+};
+
+const hideWindowInTray = (win: BrowserWindow) => {
+  if (tray == null) {
+
+    const iconPath = path.join(path.dirname(__dirname), "../public/systray", getIconByPlatform())
+
+    try {
+      tray = new Tray(iconPath)
+
+      const contextMenu = Menu.buildFromTemplate([
+        {
+          label: 'Exit',
+          accelerator: 'CmdOrCtrl+Q',
+          type: 'normal',
+          click: () => onExit()
+        },
+      ])
+
+      tray.setToolTip('Decentraland Launcher')
+      tray.setContextMenu(contextMenu)
+      tray.on('click', (event) => showWindowAndHideTray(win))
+      tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  win.hide()
+}
+
+const onExit = () => {
+  isExitAllowed = true;
+  exit(0)
+}
+
+const showWindowAndHideTray = (win: BrowserWindow) => {
+  win.show()
+  if (tray != null) {
+    tray.destroy()
+    tray = null
+  }
+}
+
 const startApp = async (): Promise<void> => {
+
   const win = await createWindow()
+
+  ipcMain.on('checkVersion', async (event) => {
+    showWindowAndHideTray(win)
+  })
+
+  ipcMain.on('executeProcess', (event) => {
+    hideWindowInTray(win)
+  })
+
+  win.on('close', (event: { preventDefault: () => void }) => {
+    // this prevents the launcher from closing when using the X button on the window
+    if (!isExitAllowed) {
+      hideWindowInTray(win)
+      event.preventDefault();
+    }
+  })
+
+  win.on('minimize', function (event: { preventDefault: () => void }) {
+    hideWindowInTray(win)
+    event.preventDefault()
+  })
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
@@ -152,4 +224,9 @@ app.whenReady().then(async () => {
       app.quit()
     }
   })
+
+  app.on('before-quit', function () {
+    //this allows exiting the launcher through command+Q or alt+f4
+    isExitAllowed = true;
+  });
 })
