@@ -11,6 +11,12 @@ const config = {
   desktopBranch: 'main'
 }
 
+const isAppAllowed = app.requestSingleInstanceLock()
+
+if (!isAppAllowed) {
+  exit(0)
+}
+
 process.argv.shift() // Skip process name
 while (process.argv.length != 0) {
   switch (process.argv[0]) {
@@ -180,6 +186,10 @@ const startApp = async (): Promise<void> => {
     event.preventDefault()
   })
 
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    showWindowAndHideTray(win)
+  })
+
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
@@ -229,4 +239,5 @@ app.whenReady().then(async () => {
     //this allows exiting the launcher through command+Q or alt+f4
     isExitAllowed = true;
   });
+
 })
