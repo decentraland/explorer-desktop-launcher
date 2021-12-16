@@ -1,6 +1,6 @@
 {
   "name": "@dcl/explorer-desktop-launcher",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -54,9 +54,13 @@
       ]
     },
     "nsis": {
-      "shortcutName": "Decentraland",
+      "oneClick": false,
+      "shortcutName": "Decentraland BETA",
       "artifactName": "Install Decentraland.${ext}",
-      "installerIcon": "public/installer-icon.ico"
+      "installerIcon": "public/installer-icon.ico",
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "perMachine": true
     },
     "linux": {
       "icon": "public/app-icon.png",

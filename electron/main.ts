@@ -62,9 +62,11 @@ if (getOSName() === 'windows') {
 
 const createWindow = async (): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
-    title: 'Decentraland',
+    title: 'Decentraland BETA',
     width: 990,
     height: 790,
+    minWidth: 990,
+    minHeight: 790,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
