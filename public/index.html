@@ -9,25 +9,45 @@
     @supports (font-variation-settings: normal) {
       html { font-family: 'Inter var', sans-serif; }
     }
-    body {
-      background-color: black;
-      color: white;
-      margin-top: 200px;
+    html, body
+    {
+        height: 100%;
+        margin:0;
+        padding:0;
+        color: #fff;
+        background-color: #000;
     }
-    img {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: transparent;
+
+    .container {
+        position:relative;
+        height: 100%;
+        width:100%;
     }
+
+    .container .image {
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        margin:auto;
+        width: 250px;
+        height: 170px;
+        text-align: center;
+    }
+    
     p {
       text-align: center;
     }
   </style>
 </head>
 <body>
-  <img src="decentraland-loading.gif" alt="Decentraland" width="128px">
-  <p>Loading Decentraland</p>
+  <div class="container">
+    <div class="image">
+      <img src="decentraland-loading.gif" alt="Decentraland" width="128px">
+      <p>Loading Decentraland</p>
+    </div>
+  </div>
 <script>
 // TODO: Implement launcher `dev-mode` here
 /*// Display the current version
