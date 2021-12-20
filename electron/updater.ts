@@ -49,8 +49,7 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
 
     if (validVersion) {
       event.sender.executeJavaScript(
-        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${
-          globalConfig.desktopBranch
+        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${globalConfig.desktopBranch
         }.commit-${globalConfig.remoteVersion.substr(0, 7)}\";`
       )
     }
@@ -71,7 +70,8 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
           return
         }
 
-        console.log(data.toString())
+        console.log("Process terminated - " + data.toString())
+        ipcMain.emit("process-terminated");
       }
 
       let path = rendererPath + getBranchName() + executablePath
@@ -82,7 +82,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       if (getOSName() === 'mac') {
         const { exec } = require('child_process')
-        exec('open "' + path + '" --args' + extraParams, onExecute)
+        exec('open -W "' + path + '" --args' + extraParams, onExecute)
       } else {
         const { exec } = require('child_process')
         exec(path + extraParams, onExecute)

@@ -45,6 +45,7 @@ if (getOSName() === null) {
   exit(1)
 }
 
+let isRendererOpen = false
 let isExitAllowed = false
 let rendererPath = `${app.getPath('appData')}/decentraland/renderer/`
 let executablePath = `/unity-renderer-${osName}`
@@ -52,7 +53,8 @@ let versionPath = `/version.json`
 const baseUrl = `https://renderer-artifacts.decentraland.org/desktop/`
 const artifactUrl = `/unity-renderer-${osName}.zip`
 const remoteVersionUrl = `/version.json`
-let tray: Tray | null = null;
+let tray: Tray | null = null
+let contextMenu: Menu | undefined = undefined
 
 if (getOSName() === 'windows') {
   rendererPath = rendererPath.replace(/\//gi, '\\')
@@ -129,7 +131,7 @@ const hideWindowInTray = (win: BrowserWindow) => {
     try {
       tray = new Tray(iconPath)
 
-      const contextMenu = Menu.buildFromTemplate([
+      contextMenu = Menu.buildFromTemplate([
         {
           label: 'Exit',
           accelerator: 'CmdOrCtrl+Q',
@@ -167,17 +169,19 @@ const startApp = async (): Promise<void> => {
 
   const win = await createWindow()
 
-  ipcMain.on('checkVersion', async (event) => {
+  ipcMain.on('process-terminated', async (event) => {
+    isRendererOpen = false
     showWindowAndHideTray(win)
   })
 
   ipcMain.on('executeProcess', (event) => {
+    isRendererOpen = true
     hideWindowInTray(win)
   })
 
   win.on('close', (event: { preventDefault: () => void }) => {
     // this prevents the launcher from closing when using the X button on the window
-    if (!isExitAllowed) {
+    if (!isExitAllowed && isRendererOpen) {
       hideWindowInTray(win)
       event.preventDefault();
     }
