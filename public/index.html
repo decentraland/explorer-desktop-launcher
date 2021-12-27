@@ -35,6 +35,27 @@
         height: 170px;
         text-align: center;
     }
+
+    .container .form {
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        margin:auto;
+        width: 600px;
+        height: 400px;
+        text-align: center;
+    }
+
+    .container .form input[type=text] {
+      width: 100%;
+    }
+
+    .container .form textarea {
+      width: 100%;
+      height: 50px;
+    }
     
     p {
       text-align: center;
@@ -42,31 +63,120 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div id="loading" class="container">
     <div class="image">
       <img src="decentraland-loading.gif" alt="Decentraland" width="128px">
       <p>Loading Decentraland</p>
     </div>
   </div>
-<script>
-// TODO: Implement launcher `dev-mode` here
-/*// Display the current version
-let version = window.location.hash.substring(1);
-document.getElementById('version').innerText = version;
+  <div id="dev" class="container" hidden="true">
+    <div class="form">
+      <label>explorer-desktop branch:</label></br>
+      <input type="text" value="main" id="explorer-desktop-branch"/></br></br>
 
-// Listen for messages
+      <label>kernel branch:</label>
+      <input onchange="checkChange(`kernel-branch`)" type="checkbox" id="check-kernel-branch"/></br>
+      <input oninput="updateUrl()" type="text" value="main" id="kernel-branch" disabled=''/></br></br>
+
+      <label>explorer-website branch:</label>
+      <input onchange="checkChange(`explorer-website-branch`)" type="checkbox" id="check-explorer-website-branch"/></br>
+      <input oninput="updateUrl()" type="text" value="main" id="explorer-website-branch" disabled=''/></br></br>
+
+      <label>custom param:</label>
+      <input onchange="checkChange(`custom-param`)" type="checkbox" id="check-custom-param"/></br>
+      <input oninput="updateUrl()" type="text" id="custom-param" value="EXAMPLE=VALUE&" disabled=''/></br></br>
+
+      <label>custom-url:</label>
+      <input onchange="checkChange(`custom-url`)" type="checkbox" id="check-custom-url"/></br>
+      <textarea oninput="updateUrl()" type="text" value="" id="custom-url" disabled=''></textarea></br></br>
+
+      <input onclick="submitForm()" type="button" value="Start"/>
+    </div>
+  </div>
+<script>
+// Display the current version
+const version = window.location.hash.substring(1);
+
+const checkAmpersand = (origText) => {
+  result = origText
+  if (origText.length > 0) {
+    const lastChar = origText.substr(origText.length - 1)
+    if (lastChar != '&' && lastChar != '?') {
+      result += '&'
+    }
+  }
+  return result
+}
+
+const updateUrl = () => {
+  const hasKernelBranch = document.getElementById("check-kernel-branch").checked
+  const hasExplorerWebsiteBranch = document.getElementById("check-explorer-website-branch").checked
+  const hasCustomParam = document.getElementById("check-custom-param").checked
+  const hasCustomUrl = document.getElementById("check-custom-url").checked
+
+  const kernelBranch = document.getElementById("kernel-branch").value
+  const explorerWebsiteBranch = document.getElementById("explorer-website-branch").value
+  const customParam = document.getElementById("custom-param").value
+  const customUrlObj = document.getElementById("custom-url")
+
+  if (!hasCustomUrl) {
+    let url = `http://play.decentraland.org/?`
+
+    if (hasExplorerWebsiteBranch) {
+      url = `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?`
+    }
+
+    if (hasKernelBranch) {
+      url += `kernel-branch=${kernelBranch}&`
+    }
+
+    if (hasCustomParam) {
+      url += checkAmpersand(customParam)
+    }
+
+    customUrlObj.value = url
+    return checkAmpersand(url)
+  } else {
+    return checkAmpersand(customUrlObj.value)
+  }
+}
+
+const submitForm = () => {
+  const explorerDesktopBranch = document.getElementById("explorer-desktop-branch").value
+  const url = updateUrl()
+
+  console.log(url, explorerDesktopBranch)
+  next(url, explorerDesktopBranch)
+}
+
+updateUrl()
+
+const checkChange = (activeElementID) => {
+  const activeElement = document.getElementById(activeElementID)
+  if (activeElement.hasAttribute("disabled")) {
+    activeElement.removeAttribute("disabled")
+  } else {
+    activeElement.setAttribute("disabled", '')
+  }
+
+  updateUrl()
+}
+
+
 const { ipcRenderer } = window.require('electron')
 
-ipcRenderer.on('message', function(event, text) {
-  var container = document.getElementById('messages');
-  var message = document.createElement('div');
-  message.innerHTML = text;
-  container.appendChild(message);
+ipcRenderer.on('checkDeveloperMode', function(event, isDev) {
+  if (isDev) {
+    document.getElementById("loading").setAttribute("hidden", '')
+    document.getElementById("dev").removeAttribute("hidden")
+  }
 })
 
-const next = () => {
-  ipcRenderer.send('loadDecentralandWeb')
-}*/
+ipcRenderer.send('checkDeveloperMode')
+
+const next = (url, explorerDesktopBranch) => {
+  ipcRenderer.send('loadDecentralandWeb', url, explorerDesktopBranch)
+}
 </script>
 </body>
 </html>

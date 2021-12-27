@@ -78,6 +78,11 @@ const createWindow = async (): Promise<BrowserWindow> => {
     }
   })
 
+  ipcMain.on('checkDeveloperMode', (event: any) => {
+    console.log('checkDeveloperMode')
+    event.sender.send('checkDeveloperMode', isDev || config.developerMode)
+  })
+
   registerUpdaterEvents(win, baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
   win.setMenuBarVisibility(false)
@@ -201,7 +206,7 @@ const startApp = async (): Promise<void> => {
     return { action: 'deny' }
   })
 
-  if (!isDev) {
+  if (!isDev && !config.developerMode) {
     const result = await autoUpdater.checkForUpdatesAndNotify()
     console.log('Result:', result)
     if (result === null || !result.downloadPromise) {
@@ -215,11 +220,11 @@ const startApp = async (): Promise<void> => {
         autoUpdater.quitAndInstall(silent, true)
       }
     }
-  } else {
-    loadDecentralandWeb(win)
   }
 
-  ipcMain.on('loadDecentralandWeb', () => {
+  ipcMain.on('loadDecentralandWeb', (event: any, url: string, explorerDesktopBranch: string) => {
+    config.customUrl = url
+    config.desktopBranch = explorerDesktopBranch
     loadDecentralandWeb(win)
   })
 
