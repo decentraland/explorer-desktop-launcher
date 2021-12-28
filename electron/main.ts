@@ -102,6 +102,8 @@ const createWindow = async (): Promise<BrowserWindow> => {
 
 const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
+    showLoading(win);
+
     const port = await getFreePort()
     const stage = config.developerMode ? 'zone' : 'org'
     let url = `http://play.decentraland.${stage}/?`
@@ -116,7 +118,9 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
 
     console.log(`Opening: ${url}`)
 
-    win.loadURL(url)
+    let promise = win.loadURL(url)
+    promise.finally(() => hideLoading(win))
+
   } catch (err) {
     console.error('err:', err)
   }
@@ -170,12 +174,23 @@ const showWindowAndHideTray = (win: BrowserWindow) => {
   }
 }
 
+const showLoading = (win: BrowserWindow) => {
+  win.webContents.executeJavaScript(`document.getElementById("loading").removeAttribute("hidden")`)
+}
+
+const hideLoading = (win: BrowserWindow) => {
+  win.webContents.executeJavaScript(`document.getElementById("loading")?.setAttribute("hidden", "")`)
+}
+
 const startApp = async (): Promise<void> => {
 
   const win = await createWindow()
 
   ipcMain.on('process-terminated', async (event) => {
     isRendererOpen = false
+
+    // (#1457) we should reload the url
+    loadDecentralandWeb(win)
     showWindowAndHideTray(win)
   })
 
