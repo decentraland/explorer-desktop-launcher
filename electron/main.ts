@@ -47,7 +47,7 @@ if (getOSName() === null) {
 
 let isRendererOpen = false
 let isExitAllowed = false
-let rendererPath = `${app.getPath('appData')}/decentraland/renderer/`
+let rendererPath = `${app.getPath('appData')}/explorer-desktop-launcher/renderer/`
 let executablePath = `/unity-renderer-${osName}`
 let versionPath = `/version.json`
 const baseUrl = `https://renderer-artifacts.decentraland.org/desktop/`
