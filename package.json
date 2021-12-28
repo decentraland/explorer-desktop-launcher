@@ -1,6 +1,6 @@
 {
-  "name": "@dcl/explorer-desktop-launcher",
-  "version": "0.1.15",
+  "name": "explorer-desktop-launcher",
+  "version": "0.1.16",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
