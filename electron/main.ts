@@ -105,7 +105,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
     showLoading(win);
 
     const port = await getFreePort()
-    const stage = config.developerMode ? 'zone' : 'org'
+    const stage = 'zone' //config.developerMode ? 'zone' : 'org' // Temporal until we figure out how to use ws=ws://localhost:5000/dcl with .org and the new security measures
     let url = `http://play.decentraland.${stage}/?`
 
     if (config.customUrl) {
