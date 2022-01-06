@@ -114,7 +114,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
       url = `${url}renderer-version=loading&`
     }
 
-    url = `${url}ws=ws://localhost:${port}/dcl`
+    url = `${url}ws=wss://localhost:${port}/dcl`
 
     console.log(`Opening: ${url}`)
 
@@ -245,6 +245,14 @@ const startApp = async (): Promise<void> => {
 
   return Promise.resolve()
 }
+
+// SSL/TSL: this is the self signed certificate support
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  // On certificate error we disable default behaviour (stop loading the page)
+  // and we then say "it is all fine - true" to the callback
+  event.preventDefault()
+  callback(true)
+})
 
 app.whenReady().then(async () => {
   await startApp()
