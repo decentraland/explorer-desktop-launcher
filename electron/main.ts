@@ -102,10 +102,10 @@ const createWindow = async (): Promise<BrowserWindow> => {
 
 const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
-    showLoading(win);
+    showLoading(win)
 
     const port = await getFreePort()
-    const stage = 'zone' //config.developerMode ? 'zone' : 'org' // Temporal until we figure out how to use ws=ws://localhost:5000/dcl with .org and the new security measures
+    const stage = config.developerMode ? 'zone' : 'org'
     let url = `http://play.decentraland.${stage}/?`
 
     if (config.customUrl) {
@@ -114,28 +114,26 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
       url = `${url}renderer-version=loading&`
     }
 
-    url = `${url}ws=ws://localhost:${port}/dcl`
+    url = `${url}ws=wss://localhost:${port}/dcl`
 
     console.log(`Opening: ${url}`)
 
     let promise = win.loadURL(url)
     promise.finally(() => hideLoading(win))
-
   } catch (err) {
     console.error('err:', err)
   }
 }
 
 const getIconByPlatform = () => {
-  if (process.platform === 'win32') return 'Windows/Icon.ico';
+  if (process.platform === 'win32') return 'Windows/Icon.ico'
   //if (nativeTheme.shouldUseDarkColors) return 'decentraland-tray.png';
-  return 'iOS/Icon.png';
-};
+  return 'iOS/Icon.png'
+}
 
 const hideWindowInTray = (win: BrowserWindow) => {
   if (tray == null) {
-
-    const iconPath = path.join(path.dirname(__dirname), "../public/systray", getIconByPlatform())
+    const iconPath = path.join(path.dirname(__dirname), '../public/systray', getIconByPlatform())
 
     try {
       tray = new Tray(iconPath)
@@ -146,15 +144,15 @@ const hideWindowInTray = (win: BrowserWindow) => {
           accelerator: 'CmdOrCtrl+Q',
           type: 'normal',
           click: () => onExit()
-        },
+        }
       ])
 
       tray.setToolTip('Decentraland Launcher')
       tray.setContextMenu(contextMenu)
       tray.on('click', (event) => showWindowAndHideTray(win))
-      tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu));
+      tray.on('right-click', (event) => tray?.popUpContextMenu(contextMenu))
     } catch (e) {
-      throw e;
+      throw e
     }
   }
 
@@ -162,7 +160,7 @@ const hideWindowInTray = (win: BrowserWindow) => {
 }
 
 const onExit = () => {
-  isExitAllowed = true;
+  isExitAllowed = true
   exit(0)
 }
 
@@ -183,7 +181,6 @@ const hideLoading = (win: BrowserWindow) => {
 }
 
 const startApp = async (): Promise<void> => {
-
   const win = await createWindow()
 
   ipcMain.on('process-terminated', async (event) => {
@@ -203,7 +200,7 @@ const startApp = async (): Promise<void> => {
     // this prevents the launcher from closing when using the X button on the window
     if (!isExitAllowed && isRendererOpen) {
       hideWindowInTray(win)
-      event.preventDefault();
+      event.preventDefault()
     }
   })
 
@@ -246,6 +243,14 @@ const startApp = async (): Promise<void> => {
   return Promise.resolve()
 }
 
+// SSL/TSL: this is the self signed certificate support
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  // On certificate error we disable default behaviour (stop loading the page)
+  // and we then say "it is all fine - true" to the callback
+  event.preventDefault()
+  callback(true)
+})
+
 app.whenReady().then(async () => {
   await startApp()
 
@@ -263,7 +268,6 @@ app.whenReady().then(async () => {
 
   app.on('before-quit', function () {
     //this allows exiting the launcher through command+Q or alt+f4
-    isExitAllowed = true;
-  });
-
+    isExitAllowed = true
+  })
 })
