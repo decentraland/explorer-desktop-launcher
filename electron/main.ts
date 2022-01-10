@@ -1,7 +1,7 @@
 import { shell, app, BrowserWindow, ipcMain, Tray, Menu, nativeTheme } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
-import { registerUpdaterEvents, getOSName, getFreePort } from './updater'
+import { registerUpdaterEvents, getOSName, getFreePort, setConfig } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
 
@@ -105,7 +105,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
     showLoading(win)
 
     const port = await getFreePort()
-    const stage = config.developerMode ? 'zone' : 'org'
+    const stage = 'zone' //config.developerMode ? 'zone' : 'org' // Temporal until we figure out how to use ws=ws://localhost:5000/dcl with .org and the new security measures
     let url = `http://play.decentraland.${stage}/?`
 
     if (config.customUrl) {
@@ -237,6 +237,7 @@ const startApp = async (): Promise<void> => {
   ipcMain.on('loadDecentralandWeb', (event: any, url: string, explorerDesktopBranch: string) => {
     config.customUrl = url
     config.desktopBranch = explorerDesktopBranch
+    setConfig(config)
     loadDecentralandWeb(win)
   })
 
