@@ -137,6 +137,10 @@ const registerDownloadEvent = (
   })
 }
 
+export const setConfig = (config: any) => {
+  globalConfig.desktopBranch = config.desktopBranch
+}
+
 export const registerUpdaterEvents = (
   win: BrowserWindow,
   baseUrl: string,
