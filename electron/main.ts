@@ -1,20 +1,38 @@
-import { shell, app, BrowserWindow, ipcMain, Tray, Menu, nativeTheme } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu } from 'electron'
 import * as path from 'path'
 import * as isDev from 'electron-is-dev'
 import { registerUpdaterEvents, getOSName, getFreePort, setConfig } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
 
-const config = {
+const defaultConfig = {
   developerMode: false,
   customUrl: '',
-  desktopBranch: 'main'
+  desktopBranch: 'main',
+  customParams: ''
 }
+
+let config = { ...defaultConfig }
+
+const openingUrl = process.argv.find((arg) => arg.startsWith('dcl://'))
+
+const checkAmpersand = (origText: string) => {
+  let result = origText
+  if (origText.length > 0) {
+    const lastChar = origText.substr(origText.length - 1)
+    if (lastChar != '&' && lastChar != '?') {
+      result += '&'
+    }
+  }
+  return result
+}
+
+app.setAsDefaultProtocolClient('dcl');
 
 const isAppAllowed = app.requestSingleInstanceLock()
 
 if (!isAppAllowed) {
-  exit(0)
+  app.quit();
 }
 
 process.argv.shift() // Skip process name
@@ -42,7 +60,7 @@ console.log('OS:', osName)
 
 if (getOSName() === null) {
   console.error('OS not supported')
-  exit(1)
+  exit(0)
 }
 
 let isRendererOpen = false
@@ -60,6 +78,23 @@ if (getOSName() === 'windows') {
   rendererPath = rendererPath.replace(/\//gi, '\\')
   versionPath = versionPath.replace(/\//gi, '\\')
   executablePath = executablePath.replace(/\//gi, '\\')
+}
+
+const loadWindow = async (win: BrowserWindow) => {
+  if (isDev) {
+    await win.loadURL(`http://localhost:9000/index.html`)
+  } else {
+    await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
+  }
+}
+
+const checkDeveloperConsole = (win: BrowserWindow) => {
+  if (isDev || config.developerMode) {
+    win.webContents.openDevTools({ mode: 'detach' })
+  } else {
+    if (win.webContents.isDevToolsOpened())
+      win.webContents.closeDevTools()
+  }
 }
 
 const createWindow = async (): Promise<BrowserWindow> => {
@@ -87,15 +122,9 @@ const createWindow = async (): Promise<BrowserWindow> => {
 
   win.setMenuBarVisibility(false)
 
-  if (isDev) {
-    await win.loadURL(`http://localhost:9000/index.html`)
-  } else {
-    await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
-  }
+  await loadWindow(win)
 
-  if (isDev || config.developerMode) {
-    win.webContents.openDevTools({ mode: 'detach' })
-  }
+  checkDeveloperConsole(win)
 
   return Promise.resolve(win)
 }
@@ -114,7 +143,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
       url = `${url}renderer-version=loading&`
     }
 
-    url = `${url}ws=wss://localhost:${port}/dcl`
+    url = `${url}${config.customParams}ws=wss://localhost:${port}/dcl`
 
     console.log(`Opening: ${url}`)
 
@@ -180,8 +209,59 @@ const hideLoading = (win: BrowserWindow) => {
   win.webContents.executeJavaScript(`document.getElementById("loading")?.setAttribute("hidden", "")`)
 }
 
+const getKeyAndValue = (data: string): [string, string | undefined] => {
+  if (data.includes('=')) {
+    const keyAndValue = data.split('=')
+    if (keyAndValue.length == 2) {
+      const key = keyAndValue[0].toUpperCase()
+      const value = keyAndValue[1]
+      return [key, value]
+    }
+  }
+
+  return [data, undefined]
+}
+
+const onOpenUrl = (data: string, win?: BrowserWindow) => {
+  config = { ...defaultConfig }
+  const url = data.substring('dcl://'.length)
+
+  const params = url.split('&')
+  for (const param of params) {
+    const [key, value] = getKeyAndValue(param)
+    if (key == 'DESKTOP-BRANCH' && value) {
+      config.desktopBranch = value
+      setConfig(config)
+    } else if (key == 'DESKTOP-DEVELOPER-MODE') {
+      config.developerMode = true
+    }
+  }
+
+  config.customParams = checkAmpersand(url)
+
+  if (win) {
+    if (!isDev && !config.developerMode) {
+      loadDecentralandWeb(win)
+    } else {
+      loadWindow(win)
+    }
+
+    checkDeveloperConsole(win)
+  }
+}
+
 const startApp = async (): Promise<void> => {
+  if (process.platform == 'win32') {
+    if (openingUrl)
+      onOpenUrl(openingUrl)
+  }
+
   const win = await createWindow()
+
+  app.on('open-url', (event, url) => {
+    event.preventDefault();
+    onOpenUrl(url, win)
+  });
 
   ipcMain.on('process-terminated', async (event) => {
     isRendererOpen = false
@@ -210,6 +290,12 @@ const startApp = async (): Promise<void> => {
   })
 
   app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (process.platform !== 'darwin') {
+      // Find the arg that is our custom protocol url and store it
+      const url = commandLine.find((arg) => arg.startsWith('dcl://'))
+      if (url)
+        onOpenUrl(url, win)
+    }
     showWindowAndHideTray(win)
   })
 
@@ -263,7 +349,7 @@ app.whenReady().then(async () => {
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-      app.quit()
+      exit(0)
     }
   })
 
