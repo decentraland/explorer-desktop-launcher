@@ -64,14 +64,14 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
   ipcMain.on('executeProcess', (event) => {
     try {
       const onExecute = (err: any, data: any) => {
+        console.log("Process terminated - " + data.toString())
+        ipcMain.emit("process-terminated");
+
         if (err) {
           console.error('Execute error: ', err)
           event.sender.send('downloadState', { type: 'ERROR', message: err })
           return
         }
-
-        console.log("Process terminated - " + data.toString())
-        ipcMain.emit("process-terminated");
       }
 
       let path = rendererPath + getBranchName() + executablePath
