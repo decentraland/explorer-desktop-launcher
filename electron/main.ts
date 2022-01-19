@@ -60,7 +60,7 @@ console.log('OS:', osName)
 
 if (getOSName() === null) {
   console.error('OS not supported')
-  exit(0)
+  exit(1)
 }
 
 let isRendererOpen = false
@@ -97,9 +97,22 @@ const checkDeveloperConsole = (win: BrowserWindow) => {
   }
 }
 
+const getAppTitle = (): string => {
+  let title = 'Decentraland BETA'
+
+  if (config.desktopBranch !== defaultConfig.desktopBranch)
+    title += ` desktop-branch=${config.desktopBranch}`
+
+  if (config.customParams !== defaultConfig.customParams)
+    title += ` params=${config.customParams}`
+
+  return title
+}
+
 const createWindow = async (): Promise<BrowserWindow> => {
+
   const win = new BrowserWindow({
-    title: 'Decentraland BETA',
+    title: getAppTitle(),
     width: 1006, // 990+16 border
     height: 849, // 790+59 border
     minWidth: 1006,
@@ -113,9 +126,17 @@ const createWindow = async (): Promise<BrowserWindow> => {
     }
   })
 
+  win.on('page-title-updated', (evt) => {
+    evt.preventDefault();
+  });
+
   ipcMain.on('checkDeveloperMode', (event: any) => {
     console.log('checkDeveloperMode')
-    event.sender.send('checkDeveloperMode', isDev || config.developerMode)
+    event.sender.send('checkDeveloperMode', {
+      isDev: isDev || config.developerMode,
+      desktopBranch: config.desktopBranch,
+      customParams: config.customParams
+    })
   })
 
   registerUpdaterEvents(win, baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
@@ -227,6 +248,7 @@ const onOpenUrl = (data: string, win?: BrowserWindow) => {
   const url = data.substring('dcl://'.length)
 
   const params = url.split('&')
+  let resultParams = ''
   for (const param of params) {
     const [key, value] = getKeyAndValue(param)
     if (key == 'DESKTOP-BRANCH' && value) {
@@ -234,12 +256,19 @@ const onOpenUrl = (data: string, win?: BrowserWindow) => {
       setConfig(config)
     } else if (key == 'DESKTOP-DEVELOPER-MODE') {
       config.developerMode = true
+    } else {
+      resultParams += key
+      if (value)
+        resultParams += `=${value}`
+      resultParams += '&'
     }
   }
 
-  config.customParams = checkAmpersand(url)
+  config.customParams = checkAmpersand(resultParams)
 
   if (win) {
+    win.setTitle(getAppTitle())
+
     if (!isDev && !config.developerMode) {
       loadDecentralandWeb(win)
     } else {
@@ -349,7 +378,7 @@ app.whenReady().then(async () => {
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-      exit(0)
+      app.quit()
     }
   })
 
