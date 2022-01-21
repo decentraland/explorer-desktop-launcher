@@ -203,7 +203,7 @@ export const getOSExtension = (): string | null => {
 export const getFreePort = (): Promise<number> => {
   return new Promise<number>((resolve, reject) => {
     var fp = require('find-free-port')
-    fp(5000, 5100, (err: any, freePort: number) => {
+    fp(7666, 7766, (err: any, freePort: number) => {
       if (err) reject(err)
       resolve(freePort)
     })

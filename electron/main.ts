@@ -10,7 +10,7 @@ const defaultConfig = {
   customUrl: '',
   desktopBranch: 'main',
   customParams: '',
-  port: 5000
+  port: 7666
 }
 
 let config = { ...defaultConfig }
@@ -158,7 +158,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
     showLoading(win)
 
-    const stage = 'zone' //config.developerMode ? 'zone' : 'org' // Temporal until we figure out how to use ws=ws://localhost:5000/dcl with .org and the new security measures
+    const stage = config.developerMode ? 'zone' : 'org'
     let url = `http://play.decentraland.${stage}/?`
 
     if (config.customUrl) {
