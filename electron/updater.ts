@@ -6,7 +6,8 @@ import axios from 'axios'
 
 const globalConfig = {
   remoteVersion: '',
-  desktopBranch: ''
+  desktopBranch: '',
+  port: 5000
 }
 
 const getCurrentVersion = (rendererPath: string, versionPath: string): string | null => {
@@ -76,7 +77,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       let path = rendererPath + getBranchName() + executablePath
 
-      let extraParams = ' --browser false'
+      let extraParams = ` --browser false --port ${config.port}`
 
       console.log('Execute path: ', path + extraParams)
 
@@ -139,6 +140,7 @@ const registerDownloadEvent = (
 
 export const setConfig = (config: any) => {
   globalConfig.desktopBranch = config.desktopBranch
+  globalConfig.port = config.port
 }
 
 export const registerUpdaterEvents = (
@@ -152,7 +154,7 @@ export const registerUpdaterEvents = (
   config: any
 ) => {
   try {
-    globalConfig.desktopBranch = config.desktopBranch
+    setConfig(config)
 
     // Get version
     registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
@@ -201,7 +203,7 @@ export const getOSExtension = (): string | null => {
 export const getFreePort = (): Promise<number> => {
   return new Promise<number>((resolve, reject) => {
     var fp = require('find-free-port')
-    fp(5000, 5100, (err: any, freePort: number) => {
+    fp(7666, 7766, (err: any, freePort: number) => {
       if (err) reject(err)
       resolve(freePort)
     })

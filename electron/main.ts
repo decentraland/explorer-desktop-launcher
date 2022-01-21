@@ -9,7 +9,8 @@ const defaultConfig = {
   developerMode: false,
   customUrl: '',
   desktopBranch: 'main',
-  customParams: ''
+  customParams: '',
+  port: 7666
 }
 
 let config = { ...defaultConfig }
@@ -139,6 +140,9 @@ const createWindow = async (): Promise<BrowserWindow> => {
     })
   })
 
+  const port = await getFreePort()
+  config.port = port
+
   registerUpdaterEvents(win, baseUrl, rendererPath, versionPath, executablePath, artifactUrl, remoteVersionUrl, config)
 
   win.setMenuBarVisibility(false)
@@ -154,8 +158,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
     showLoading(win)
 
-    const port = await getFreePort()
-    const stage = 'zone' //config.developerMode ? 'zone' : 'org' // Temporal until we figure out how to use ws=ws://localhost:5000/dcl with .org and the new security measures
+    const stage = config.developerMode ? 'zone' : 'org'
     let url = `http://play.decentraland.${stage}/?`
 
     if (config.customUrl) {
@@ -164,7 +167,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
       url = `${url}renderer-version=loading&`
     }
 
-    url = `${url}${config.customParams}ws=wss://localhost:${port}/dcl`
+    url = `${url}${config.customParams}ws=wss://localhost:${config.port}/dcl`
 
     console.log(`Opening: ${url}`)
 
