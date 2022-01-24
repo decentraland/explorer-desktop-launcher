@@ -10,7 +10,8 @@ const defaultConfig = {
   customUrl: '',
   desktopBranch: 'main',
   customParams: '',
-  port: 7666
+  port: 7666,
+  defaultParams: 'DISABLE_ASSET_BUNDLES&DISABLE_WEARABLE_ASSET_BUNDLES&'
 }
 
 let config = { ...defaultConfig }
@@ -167,7 +168,7 @@ const loadDecentralandWeb = async (win: BrowserWindow) => {
       url = `${url}renderer-version=loading&`
     }
 
-    url = `${url}${config.customParams}ws=wss://localhost:${config.port}/dcl`
+    url = `${url}${config.customParams}${config.defaultParams}ws=wss://localhost:${config.port}/dcl`
 
     console.log(`Opening: ${url}`)
 
