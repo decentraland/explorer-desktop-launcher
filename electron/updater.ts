@@ -3,12 +3,9 @@ import { unzip } from './decompress'
 import { BrowserWindow, ipcMain, ipcRenderer } from 'electron'
 import * as fs from 'fs'
 import axios from 'axios'
+import { main } from './main'
 
-const globalConfig = {
-  remoteVersion: '',
-  desktopBranch: '',
-  port: 5000
-}
+let remoteVersion: string
 
 const getCurrentVersion = (rendererPath: string, versionPath: string): string | null => {
   const path = rendererPath + getBranchName() + versionPath
@@ -22,20 +19,18 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
   return version
 }
 
-const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl: string, remoteVersionUrl: string) => {
+const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
-    const version = getCurrentVersion(rendererPath, versionPath)
-    const url = baseUrl + globalConfig.desktopBranch + remoteVersionUrl
+    const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
+    const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
 
     console.log('checkVersion', url)
 
     const response = await axios.get(url)
-    const remoteVersion = response.data.version
+    remoteVersion = response.data.version
 
     const regex = /[0-9a-f]{40}/g
     const validVersion = remoteVersion.match(regex)
-
-    globalConfig.remoteVersion = remoteVersion
 
     if (!validVersion) {
       // error
@@ -50,18 +45,18 @@ const registerVersionEvent = (rendererPath: string, versionPath: string, baseUrl
 
     if (validVersion) {
       event.sender.executeJavaScript(
-        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${globalConfig.desktopBranch
-        }.commit-${globalConfig.remoteVersion.substr(0, 7)}\";`
+        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${main.config.desktopBranch
+        }.commit-${remoteVersion.substr(0, 7)}\";`
       )
     }
   })
 }
 
 const getBranchName = () => {
-  return globalConfig.desktopBranch.replace(/\//gi, '-')
+  return main.config.desktopBranch.replace(/\//gi, '-')
 }
 
-const registerExecuteProcessEvent = (rendererPath: string, executablePath: string, config: any) => {
+const registerExecuteProcessEvent = (rendererPath: string, executablePath: string) => {
   ipcMain.on('executeProcess', (event) => {
     try {
       const onExecute = (err: any, data: any) => {
@@ -77,7 +72,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       let path = rendererPath + getBranchName() + executablePath
 
-      let extraParams = ` --browser false --port ${config.port}`
+      let extraParams = ` --browser false --port ${main.config.port}`
 
       console.log('Execute path: ', path + extraParams)
 
@@ -96,16 +91,13 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 }
 const registerDownloadEvent = (
   win: BrowserWindow,
-  rendererPath: string,
-  versionPath: string,
-  baseUrl: string,
-  artifactUrl: string
+  launcherPaths: LauncherPaths
 ) => {
   //electronDl();
   ipcMain.on('download', async (event) => {
-    const branchPath = rendererPath + getBranchName()
+    const branchPath = launcherPaths.rendererPath + getBranchName()
     fs.rmdirSync(branchPath, { recursive: true })
-    const url = baseUrl + globalConfig.desktopBranch + artifactUrl
+    const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.artifactUrl
     console.log('artifactUrl: ', url)
     const res = await electronDl.download(win, url, {
       directory: branchPath,
@@ -123,10 +115,10 @@ const registerDownloadEvent = (
           fs.rmSync(file.path)
 
           const versionData = {
-            version: globalConfig.remoteVersion
+            version: remoteVersion
           }
 
-          const path = branchPath + versionPath
+          const path = branchPath + launcherPaths.versionPath
 
           fs.writeFileSync(path, JSON.stringify(versionData))
           event.sender.send('downloadState', { type: 'READY' })
@@ -138,36 +130,23 @@ const registerDownloadEvent = (
   })
 }
 
-export const setConfig = (config: any) => {
-  globalConfig.desktopBranch = config.desktopBranch
-  globalConfig.port = config.port
-}
-
 export const registerUpdaterEvents = (
   win: BrowserWindow,
-  baseUrl: string,
-  rendererPath: string,
-  versionPath: string,
-  executablePath: string,
-  artifactUrl: string,
-  remoteVersionUrl: string,
-  config: any
+  launcherPaths: LauncherPaths,
 ) => {
   try {
-    setConfig(config)
-
     // Get version
-    registerVersionEvent(rendererPath, versionPath, baseUrl, remoteVersionUrl)
+    registerVersionEvent(launcherPaths)
 
     // Register event to execute process
-    registerExecuteProcessEvent(rendererPath, executablePath + getOSExtension(), config)
+    registerExecuteProcessEvent(launcherPaths.rendererPath, launcherPaths.executablePath + getOSExtension())
 
     // Register event to download
-    registerDownloadEvent(win, rendererPath, versionPath, baseUrl, artifactUrl)
+    registerDownloadEvent(win, launcherPaths)
 
     // Register clear cache
     ipcMain.on('clearCache', async (event) => {
-      fs.rmdirSync(rendererPath, { recursive: true })
+      fs.rmdirSync(launcherPaths.rendererPath, { recursive: true })
     })
   } catch (e) {
     console.error('registerUpdaterEvents error: ', e)
