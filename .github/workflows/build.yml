@@ -4,16 +4,16 @@ on: push
 
 jobs:
   release:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
 
     strategy:
       matrix:
         include:
-          - os: macos-latest
+          - os: macos
             ext: dmg
-          - os: ubuntu-latest
+          - os: ubuntu
             ext: AppImage
-          - os: windows-latest
+          - os: windows
             ext: exe
 
     steps:
@@ -33,7 +33,7 @@ jobs:
           npm install
           npm run build
       - name: Publish Electron App
-        if: github.ref == 'refs/heads/main'
+        if: ${{ github.ref == 'refs/heads/main' && matrix.os != 'windows' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         run: |
