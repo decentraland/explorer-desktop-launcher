@@ -135,8 +135,7 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
 
 export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   main.config = { ...main.defaultConfig }
-  const url = data.substring('dcl://'.length)
-
+  const url = checkAmpersand(data.substring('dcl://'.length))
   const params = url.split('&')
   let resultParams = ''
   for (const param of params) {
@@ -154,6 +153,9 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   }
 
   main.config.customParams = checkAmpersand(resultParams)
+
+  if (main.config.customParams === '&')
+    main.config.customParams = ''
 
   if (win) {
     win.setTitle(getAppTitle())

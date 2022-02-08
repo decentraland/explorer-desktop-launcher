@@ -29,7 +29,7 @@ class MainApp {
 
 export const main: MainApp = new MainApp();
 
-parseConfig(process.argv)
+parseConfig([...process.argv])
 
 main.openingUrl = process.argv.find((arg) => arg.startsWith('dcl://'))
 
