@@ -99,15 +99,18 @@ const startApp = async (): Promise<void> => {
     onOpenUrl(url, win)
   });
 
-  ipcMain.on('process-terminated', async (event) => {
+  ipcMain.on('process-terminated', async (event, reloadWebsite: boolean) => {
     main.isRendererOpen = false
 
-    // (#1457) we should reload the url
-    loadDecentralandWeb(win)
+    if (reloadWebsite) {
+      // (#1457) we should reload the url
+      loadDecentralandWeb(win)
+    }
+  
     showWindowAndHideTray(win)
   })
 
-  ipcMain.on('executeProcess', (event) => {
+  ipcMain.on('on-open-renderer', (event) => {
     main.isRendererOpen = true
     hideWindowInTray(win)
   })
