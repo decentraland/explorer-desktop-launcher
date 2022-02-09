@@ -17,6 +17,7 @@ export const createWindow = async (
     minWidth: 1006,
     minHeight: 849,
     webPreferences: {
+      backgroundThrottling: false,
       nodeIntegration: true,
       enableRemoteModule: true,
       contextIsolation: false,
