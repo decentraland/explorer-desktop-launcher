@@ -1,9 +1,10 @@
 import * as electronDl from 'electron-dl'
 import { unzip } from './decompress'
-import { BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import * as fs from 'fs'
 import axios from 'axios'
 import { main } from './main'
+import * as isDev from 'electron-is-dev'
 
 let remoteVersion: string
 
@@ -21,6 +22,12 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
 
 const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
+
+    const electronMode = `\"${main.config.developerMode || isDev ? 'development' : 'production'}\"`
+    event.sender.executeJavaScript(
+      `ELECTRON_MODE = ${electronMode}`
+    )
+
     const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
 
@@ -44,9 +51,13 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
     }
 
     if (validVersion) {
+      const desktopVersion = `\"desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}\"`
       event.sender.executeJavaScript(
-        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = \"desktop-${main.config.desktopBranch
-        }.commit-${remoteVersion.substr(0, 7)}\";`
+        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`
+      )
+
+      event.sender.executeJavaScript(
+        `globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`
       )
     }
   })
@@ -60,17 +71,18 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
   ipcMain.on('executeProcess', (event) => {
     try {
       const onExecute = (err: any, data: any) => {
-        console.log("Process terminated - " + data.toString())
-        ipcMain.emit("process-terminated");
-
         if (err) {
           console.error('Execute error: ', err)
           event.sender.send('downloadState', { type: 'ERROR', message: err })
+          ipcMain.emit("process-terminated", false);  
           return
         }
+
+        console.log("Process terminated - " + data.toString())
+        ipcMain.emit("process-terminated", true);
       }
 
-      let path = rendererPath + getBranchName() + executablePath
+      let path = "\"" + rendererPath + getBranchName() + executablePath + "\""
 
       let extraParams = ` --browser false --port ${main.config.port}`
 
@@ -83,6 +95,8 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
         const { exec } = require('child_process')
         exec(path + extraParams, onExecute)
       }
+
+      ipcMain.emit("on-open-renderer")
     } catch (e) {
       console.error('Execute error: ', e)
       event.sender.send('downloadState', { type: 'ERROR', message: e })
