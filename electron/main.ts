@@ -27,18 +27,18 @@ class MainApp {
   config: LauncherConfig = defaultConfig
 }
 
-export const main: MainApp = new MainApp();
+export const main: MainApp = new MainApp()
 
 parseConfig([...process.argv])
 
 main.openingUrl = process.argv.find((arg) => arg.startsWith('dcl://'))
 
-app.setAsDefaultProtocolClient('dcl');
+app.setAsDefaultProtocolClient('dcl')
 
 const isAppAllowed = app.requestSingleInstanceLock()
 
 if (!isAppAllowed) {
-  app.quit();
+  app.quit()
 }
 
 const osName = getOSName()
@@ -66,20 +66,30 @@ if (getOSName() === 'windows') {
   launcherPaths.executablePath = launcherPaths.executablePath.replace(/\//gi, '\\')
 }
 
-const checkUpdates = async(win: BrowserWindow): Promise<void> => {
-  const result = await autoUpdater.checkForUpdatesAndNotify()
-  console.log('Result:', result)
-  if (result === null || !result.downloadPromise) {
-    loadDecentralandWeb(win)
+const checkUpdates = async (win: BrowserWindow): Promise<void> => {
+  if (getOSName() === 'mac') {
+    loadDecentralandWeb(win) // Skip auto update on Mac
   } else {
-    if (result.downloadPromise) {
-      await result.downloadPromise
+    try {
+      const result = await autoUpdater.checkForUpdatesAndNotify()
+      console.log('Result:', result)
+      if (result === null || !result.downloadPromise) {
+        loadDecentralandWeb(win)
+      } else {
+        if (result.downloadPromise) {
+          await result.downloadPromise
 
-      console.log('Download completed')
-      const silent = process.platform === 'darwin' // Silent=true only on Mac
-      autoUpdater.quitAndInstall(silent, true)
+          console.log('Download completed')
+          const silent = process.platform === 'darwin' // Silent=true only on Mac
+          autoUpdater.quitAndInstall(silent, true)
+        }
+      }
+    } catch (err) {
+      console.error(`Check Updates error: ${err}`)
+      loadDecentralandWeb(win) // Load current version anyway
     }
   }
+  return Promise.resolve()
 }
 
 const startApp = async (): Promise<void> => {
@@ -95,9 +105,9 @@ const startApp = async (): Promise<void> => {
   const win = await createWindow(appTitle, launcherPaths)
 
   app.on('open-url', (event, url) => {
-    event.preventDefault();
+    event.preventDefault()
     onOpenUrl(url, win)
-  });
+  })
 
   ipcMain.on('process-terminated', async (event, reloadWebsite: boolean) => {
     main.isRendererOpen = false
@@ -106,7 +116,7 @@ const startApp = async (): Promise<void> => {
       // (#1457) we should reload the url
       loadDecentralandWeb(win)
     }
-  
+
     showWindowAndHideTray(win)
   })
 
@@ -132,8 +142,7 @@ const startApp = async (): Promise<void> => {
     if (process.platform !== 'darwin') {
       // Find the arg that is our custom protocol url and store it
       const url = commandLine.find((arg) => arg.startsWith('dcl://'))
-      if (url)
-        onOpenUrl(url, win)
+      if (url) onOpenUrl(url, win)
     }
     showWindowAndHideTray(win)
   })

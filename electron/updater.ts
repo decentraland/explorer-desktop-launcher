@@ -22,11 +22,8 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
 
 const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
-
     const electronMode = `\"${main.config.developerMode || isDev ? 'development' : 'production'}\"`
-    event.sender.executeJavaScript(
-      `ELECTRON_MODE = ${electronMode}`
-    )
+    event.sender.executeJavaScript(`ELECTRON_MODE = ${electronMode}`)
 
     const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
@@ -52,13 +49,9 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 
     if (validVersion) {
       const desktopVersion = `\"desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}\"`
-      event.sender.executeJavaScript(
-        `globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`
-      )
+      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
 
-      event.sender.executeJavaScript(
-        `globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`
-      )
+      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`)
     }
   })
 }
@@ -74,15 +67,15 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
         if (err) {
           console.error('Execute error: ', err)
           event.sender.send('downloadState', { type: 'ERROR', message: err })
-          ipcMain.emit("process-terminated", false);  
+          ipcMain.emit('process-terminated', false)
           return
         }
 
-        console.log("Process terminated - " + data.toString())
-        ipcMain.emit("process-terminated", true);
+        console.log('Process terminated - ' + data.toString())
+        ipcMain.emit('process-terminated', true)
       }
 
-      let path = "\"" + rendererPath + getBranchName() + executablePath + "\""
+      let path = '"' + rendererPath + getBranchName() + executablePath + '"'
 
       let extraParams = ` --browser false --port ${main.config.port}`
 
@@ -90,23 +83,20 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       if (getOSName() === 'mac') {
         const { exec } = require('child_process')
-        exec('open -W "' + path + '" --args' + extraParams, onExecute)
+        exec('open -W ' + path + ' --args' + extraParams, onExecute)
       } else {
         const { exec } = require('child_process')
         exec(path + extraParams, onExecute)
       }
 
-      ipcMain.emit("on-open-renderer")
+      ipcMain.emit('on-open-renderer')
     } catch (e) {
       console.error('Execute error: ', e)
       event.sender.send('downloadState', { type: 'ERROR', message: e })
     }
   })
 }
-const registerDownloadEvent = (
-  win: BrowserWindow,
-  launcherPaths: LauncherPaths
-) => {
+const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths) => {
   //electronDl();
   ipcMain.on('download', async (event) => {
     const branchPath = launcherPaths.rendererPath + getBranchName()
@@ -144,10 +134,7 @@ const registerDownloadEvent = (
   })
 }
 
-export const registerUpdaterEvents = (
-  win: BrowserWindow,
-  launcherPaths: LauncherPaths,
-) => {
+export const registerUpdaterEvents = (win: BrowserWindow, launcherPaths: LauncherPaths) => {
   try {
     // Get version
     registerVersionEvent(launcherPaths)
