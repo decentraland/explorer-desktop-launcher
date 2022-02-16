@@ -59,7 +59,10 @@
       "icon": "public/app-icon.png",
       "target": [
         "nsis"
-      ]
+      ],
+      "signingHashAlgorithms": [ "sha256" ],
+      "rfc3161TimeStampServer": "http://ts.ssl.com",
+      "timeStampServer": "http://ts.ssl.com"
     },
     "nsis": {
       "oneClick": false,
