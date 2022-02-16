@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -59,7 +59,10 @@
       "icon": "public/app-icon.png",
       "target": [
         "nsis"
-      ]
+      ],
+      "signingHashAlgorithms": [ "sha256" ],
+      "rfc3161TimeStampServer": "http://ts.ssl.com",
+      "timeStampServer": "http://ts.ssl.com"
     },
     "nsis": {
       "oneClick": false,
