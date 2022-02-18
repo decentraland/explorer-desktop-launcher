@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -60,7 +60,9 @@
       "target": [
         "nsis"
       ],
-      "signingHashAlgorithms": [ "sha256" ],
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
       "rfc3161TimeStampServer": "http://ts.ssl.com",
       "timeStampServer": "http://ts.ssl.com"
     },
@@ -71,7 +73,8 @@
       "installerIcon": "public/installer-icon.ico",
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": true,
-      "perMachine": true
+      "perMachine": true,
+      "include": "electron/installer.nsh"
     },
     "linux": {
       "icon": "public/app-icon.png",
