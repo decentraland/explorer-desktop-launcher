@@ -84,7 +84,6 @@ export const hideWindowInTray = (win: BrowserWindow) => {
 
       main.tray.setToolTip('Decentraland Launcher')
       main.tray.setContextMenu(main.contextMenu)
-      main.tray.on('click', (event) => showWindowAndHideTray(win))
       main.tray.on('right-click', (event) => main.tray?.popUpContextMenu(main.contextMenu))
     } catch (e) {
       throw e
