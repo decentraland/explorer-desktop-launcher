@@ -24,6 +24,7 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
     const electronMode = `\"${main.config.developerMode || isDev ? 'development' : 'production'}\"`
     event.sender.executeJavaScript(`ELECTRON_MODE = ${electronMode}`)
+    const PREVIEW = await event.sender.executeJavaScript('globalThis.preview')
 
     const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
@@ -47,10 +48,9 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
       event.sender.send('downloadState', { type: 'NEW_VERSION' })
     }
 
-    if (validVersion) {
+    if (validVersion && !PREVIEW) {
       const desktopVersion = `\"desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}\"`
       event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
-
       event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`)
     }
   })
