@@ -5,7 +5,8 @@ type LauncherConfig = {
   customParams: string,
   port: number,
   defaultParams: string,
-  remoteVersion?: string
+  remoteVersion?: string,
+  previewMode: boolean
 }
 
 type LauncherPaths = {

@@ -175,7 +175,11 @@
 
     const { ipcRenderer } = window.require('electron')
 
-    ipcRenderer.on('checkDeveloperMode', (event, { isDev, desktopBranch, customParams }) => {
+    ipcRenderer.on('checkDeveloperMode', (event, { isDev, desktopBranch, customParams, previewMode }) => {
+      if (previewMode) {
+        document.getElementById("custom-url").value = previewMode
+      }
+
       if (isDev) {
         document.getElementById("loading").setAttribute("hidden", '')
         document.getElementById("dev").removeAttribute("hidden")

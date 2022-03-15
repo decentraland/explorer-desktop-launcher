@@ -33,6 +33,7 @@ export const createWindow = async (
     console.log('checkDeveloperMode')
     event.sender.send('checkDeveloperMode', {
       isDev: isDev || main.config.developerMode,
+      previewMode: main.config.previewMode ? main.config.customUrl : undefined,
       desktopBranch: main.config.desktopBranch,
       customParams: main.config.customParams
     })
@@ -144,6 +145,9 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
       main.config.desktopBranch = value
     } else if (key == 'DESKTOP-DEVELOPER-MODE') {
       main.config.developerMode = true
+    } else if (key == 'PREVIEW-MODE' && value) {
+      main.config.customUrl = value
+      main.config.previewMode = true
     } else {
       resultParams += key
       if (value)

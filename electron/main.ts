@@ -13,7 +13,8 @@ const defaultConfig: LauncherConfig = {
   desktopBranch: 'main',
   customParams: '',
   port: 7666,
-  defaultParams: 'DISABLE_ASSET_BUNDLES&DISABLE_WEARABLE_ASSET_BUNDLES&'
+  defaultParams: 'DISABLE_ASSET_BUNDLES&DISABLE_WEARABLE_ASSET_BUNDLES&',
+  previewMode: false
 }
 
 class MainApp {
@@ -95,7 +96,7 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
 const startApp = async (): Promise<void> => {
   main.config.port = await getFreePort()
 
-  if (process.platform == 'win32') {
+  if (process.platform == 'win32' || process.platform == 'linux') {
     if (main.openingUrl) {
       onOpenUrl(main.openingUrl)
     }
