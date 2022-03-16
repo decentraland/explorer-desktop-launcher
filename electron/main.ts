@@ -159,7 +159,7 @@ const startApp = async (): Promise<void> => {
     loadDecentralandWeb(win)
   })
 
-  if (!isDev && !main.config.developerMode) {
+  if (!isDev && !main.config.developerMode && !main.config.previewMode) {
     await checkUpdates(win)
   }
 

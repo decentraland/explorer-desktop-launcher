@@ -164,7 +164,7 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   if (win) {
     win.setTitle(getAppTitle())
 
-    if (!isDev && !main.config.developerMode) {
+    if (!isDev && !main.config.developerMode && !main.config.previewMode) {
       loadDecentralandWeb(win)
     } else {
       loadWindow(win, isDev)

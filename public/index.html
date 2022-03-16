@@ -78,6 +78,20 @@
       <p>Loading Decentraland</p>
     </div>
   </div>
+  <div id="preview" class="container" hidden="true">
+    <div class="form">
+      <img src="decentraland-loading.gif" alt="Decentraland" width="128px">
+      <p>You're entering a local Decentraland preview hosted at:</p>
+      <p style="color: #f05; text-decoration: underline;" id="preview-mode-url">empty</p>
+      <p><small>Only follow links to trusted domains</small></p>
+      
+      <p><input onclick="submitForm()" type="button" style="background-color: #ff2d55; border-radius: 6px; border: 0; height: 44px; color: #fff; font-weight: bold; font-size: 13px; width: 128px; font-family: -apple-system,system-ui,segoe ui,Roboto,helvetica neue,Arial,sans-serif;" value="CONTINUE" /></p>
+      
+      <label>Add custom URL parameters:</label>
+      <input onchange="checkChange(`preview-custom-param`)" type="checkbox" id="preview-check-custom-param" /></br>
+      <input oninput="updateUrl()" type="text" id="preview-custom-param" value="EXAMPLE=VALUE&" disabled='' /></br></br>
+    </div>
+  </div>
   <div id="dev" class="container" hidden="true">
     <div class="form">
       <label>explorer-desktop branch:</label></br>
@@ -118,19 +132,23 @@
       return result
     }
 
+    let baseUrl = `http://play.decentraland.org/?`
+
     const updateUrl = () => {
       const hasKernelBranch = document.getElementById("check-kernel-branch").checked
       const hasExplorerWebsiteBranch = document.getElementById("check-explorer-website-branch").checked
       const hasCustomParam = document.getElementById("check-custom-param").checked
+      const hasPreviewCustomParam = document.getElementById("preview-check-custom-param").checked
       const hasCustomUrl = document.getElementById("check-custom-url").checked
 
       const kernelBranch = document.getElementById("kernel-branch").value
       const explorerWebsiteBranch = document.getElementById("explorer-website-branch").value
       const customParam = document.getElementById("custom-param").value
+      const previewCustomParam = document.getElementById("preview-custom-param").value
       const customUrlObj = document.getElementById("custom-url")
 
       if (!hasCustomUrl) {
-        let url = `http://play.decentraland.org/?`
+        let url = baseUrl
 
         if (hasExplorerWebsiteBranch) {
           url = `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?`
@@ -147,7 +165,15 @@
         customUrlObj.value = url
         return checkAmpersand(url)
       } else {
-        return checkAmpersand(customUrlObj.value)
+        let url = baseUrl
+
+        if (hasPreviewCustomParam) {
+          url += checkAmpersand(previewCustomParam)
+        }
+
+        customUrlObj.value = url        
+        document.getElementById("preview-mode-url").innerText = url
+        return checkAmpersand(url)
       }
     }
 
@@ -176,13 +202,15 @@
     const { ipcRenderer } = window.require('electron')
 
     ipcRenderer.on('checkDeveloperMode', (event, { isDev, desktopBranch, customParams, previewMode }) => {
-      if (previewMode) {
-        document.getElementById("custom-url").value = previewMode
-      }
-
       if (isDev) {
         document.getElementById("loading").setAttribute("hidden", '')
         document.getElementById("dev").removeAttribute("hidden")
+
+        if (previewMode) {
+          document.getElementById("check-custom-url").checked = true
+          document.getElementById("custom-url").removeAttribute("disabled")
+          document.getElementById("custom-url").value = previewMode
+        }
 
         const explorerDesktopBranchElement = document.getElementById("explorer-desktop-branch")
         const customParamElement = document.getElementById("custom-param")
@@ -195,6 +223,17 @@
           customParamCheckElement.checked = true
           checkChange('custom-param')
         }
+      } else if (previewMode) {
+        baseUrl = previewMode
+        document.getElementById("loading").setAttribute("hidden", '')
+        document.getElementById("preview").removeAttribute("hidden")
+
+        document.getElementById("check-custom-url").checked = true
+        document.getElementById("custom-url").removeAttribute("disabled")
+        document.getElementById("custom-url").value = previewMode
+        document.getElementById("preview-mode-url").innerText = previewMode
+
+        updateUrl()
       }
     })
 
