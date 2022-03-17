@@ -147,6 +147,8 @@
       const previewCustomParam = document.getElementById("preview-custom-param").value
       const customUrlObj = document.getElementById("custom-url")
 
+      const previewPanelHidden = document.getElementById("preview").hasAttribute('hidden')
+
       if (!hasCustomUrl) {
         let url = baseUrl
 
@@ -164,7 +166,7 @@
 
         customUrlObj.value = url
         return checkAmpersand(url)
-      } else {
+      } else if (!previewPanelHidden) {
         let url = baseUrl
 
         if (hasPreviewCustomParam) {
@@ -174,6 +176,8 @@
         customUrlObj.value = url        
         document.getElementById("preview-mode-url").innerText = url
         return checkAmpersand(url)
+      } else {
+        return checkAmpersand(customUrlObj.value)
       }
     }
 
@@ -207,6 +211,7 @@
         document.getElementById("dev").removeAttribute("hidden")
 
         if (previewMode) {
+          baseUrl = previewMode
           document.getElementById("check-custom-url").checked = true
           document.getElementById("custom-url").removeAttribute("disabled")
           document.getElementById("custom-url").value = previewMode
