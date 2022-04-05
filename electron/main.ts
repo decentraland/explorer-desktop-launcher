@@ -36,8 +36,7 @@ parseConfig([...process.argv])
 main.openingUrl = process.argv.find((arg) => arg.startsWith('dcl://'))
 console.log('main.openingUrl: ', main.openingUrl)
 
-if (main.openingUrl) app.setAsDefaultProtocolClient('dcl', process.execPath, [main.openingUrl])
-else app.setAsDefaultProtocolClient('dcl')
+app.setAsDefaultProtocolClient('dcl')
 
 const isAppAllowed = app.requestSingleInstanceLock()
 

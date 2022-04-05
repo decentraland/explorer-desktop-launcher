@@ -149,7 +149,7 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   const previewMode: string | null = params.get('PREVIEW-MODE')
   if (previewMode != null) {
     if (previewMode !== '') {
-      main.config.customUrl = previewMode
+      main.config.customUrl = checkAmpersand(previewMode)
       main.config.previewMode = true
     }
     params.delete('PREVIEW-MODE')
