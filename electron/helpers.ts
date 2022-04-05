@@ -1,14 +1,19 @@
-import { app } from "electron"
-import { main } from "./main"
+import { app } from 'electron'
+import { main } from './main'
 
 export const checkAmpersand = (origText: string) => {
-  let result = origText
-  if (origText.length > 0) {
-    const lastChar = origText.substring(origText.length - 1)
-    if (lastChar != '&' && lastChar != '?') {
+  const url = new URL(origText)
+  let result = url.href
+  const lastChar = result.substring(result.length - 1)
+
+  if (lastChar !== '&' && lastChar !== '?') {
+    if (result.indexOf('?') > 0) {
       result += '&'
+    } else {
+      result += '?'
     }
   }
+
   return result
 }
 
@@ -18,8 +23,7 @@ export const getAppTitle = (): string => {
   if (main.config.desktopBranch !== main.defaultConfig.desktopBranch)
     title += ` desktop-branch=${main.config.desktopBranch}`
 
-  if (main.config.customParams !== main.defaultConfig.customParams)
-    title += ` params=${main.config.customParams}`
+  if (main.config.customParams !== main.defaultConfig.customParams) title += ` params=${main.config.customParams}`
 
   return title
 }

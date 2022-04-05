@@ -1,15 +1,12 @@
-import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron";
-import { registerUpdaterEvents } from "./updater";
+import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron'
+import { registerUpdaterEvents } from './updater'
 import * as path from 'path'
-import { main } from "./main";
+import { main } from './main'
 import * as isDev from 'electron-is-dev'
-import { checkAmpersand, getAppTitle, getIconByPlatform, getKeyAndValue, onExit } from "./helpers";
+import { checkAmpersand, getAppTitle, getIconByPlatform, getKeyAndValue, onExit } from './helpers'
+import { URLSearchParams } from 'url'
 
-export const createWindow = async (
-  title: string,
-  launcherPaths: LauncherPaths
-): Promise<BrowserWindow> => {
-
+export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
     title,
     width: 1006, // 990+16 border
@@ -26,13 +23,14 @@ export const createWindow = async (
   })
 
   win.on('page-title-updated', (evt) => {
-    evt.preventDefault();
-  });
+    evt.preventDefault()
+  })
 
   ipcMain.on('checkDeveloperMode', (event: any) => {
     console.log('checkDeveloperMode')
     event.sender.send('checkDeveloperMode', {
       isDev: isDev || main.config.developerMode,
+      previewMode: main.config.previewMode ? main.config.customUrl : undefined,
       desktopBranch: main.config.desktopBranch,
       customParams: main.config.customParams
     })
@@ -61,8 +59,7 @@ export const checkDeveloperConsole = (win: BrowserWindow) => {
   if (isDev || main.config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
   } else {
-    if (win.webContents.isDevToolsOpened())
-      win.webContents.closeDevTools()
+    if (win.webContents.isDevToolsOpened()) win.webContents.closeDevTools()
   }
 }
 
@@ -135,32 +132,39 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
 
 export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   main.config = { ...main.defaultConfig }
-  const url = checkAmpersand(data.substring('dcl://'.length))
-  const params = url.split('&')
-  let resultParams = ''
-  for (const param of params) {
-    const [key, value] = getKeyAndValue(param)
-    if (key == 'DESKTOP-BRANCH' && value) {
-      main.config.desktopBranch = value
-    } else if (key == 'DESKTOP-DEVELOPER-MODE') {
-      main.config.developerMode = true
-    } else {
-      resultParams += key
-      if (value)
-        resultParams += `=${value}`
-      resultParams += '&'
-    }
+
+  const params = new URLSearchParams(data.substring('dcl://'.length))
+
+  const desktopBranch: string | null = params.get('DESKTOP-BRANCH')
+  if (desktopBranch != null) {
+    main.config.desktopBranch = desktopBranch
+    params.delete('DESKTOP-BRANCH')
   }
 
-  main.config.customParams = checkAmpersand(resultParams)
+  if (params.get('DESKTOP-DEVELOPER-MODE') != null) {
+    main.config.developerMode = true
+    params.delete('DESKTOP-DEVELOPER-MODE')
+  }
 
-  if (main.config.customParams === '&')
-    main.config.customParams = ''
+  const previewMode: string | null = params.get('PREVIEW-MODE')
+  if (previewMode != null) {
+    if (previewMode !== '') {
+      main.config.customUrl = checkAmpersand(previewMode)
+      main.config.previewMode = true
+    }
+    params.delete('PREVIEW-MODE')
+  }
+
+  main.config.customParams = params.toString()
+
+  if (main.config.customParams.length > 0) {
+    main.config.customParams = checkAmpersand(main.config.customParams)
+  }
 
   if (win) {
     win.setTitle(getAppTitle())
 
-    if (!isDev && !main.config.developerMode) {
+    if (!isDev && !main.config.developerMode && !main.config.previewMode) {
       loadDecentralandWeb(win)
     } else {
       loadWindow(win, isDev)
