@@ -26,6 +26,7 @@ class MainApp {
   contextMenu: Menu | undefined = undefined
   openingUrl: string | undefined
   config: LauncherConfig = defaultConfig
+  win: BrowserWindow | undefined
 }
 
 export const main: MainApp = new MainApp()
@@ -33,13 +34,24 @@ export const main: MainApp = new MainApp()
 parseConfig([...process.argv])
 
 main.openingUrl = process.argv.find((arg) => arg.startsWith('dcl://'))
+console.log('main.openingUrl: ', main.openingUrl)
 
-app.setAsDefaultProtocolClient('dcl')
+if (main.openingUrl) app.setAsDefaultProtocolClient('dcl', process.execPath, [main.openingUrl])
+else app.setAsDefaultProtocolClient('dcl')
 
 const isAppAllowed = app.requestSingleInstanceLock()
 
 if (!isAppAllowed) {
   app.quit()
+} else {
+  app.on('open-url', (event, url) => {
+    if (main.win) {
+      onOpenUrl(url, main.win)
+    } else {
+      main.openingUrl = url
+    }
+    event.preventDefault()
+  })
 }
 
 const osName = getOSName()
@@ -96,19 +108,14 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
 const startApp = async (): Promise<void> => {
   main.config.port = await getFreePort()
 
-  if (process.platform == 'win32' || process.platform == 'linux') {
-    if (main.openingUrl) {
-      onOpenUrl(main.openingUrl)
-    }
+  if (main.openingUrl) {
+    console.log('opening-url: ', main.openingUrl)
+    onOpenUrl(main.openingUrl)
   }
 
   const appTitle = getAppTitle()
   const win = await createWindow(appTitle, launcherPaths)
-
-  app.on('open-url', (event, url) => {
-    event.preventDefault()
-    onOpenUrl(url, win)
-  })
+  main.win = win
 
   ipcMain.on('process-terminated', async (event, reloadWebsite: boolean) => {
     main.isRendererOpen = false
@@ -144,6 +151,8 @@ const startApp = async (): Promise<void> => {
       // Find the arg that is our custom protocol url and store it
       const url = commandLine.find((arg) => arg.startsWith('dcl://'))
       if (url) onOpenUrl(url, win)
+
+      console.log('second-instance url: ', url)
     }
     showWindowAndHideTray(win)
   })
