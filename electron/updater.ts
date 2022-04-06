@@ -1,10 +1,11 @@
 import * as electronDl from 'electron-dl'
 import { unzip } from './decompress'
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, ipcMain, WebContents } from 'electron'
 import * as fs from 'fs'
 import axios from 'axios'
 import { main } from './main'
 import * as isDev from 'electron-is-dev'
+import { app } from 'electron/main'
 
 let remoteVersion: string
 
@@ -60,16 +61,55 @@ const getBranchName = () => {
   return main.config.desktopBranch.replace(/\//gi, '-')
 }
 
+const getPlayerLogPath = (): string | undefined => {
+  switch (getOSName()) {
+    case 'mac':
+      return `${app.getPath('home')}/Library/Logs/Decentraland/Decentraland/Player.log`
+    case 'linux':
+      return `${app.getPath('home')}/.config/unity3d/CompanyName/ProductName/Player.log`
+    case 'windows':
+      return `${app.getPath('userData')}\\..\\LocalLow\\CompanyName\\ProductName\\Player.log`
+    default:
+      return undefined
+  }
+}
+
+const getPlayerLog = (): string => {
+  const path = getPlayerLogPath()
+  if (path) {
+    try {
+      const data = fs.readFileSync(path, 'utf8')
+      return data
+    } catch (err) {
+      console.error(err)
+      return ''
+    }
+  } else {
+    return ''
+  }
+}
+
+const reportCrash = (sender: WebContents) => {
+  const path = getPlayerLogPath()
+  const data = getPlayerLog()
+  sender.executeJavaScript(
+    `window.Rollbar.critical('Renderer Crash', { playerlogpath: "${path}", playerlog: "${data}" });`
+  )
+}
+
 const registerExecuteProcessEvent = (rendererPath: string, executablePath: string) => {
   ipcMain.on('executeProcess', (event) => {
     try {
-      const onExecute = (err: any, data: any) => {
+      const onProcessFinish = (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
           event.sender.send('downloadState', { type: 'ERROR', message: err })
           ipcMain.emit('process-terminated', false)
+          //reportCrash(event.sender)
           return
         }
+
+        reportCrash(event.sender) // TEMP
 
         console.log('Process terminated - ' + data.toString())
         ipcMain.emit('process-terminated', true)
@@ -83,10 +123,10 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       if (getOSName() === 'mac') {
         const { exec } = require('child_process')
-        exec('open -W ' + path + ' --args' + extraParams, onExecute)
+        exec('open -W ' + path + ' --args' + extraParams, onProcessFinish)
       } else {
         const { exec } = require('child_process')
-        exec(path + extraParams, onExecute)
+        exec(path + extraParams, onProcessFinish)
       }
 
       ipcMain.emit('on-open-renderer')
