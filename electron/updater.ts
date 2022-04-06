@@ -94,7 +94,10 @@ const reportCrash = (sender: WebContents) => {
   const data = getPlayerLog()
   console.log(`reportCrash path: ${path}`)
   sender.executeJavaScript(
-    `window.Rollbar.critical('Renderer Crash', { playerlogpath: "${path}", playerlog: "${data}" });`
+    `
+    window.Rollbar.log('${data}', { playerlogpath: "${path}" })
+    window.Rollbar.critical('Renderer Crash');
+    `
   )
 }
 
