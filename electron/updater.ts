@@ -82,7 +82,7 @@ const getPlayerLog = (): string => {
       return data
     } catch (err) {
       console.error(err)
-      return ''
+      return `Get player log error: ${err}`
     }
   } else {
     return ''
