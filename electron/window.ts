@@ -3,7 +3,7 @@ import { registerUpdaterEvents } from './updater'
 import * as path from 'path'
 import { main } from './main'
 import * as isDev from 'electron-is-dev'
-import { checkAmpersand, getAppTitle, getIconByPlatform, getKeyAndValue, onExit } from './helpers'
+import { getAppTitle, getIconByPlatform, onExit } from './helpers'
 import { URLSearchParams } from 'url'
 
 export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
@@ -130,10 +130,26 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
   }
 }
 
+/**
+ * Crop 'dcl://' at begin and a slash at the end if exists.
+ * @param url - to be process
+ * @returns URL proccesed
+ */
+function cropUrl(url: string): string {
+  let result: string = url
+  if (url.startsWith('dcl://')) {
+    result = result.substring('dcl://'.length)
+  }
+  if (url.endsWith('/')) {
+    result = result.substring(0, result.length - 1)
+  }
+  return result
+}
+
 export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   main.config = { ...main.defaultConfig }
 
-  const params = new URLSearchParams(data.substring('dcl://'.length))
+  const params = new URLSearchParams(cropUrl(data))
 
   const desktopBranch: string | null = params.get('DESKTOP-BRANCH')
   if (desktopBranch != null) {
@@ -149,7 +165,7 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   const previewMode: string | null = params.get('PREVIEW-MODE')
   if (previewMode != null) {
     if (previewMode !== '') {
-      main.config.customUrl = checkAmpersand(previewMode)
+      main.config.customUrl = previewMode
       main.config.previewMode = true
     }
     params.delete('PREVIEW-MODE')

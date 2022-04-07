@@ -1,22 +1,6 @@
 import { app } from 'electron'
 import { main } from './main'
 
-export const checkAmpersand = (origText: string) => {
-  const url = new URL(origText)
-  let result = url.href
-  const lastChar = result.substring(result.length - 1)
-
-  if (lastChar !== '&' && lastChar !== '?') {
-    if (result.indexOf('?') > 0) {
-      result += '&'
-    } else {
-      result += '?'
-    }
-  }
-
-  return result
-}
-
 export const getAppTitle = (): string => {
   let title = 'Decentraland BETA'
 
