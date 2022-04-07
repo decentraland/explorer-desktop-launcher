@@ -111,19 +111,25 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
     showLoading(win)
 
     const stage = main.config.developerMode ? 'zone' : 'org'
-    let url = `http://play.decentraland.${stage}/?`
+    const url = new URL(
+      main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`
+    )
 
-    if (main.config.customUrl) {
-      url = main.config.customUrl
-    } else {
-      url = `${url}renderer-version=loading&`
+    const customParamObj = new URLSearchParams(main.config.customParams)
+    for (const [key, value] of Array.from(customParamObj.entries())) {
+      url.searchParams.append(key, value)
     }
 
-    url = `${url}${main.config.customParams}${main.config.defaultParams}ws=wss://localhost:${main.config.port}/dcl`
+    const defaultParamObj = new URLSearchParams(main.config.defaultParams)
+    for (const [key, value] of Array.from(defaultParamObj.entries())) {
+      url.searchParams.append(key, value)
+    }
 
-    console.log(`Opening: ${url}`)
+    url.searchParams.append('ws', `wss://localhost:${main.config.port}/dcl`)
 
-    let promise = win.loadURL(url)
+    console.log(`Opening: ${url.toString()}`)
+
+    let promise = win.loadURL(url.toString())
     promise.finally(() => hideLoading(win))
   } catch (err) {
     console.error('err:', err)
