@@ -158,7 +158,7 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   main.config.customParams = params.toString()
 
   if (main.config.customParams.length > 0) {
-    main.config.customParams = checkAmpersand(main.config.customParams)
+    main.config.customParams += '&'
   }
 
   if (win) {
