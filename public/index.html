@@ -121,17 +121,6 @@
     // Display the current version
     const version = window.location.hash.substring(1);
 
-    const checkAmpersand = (origText) => {
-      result = origText
-      if (origText.length > 0) {
-        const lastChar = origText.substr(origText.length - 1)
-        if (lastChar != '&' && lastChar != '?') {
-          result += '&'
-        }
-      }
-      return result
-    }
-
     let baseUrl = `http://play.decentraland.org/?`
 
     const updateUrl = () => {
@@ -149,35 +138,41 @@
 
       const previewPanelHidden = document.getElementById("preview").hasAttribute('hidden')
 
+
       if (!hasCustomUrl) {
-        let url = baseUrl
-
-        if (hasExplorerWebsiteBranch) {
-          url = `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?`
-        }
-
+        const newUrl = new URL(
+          hasExplorerWebsiteBranch ? `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?` 
+          : baseUrl
+        )
+        
         if (hasKernelBranch) {
-          url += `kernel-branch=${kernelBranch}&`
+          newUrl.searchParams.append('kernel-branch', )
         }
 
         if (hasCustomParam) {
-          url += checkAmpersand(customParam)
+          const customParamObj = new URLSearchParams(customParam)
+          for (const [paramKey, paramValue] of customParamObj) {
+            newUrl.searchParams.append(paramKey, paramValue)
+          }
         }
 
-        customUrlObj.value = url
-        return checkAmpersand(url)
+        customUrlObj.value = newUrl.toString()
+        return newUrl.toString()
       } else if (!previewPanelHidden) {
-        let url = baseUrl
-
+        const newUrl = new URL(baseUrl)
+        
         if (hasPreviewCustomParam) {
-          url += checkAmpersand(previewCustomParam)
+          const customParamObj = new URLSearchParams(previewCustomParam)
+          for (const [paramKey, paramValue] of customParamObj) {
+            newUrl.searchParams.append(paramKey, paramValue)
+          }
         }
 
-        customUrlObj.value = url        
-        document.getElementById("preview-mode-url").innerText = url
-        return checkAmpersand(url)
+        customUrlObj.value = newUrl.toString()
+        document.getElementById("preview-mode-url").innerText = newUrl.toString()
+        return newUrl.toString()
       } else {
-        return checkAmpersand(customUrlObj.value)
+        return customUrlObj.value
       }
     }
 
