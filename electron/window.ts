@@ -16,7 +16,7 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
     webPreferences: {
       backgroundThrottling: false,
       nodeIntegration: true,
-      enableRemoteModule: true,
+      // enableRemoteModule: true, // Deprecated in Electron 14 - https://stackoverflow.com/questions/69059668/enableremotemodule-is-missing-from-electron-v14-typescript-type-definitions
       contextIsolation: false,
       webSecurity: !isDev
     }
@@ -111,9 +111,7 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
     showLoading(win)
 
     const stage = main.config.developerMode ? 'zone' : 'org'
-    const url = new URL(
-      main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`
-    )
+    const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`)
 
     const customParamObj = new URLSearchParams(main.config.customParams)
     for (const [key, value] of Array.from(customParamObj.entries())) {
