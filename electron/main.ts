@@ -13,7 +13,6 @@ const defaultConfig: LauncherConfig = {
   desktopBranch: 'main',
   customParams: '',
   port: 7666,
-  defaultParams: 'DISABLE_ASSET_BUNDLES&DISABLE_WEARABLE_ASSET_BUNDLES&',
   previewMode: false
 }
 
