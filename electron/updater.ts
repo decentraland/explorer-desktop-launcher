@@ -66,9 +66,9 @@ const getPlayerLogPath = (): string | undefined => {
     case 'mac':
       return `${app.getPath('home')}/Library/Logs/Decentraland/Decentraland/Player.log`
     case 'linux':
-      return `${app.getPath('home')}/.config/unity3d/CompanyName/ProductName/Player.log`
+      return `${app.getPath('home')}/.config/unity3d/Decentraland/Decentraland/Player.log`
     case 'windows':
-      return `${app.getPath('userData')}\\..\\LocalLow\\CompanyName\\ProductName\\Player.log`
+      return `${app.getPath('userData')}\\..\\LocalLow\\Decentraland\\Decentraland\\Player.log`
     default:
       return undefined
   }
