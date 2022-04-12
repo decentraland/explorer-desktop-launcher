@@ -78,8 +78,10 @@ const getPlayerLog = (): string => {
   const path = getPlayerLogPath()
   if (path) {
     try {
+      const maxCharsToRead = 2000
       const data = fs.readFileSync(path, 'utf8')
-      return data
+      const charsToRead = Math.min(maxCharsToRead, 2000)
+      return data.substring(-charsToRead)
     } catch (err) {
       console.error(err)
       return `Get player log error: ${err}`
@@ -96,7 +98,7 @@ const reportCrash = (sender: WebContents) => {
   sender.executeJavaScript(
     `
     window.Rollbar.error('${data}', ${JSON.stringify({ playerlogpath: path })})
-    window.Rollbar.critical('Renderer Crash')`
+    window.Rollbar.critical('Renderer Crash')
     `
   )
 }
