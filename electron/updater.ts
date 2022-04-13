@@ -70,7 +70,7 @@ const getPlayerLogPath = (): string | undefined => {
     case 'linux':
       return `${app.getPath('home')}/.config/unity3d/Decentraland/Decentraland/Player.log`
     case 'windows':
-      return `${app.getPath('userData')}\\..\\LocalLow\\Decentraland\\Decentraland\\Player.log`
+      return `${app.getPath('userData')}\\..\\..\\LocalLow\\Decentraland\\Decentraland\\Player.log`
     default:
       return undefined
   }
@@ -82,14 +82,14 @@ const getPlayerLog = (): string => {
     try {
       const maxCharsToRead = 2000
       const data = fs.readFileSync(path, 'utf8')
-      const charsToRead = Math.min(maxCharsToRead, 2000)
-      return data.substring(-charsToRead)
+      if (data.length > maxCharsToRead) return data.substring(-maxCharsToRead)
+      else return data
     } catch (err) {
       console.error(err)
       return `Get player log error: ${err}`
     }
   } else {
-    return ''
+    return 'No path'
   }
 }
 
@@ -101,16 +101,20 @@ const reportFatalError = async (sender: WebContents, message: string) => {
   )
 }
 
-const reportCrash = async (sender: WebContents) => {
-  const path = getPlayerLogPath()
-  const data = getPlayerLog()
-  console.log(`reportCrash path: ${path}`)
-  await sender.executeJavaScript(
-    `
-    window.Rollbar.error(${JSON.stringify(data)}, ${JSON.stringify({ playerlogpath: path })})
-    `
-  )
-  await reportFatalError(sender, 'Renderer Crash')
+const reportCrash = async (sender: WebContents, message: string) => {
+  try {
+    const path = getPlayerLogPath()
+    const data = `Player log:\n${getPlayerLog()}`
+    console.log(`reportCrash path: ${path}`)
+    await sender.executeJavaScript(
+      `
+      window.Rollbar.error(${JSON.stringify(data)}, ${JSON.stringify({ playerlogpath: path })})
+      `
+    )
+    await reportFatalError(sender, message)
+  } catch (e) {
+    console.error(`Report crash error: ${e}`)
+  }
 }
 
 const registerExecuteProcessEvent = (rendererPath: string, executablePath: string) => {
@@ -119,8 +123,8 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
+          await reportCrash(event.sender, err.message)
           ipcMain.emit('process-terminated', false)
-          await reportCrash(event.sender)
           return
         }
 
