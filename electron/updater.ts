@@ -107,7 +107,7 @@ const reportCrash = async (sender: WebContents) => {
   console.log(`reportCrash path: ${path}`)
   await sender.executeJavaScript(
     `
-    window.Rollbar.error('${data}', ${JSON.stringify({ playerlogpath: path })})
+    window.Rollbar.error(${JSON.stringify(data)}, ${JSON.stringify({ playerlogpath: path })})
     `
   )
   await reportFatalError(sender, 'Renderer Crash')
