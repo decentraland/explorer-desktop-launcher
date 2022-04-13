@@ -24,7 +24,7 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
 const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
     const electronMode = `\"${main.config.developerMode || isDev ? 'development' : 'production'}\"`
-    event.sender.executeJavaScript(`ELECTRON_MODE = ${electronMode}`)
+    await event.sender.executeJavaScript(`ELECTRON_MODE = ${electronMode}`)
     const PREVIEW = await event.sender.executeJavaScript('globalThis.preview')
 
     const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
@@ -40,7 +40,7 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 
     if (!validVersion) {
       // error
-      event.sender.send('downloadState', { type: 'ERROR', message: 'Invalid remote version' })
+      await reportFatalError(event.sender, 'Invalid remote version')
     } else if (version === remoteVersion) {
       // ready
       event.sender.send('downloadState', { type: 'READY' })
@@ -51,8 +51,10 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 
     if (validVersion && !PREVIEW) {
       const desktopVersion = `\"desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}\"`
-      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
-      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`)
+      await event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
+      await event.sender.executeJavaScript(
+        `globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`
+      )
     }
   })
 }
@@ -91,31 +93,36 @@ const getPlayerLog = (): string => {
   }
 }
 
-const reportCrash = (sender: WebContents) => {
-  const path = getPlayerLogPath()
-  const data = getPlayerLog()
-  console.log(`reportCrash path: ${path}`)
-  sender.executeJavaScript(
+const reportFatalError = async (sender: WebContents, message: string) => {
+  await sender.executeJavaScript(
     `
-    window.Rollbar.error('${data}', ${JSON.stringify({ playerlogpath: path })})
-    window.Rollbar.critical('Renderer Crash')
+    ReportFatalError(new Error('${message}'), 'renderer#errorHandler')
     `
   )
 }
 
+const reportCrash = async (sender: WebContents) => {
+  const path = getPlayerLogPath()
+  const data = getPlayerLog()
+  console.log(`reportCrash path: ${path}`)
+  await sender.executeJavaScript(
+    `
+    window.Rollbar.error('${data}', ${JSON.stringify({ playerlogpath: path })})
+    `
+  )
+  await reportFatalError(sender, 'Renderer Crash')
+}
+
 const registerExecuteProcessEvent = (rendererPath: string, executablePath: string) => {
-  ipcMain.on('executeProcess', (event) => {
+  ipcMain.on('executeProcess', async (event) => {
     try {
-      const onProcessFinish = (err: any, data: any) => {
+      const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          event.sender.send('downloadState', { type: 'ERROR', message: err })
           ipcMain.emit('process-terminated', false)
-          //reportCrash(event.sender)
+          await reportCrash(event.sender)
           return
         }
-
-        reportCrash(event.sender) // TEMP
 
         console.log('Process terminated - ' + data.toString())
         ipcMain.emit('process-terminated', true)
@@ -138,7 +145,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       ipcMain.emit('on-open-renderer')
     } catch (e) {
       console.error('Execute error: ', e)
-      event.sender.send('downloadState', { type: 'ERROR', message: e })
+      await reportFatalError(event.sender, JSON.stringify(e))
     }
   })
 }
