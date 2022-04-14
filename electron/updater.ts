@@ -103,14 +103,11 @@ const reportFatalError = async (sender: WebContents, message: string) => {
 
 const reportCrash = async (sender: WebContents, message: string) => {
   try {
-    const path = getPlayerLogPath()
-    const data = `Player log:\n${getPlayerLog()}`
+    const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
+    const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
+
     console.log(`reportCrash path: ${path}`)
-    await sender.executeJavaScript(
-      `
-      window.Rollbar.error(${JSON.stringify(data)}, ${JSON.stringify({ playerlogpath: path })})
-      `
-    )
+    await sender.executeJavaScript(`window.Rollbar.error(${data}, ${path})`)
     await reportFatalError(sender, message)
   } catch (e) {
     console.error(`Report crash error: ${e}`)
