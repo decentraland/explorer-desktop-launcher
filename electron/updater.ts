@@ -104,7 +104,6 @@ const reportFatalError = async (sender: WebContents, message: string) => {
 }
 
 const reportCrash = async (sender: WebContents) => {
-
   const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
   const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
   const code = `window.Rollbar.error(${data}, ${path})`
@@ -160,6 +159,7 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
   ipcMain.on('download', async (event) => {
     const branchPath = launcherPaths.rendererPath + getBranchName()
     fs.rmdirSync(branchPath, { recursive: true })
+    createDirIfNotExists(branchPath)
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.artifactUrl
     console.log('artifactUrl: ', url)
     const res = await electronDl.download(win, url, {
@@ -193,8 +193,16 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
   })
 }
 
+const createDirIfNotExists = (path: string) => {
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path)
+  }
+}
+
 export const registerUpdaterEvents = (win: BrowserWindow, launcherPaths: LauncherPaths) => {
   try {
+    createDirIfNotExists(launcherPaths.rendererPath)
+
     // Get version
     registerVersionEvent(launcherPaths)
 
