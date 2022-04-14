@@ -19,6 +19,7 @@ const defaultConfig: LauncherConfig = {
 class MainApp {
   defaultConfig: LauncherConfig = defaultConfig
 
+  isDefaultWeb = false
   isRendererOpen = false
   isExitAllowed = false
   tray: Tray | null = null
@@ -120,7 +121,7 @@ const startApp = async (): Promise<void> => {
 
     if (reloadWebsite) {
       // (#1457) we should reload the url
-      loadDecentralandWeb(win)
+      await loadDecentralandWeb(win)
     }
 
     showWindowAndHideTray(win)
