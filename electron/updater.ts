@@ -158,7 +158,9 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
   //electronDl();
   ipcMain.on('download', async (event) => {
     const branchPath = launcherPaths.rendererPath + getBranchName()
-    fs.rmdirSync(branchPath, { recursive: true })
+    if (fs.existsSync(branchPath)) {
+      fs.rmSync(branchPath, { recursive: true })
+    }
     createDirIfNotExists(branchPath)
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.artifactUrl
     console.log('artifactUrl: ', url)
@@ -175,7 +177,9 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
       onCompleted: (file) => {
         console.log('onCompleted:', file)
         unzip(file.path, branchPath, () => {
-          fs.rmSync(file.path)
+          if (fs.existsSync(file.path)) {
+            fs.rmSync(file.path)
+          }
 
           const versionData = {
             version: remoteVersion
@@ -214,7 +218,9 @@ export const registerUpdaterEvents = (win: BrowserWindow, launcherPaths: Launche
 
     // Register clear cache
     ipcMain.on('clearCache', async (event) => {
-      fs.rmdirSync(launcherPaths.rendererPath, { recursive: true })
+      if (fs.existsSync(launcherPaths.rendererPath)) {
+        fs.rmSync(launcherPaths.rendererPath, { recursive: true })
+      }
     })
   } catch (e) {
     console.error('registerUpdaterEvents error: ', e)
