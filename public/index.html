@@ -84,9 +84,11 @@
       <p>You're entering a local Decentraland preview hosted at:</p>
       <p style="color: #f05; text-decoration: underline;" id="preview-mode-url">empty</p>
       <p><small>Only follow links to trusted domains</small></p>
-      
-      <p><input onclick="submitForm()" type="button" style="background-color: #ff2d55; border-radius: 6px; border: 0; height: 44px; color: #fff; font-weight: bold; font-size: 13px; width: 128px; font-family: -apple-system,system-ui,segoe ui,Roboto,helvetica neue,Arial,sans-serif;" value="CONTINUE" /></p>
-      
+
+      <p><input onclick="submitForm()" type="button"
+          style="background-color: #ff2d55; border-radius: 6px; border: 0; height: 44px; color: #fff; font-weight: bold; font-size: 13px; width: 128px; font-family: -apple-system,system-ui,segoe ui,Roboto,helvetica neue,Arial,sans-serif;"
+          value="CONTINUE" /></p>
+
       <label>Add custom URL parameters:</label>
       <input onchange="checkChange(`preview-custom-param`)" type="checkbox" id="preview-check-custom-param" /></br>
       <input oninput="updateUrl()" type="text" id="preview-custom-param" value="EXAMPLE=VALUE&" disabled='' /></br></br>
@@ -141,12 +143,12 @@
 
       if (!hasCustomUrl) {
         const newUrl = new URL(
-          hasExplorerWebsiteBranch ? `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?` 
-          : baseUrl
+          hasExplorerWebsiteBranch ? `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?`
+            : baseUrl
         )
-        
+
         if (hasKernelBranch) {
-          newUrl.searchParams.append('kernel-branch', )
+          newUrl.searchParams.append('kernel-branch', '')
         }
 
         if (hasCustomParam) {
@@ -160,7 +162,7 @@
         return newUrl.toString()
       } else if (!previewPanelHidden) {
         const newUrl = new URL(baseUrl)
-        
+
         if (hasPreviewCustomParam) {
           const customParamObj = new URLSearchParams(previewCustomParam)
           for (const [paramKey, paramValue] of customParamObj) {

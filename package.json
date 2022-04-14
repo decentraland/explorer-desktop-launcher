@@ -28,8 +28,8 @@
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "start": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://localhost:9000 && tsc -p electron -w\" \"wait-on http://localhost:9000 && electron .\"",
-    "start:local": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://localhost:9000 && tsc -p electron -w\" \"wait-on http://localhost:9000 && electron . --custom-url http://localhost:3000/?\"",
+    "start": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://localhost:9000 && tsc -p electron && electron .\"",
+    "start:local": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://localhost:9000 && tsc -p electron && electron . --custom-url http://localhost:3000/?\"",
     "build": "tsc -p electron && electron-builder --publish never",
     "publish": "tsc -p electron && electron-builder --publish always"
   },

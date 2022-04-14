@@ -40,14 +40,15 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
 
   win.setMenuBarVisibility(false)
 
-  await loadWindow(win, isDev)
+  await loadDefaultWeb(win, isDev)
 
   checkDeveloperConsole(win)
 
   return Promise.resolve(win)
 }
 
-export const loadWindow = async (win: BrowserWindow, isDev: boolean) => {
+export const loadDefaultWeb = async (win: BrowserWindow, isDev: boolean) => {
+  main.isDefaultWeb = true
   if (isDev) {
     await win.loadURL(`http://localhost:9000/index.html`)
   } else {
@@ -98,17 +99,26 @@ export const showWindowAndHideTray = (win: BrowserWindow) => {
   }
 }
 
-const showLoading = (win: BrowserWindow) => {
-  win.webContents.executeJavaScript(`document.getElementById("loading").removeAttribute("hidden")`)
+const showLoading = async (win: BrowserWindow) => {
+  try {
+    await win.webContents.executeJavaScript(`document.getElementById("loading").removeAttribute("hidden")`)
+  } catch (e) {
+    console.error(`Show loading error ${e}`)
+  }
 }
 
-const hideLoading = (win: BrowserWindow) => {
-  win.webContents.executeJavaScript(`document.getElementById("loading")?.setAttribute("hidden", "")`)
+const hideLoading = async (win: BrowserWindow) => {
+  try {
+    await win.webContents.executeJavaScript(`document.getElementById("loading")?.setAttribute("hidden", "")`)
+  } catch (e) {
+    console.error(`Hide loading error ${e}`)
+  }
 }
 
 export const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
-    showLoading(win)
+    if (main.isDefaultWeb)
+      await showLoading(win)
 
     const stage = main.config.developerMode ? 'zone' : 'org'
     const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`)
@@ -125,8 +135,9 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
 
     console.log(`Opening: ${url.toString()}`)
 
-    let promise = win.loadURL(url.toString())
-    promise.finally(() => hideLoading(win))
+    main.isDefaultWeb = false
+    await win.loadURL(url.toString())
+    await hideLoading(win)
   } catch (err) {
     console.error('err:', err)
   }
@@ -185,7 +196,7 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
     if (!isDev && !main.config.developerMode && !main.config.previewMode) {
       loadDecentralandWeb(win)
     } else {
-      loadWindow(win, isDev)
+      loadDefaultWeb(win, isDev)
     }
 
     checkDeveloperConsole(win)

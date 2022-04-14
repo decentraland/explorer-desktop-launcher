@@ -94,23 +94,28 @@ const getPlayerLog = (): string => {
 }
 
 const reportFatalError = async (sender: WebContents, message: string) => {
-  await sender.executeJavaScript(
-    `
-    ReportFatalError(new Error('${message}'), 'renderer#errorHandler')
-    `
-  )
+  try {
+    const code = `ReportFatalError(new Error(${JSON.stringify(message)}), 'renderer#errorHandler')`
+    console.log(code)
+    await sender.executeJavaScript(code)
+  } catch (e) {
+    console.error(`Report fatal error, error: ${e}`)
+  }
 }
 
-const reportCrash = async (sender: WebContents, message: string) => {
-  try {
-    const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
-    const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
+const reportCrash = async (sender: WebContents) => {
 
-    console.log(`reportCrash path: ${path}`)
-    await sender.executeJavaScript(`window.Rollbar.error(${data}, ${path})`)
-    await reportFatalError(sender, message)
+  const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
+  const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
+  const code = `window.Rollbar.error(${data}, ${path})`
+  console.log(`reportCrash path: ${path}`)
+
+  try {
+    await sender.executeJavaScript(code)
+
+    await reportFatalError(sender, 'Renderer unexpected exit')
   } catch (e) {
-    console.error(`Report crash error: ${e}`)
+    console.error(`Report crash, error: ${e}`)
   }
 }
 
@@ -120,13 +125,13 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          await reportCrash(event.sender, err.message)
-          ipcMain.emit('process-terminated', false)
+          await reportCrash(event.sender)
+          ipcMain.emit('process-terminated', event, false)
           return
         }
 
         console.log('Process terminated - ' + data.toString())
-        ipcMain.emit('process-terminated', true)
+        ipcMain.emit('process-terminated', event, true)
       }
 
       let path = '"' + rendererPath + getBranchName() + executablePath + '"'
@@ -143,7 +148,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
         exec(path + extraParams, onProcessFinish)
       }
 
-      ipcMain.emit('on-open-renderer')
+      ipcMain.emit('on-open-renderer', event)
     } catch (e) {
       console.error('Execute error: ', e)
       await reportFatalError(event.sender, JSON.stringify(e))
