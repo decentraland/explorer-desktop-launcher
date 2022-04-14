@@ -1,10 +1,11 @@
 import * as electronDl from 'electron-dl'
 import { unzip } from './decompress'
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, ipcMain, WebContents } from 'electron'
 import * as fs from 'fs'
 import axios from 'axios'
 import { main } from './main'
 import * as isDev from 'electron-is-dev'
+import { app } from 'electron/main'
 
 let remoteVersion: string
 
@@ -23,7 +24,7 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
 const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
     const electronMode = `\"${main.config.developerMode || isDev ? 'development' : 'production'}\"`
-    event.sender.executeJavaScript(`ELECTRON_MODE = ${electronMode}`)
+    await event.sender.executeJavaScript(`ELECTRON_MODE = ${electronMode}`)
     const PREVIEW = await event.sender.executeJavaScript('globalThis.preview')
 
     const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
@@ -39,7 +40,7 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 
     if (!validVersion) {
       // error
-      event.sender.send('downloadState', { type: 'ERROR', message: 'Invalid remote version' })
+      await reportFatalError(event.sender, 'Invalid remote version')
     } else if (version === remoteVersion) {
       // ready
       event.sender.send('downloadState', { type: 'READY' })
@@ -50,8 +51,10 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 
     if (validVersion && !PREVIEW) {
       const desktopVersion = `\"desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}\"`
-      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
-      event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`)
+      await event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
+      await event.sender.executeJavaScript(
+        `globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`
+      )
     }
   })
 }
@@ -60,13 +63,64 @@ const getBranchName = () => {
   return main.config.desktopBranch.replace(/\//gi, '-')
 }
 
-const registerExecuteProcessEvent = (rendererPath: string, executablePath: string) => {
-  ipcMain.on('executeProcess', (event) => {
+const getPlayerLogPath = (): string | undefined => {
+  switch (getOSName()) {
+    case 'mac':
+      return `${app.getPath('home')}/Library/Logs/Decentraland/Decentraland/Player.log`
+    case 'linux':
+      return `${app.getPath('home')}/.config/unity3d/Decentraland/Decentraland/Player.log`
+    case 'windows':
+      return `${app.getPath('userData')}\\..\\..\\LocalLow\\Decentraland\\Decentraland\\Player.log`
+    default:
+      return undefined
+  }
+}
+
+const getPlayerLog = (): string => {
+  const path = getPlayerLogPath()
+  if (path) {
     try {
-      const onExecute = (err: any, data: any) => {
+      const maxCharsToRead = 2000
+      const data = fs.readFileSync(path, 'utf8')
+      if (data.length > maxCharsToRead) return data.substring(-maxCharsToRead)
+      else return data
+    } catch (err) {
+      console.error(err)
+      return `Get player log error: ${err}`
+    }
+  } else {
+    return 'No path'
+  }
+}
+
+const reportFatalError = async (sender: WebContents, message: string) => {
+  await sender.executeJavaScript(
+    `
+    ReportFatalError(new Error('${message}'), 'renderer#errorHandler')
+    `
+  )
+}
+
+const reportCrash = async (sender: WebContents, message: string) => {
+  try {
+    const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
+    const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
+
+    console.log(`reportCrash path: ${path}`)
+    await sender.executeJavaScript(`window.Rollbar.error(${data}, ${path})`)
+    await reportFatalError(sender, message)
+  } catch (e) {
+    console.error(`Report crash error: ${e}`)
+  }
+}
+
+const registerExecuteProcessEvent = (rendererPath: string, executablePath: string) => {
+  ipcMain.on('executeProcess', async (event) => {
+    try {
+      const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          event.sender.send('downloadState', { type: 'ERROR', message: err })
+          await reportCrash(event.sender, err.message)
           ipcMain.emit('process-terminated', false)
           return
         }
@@ -83,16 +137,16 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       if (getOSName() === 'mac') {
         const { exec } = require('child_process')
-        exec('open -W ' + path + ' --args' + extraParams, onExecute)
+        exec('open -W ' + path + ' --args' + extraParams, onProcessFinish)
       } else {
         const { exec } = require('child_process')
-        exec(path + extraParams, onExecute)
+        exec(path + extraParams, onProcessFinish)
       }
 
       ipcMain.emit('on-open-renderer')
     } catch (e) {
       console.error('Execute error: ', e)
-      event.sender.send('downloadState', { type: 'ERROR', message: e })
+      await reportFatalError(event.sender, JSON.stringify(e))
     }
   })
 }
