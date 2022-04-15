@@ -20,7 +20,7 @@
   "devDependencies": {
     "concurrently": "^6.5.1",
     "cross-env": "^7.0.3",
-    "electron": "^18.0.3",
+    "electron": "^18.0.4",
     "electron-builder": "^22.14.13",
     "http-server": "^13.1.0",
     "typescript": "^4.6.3",
