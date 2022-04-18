@@ -200,7 +200,7 @@
     }
 
 
-    const { ipcRenderer } = window.require('electron')
+    const ipcRenderer = window.electron.ipcRenderer
 
     ipcRenderer.on('checkDeveloperMode', (event, { isDev, desktopBranch, customParams, previewMode }) => {
       if (isDev) {

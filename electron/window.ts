@@ -14,11 +14,13 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
     minWidth: 1006,
     minHeight: 849,
     webPreferences: {
-      backgroundThrottling: false,
-      nodeIntegration: true,
-      // enableRemoteModule: true, // Deprecated in Electron 14 - https://stackoverflow.com/questions/69059668/enableremotemodule-is-missing-from-electron-v14-typescript-type-definitions
-      contextIsolation: false,
-      webSecurity: !isDev
+      nodeIntegration: false,
+      nodeIntegrationInWorker: false,
+      nodeIntegrationInSubFrames: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
+      webSecurity: true,
+      backgroundThrottling: false
     }
   })
 
