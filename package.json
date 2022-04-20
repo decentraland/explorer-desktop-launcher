@@ -7,14 +7,13 @@
   "main": "build/electron/main.js",
   "private": false,
   "dependencies": {
-    "@types/node": "^16.11.26",
     "axios": "^0.21.4",
     "decompress-zip": "^0.3.3",
     "electron-dl": "^3.3.1",
     "electron-is-dev": "^2.0.0",
     "electron-updater": "^4.6.5",
     "find-free-port": "^2.0.0",
-    "node": "^16.14.2",
+    "node-stream-zip": "^1.15.0",
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
