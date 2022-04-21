@@ -15,7 +15,7 @@ export const getAppTitle = (): string => {
 export const getFreePort = (): Promise<number> => {
   return new Promise<number>((resolve, reject) => {
     var fp = require('find-free-port')
-    fp(7666, 7766, (err: any, freePort: number) => {
+    fp(7666, 7679, (err: any, freePort: number) => {
       if (err) reject(err)
       resolve(freePort)
     })
@@ -44,4 +44,9 @@ export const getKeyAndValue = (data: string): [string, string | undefined] => {
   }
 
   return [data, undefined]
+}
+
+export const isTrustedCertificate = (url: string, error: string): boolean => {
+  const regex = new RegExp('^wss://localhost:76[67][0-9]/dcl$') // Accept from 7660 to 7679
+  return url.match(url) != null && error === 'net::ERR_CERT_AUTHORITY_INVALID'
 }
