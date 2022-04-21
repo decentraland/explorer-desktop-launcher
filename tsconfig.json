@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "strict": true,
+    "outDir": "build",
+    "rootDir": ".",
+    "noEmitOnError": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "public"
+  ],
+  "include": [
+    "electron/**/*",
+    "test/**/*"
+  ]
+}
