@@ -13,6 +13,7 @@ jobs:
         uses: vazco/github-actions-branch-name@v1
         id: branch
       - name: Comment PR
+        if: ${{ github.event.pull_request.head.repo.full_name == 'org/repo' }} # Not a fork
         uses: thollander/actions-comment-pull-request@main
         with:
           message: |
