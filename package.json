@@ -68,7 +68,8 @@
     "win": {
       "icon": "public/app-icon.png",
       "target": [
-        "nsis"
+        "nsis",
+        "appx"
       ],
       "signingHashAlgorithms": [
         "sha256"
@@ -85,6 +86,9 @@
       "deleteAppDataOnUninstall": true,
       "perMachine": true,
       "include": "electron/installer.nsh"
+    },
+    "appx": {
+      "applicationId": "com.decentraland.launcher"
     },
     "linux": {
       "icon": "public/app-icon.png",
