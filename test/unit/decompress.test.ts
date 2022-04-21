@@ -18,7 +18,7 @@ describe('Test unzip', () => {
     fs.rmSync('output', { recursive: true })
   })
 
-  it('error unzip', async () => {
+  it('trying to unzip relative paths', async () => {
     await expect(unzip('./test/resources/zip-with-relative-path.zip', 'output')).to.be.rejectedWith(
       'Malicious entry: ../some_folder/'
     )
