@@ -181,6 +181,14 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
             fs.rmSync(file.path)
           }
 
+          if (getOSName() === 'mac') {
+            const execPath = `${branchPath}/unity-renderer-mac.app/Contents/MacOS/Decentraland`
+            console.log('execPath ' + execPath)
+            if (fs.existsSync(execPath)) {
+              fs.chmodSync(execPath, 0o755)
+            }
+          }
+
           const versionData = {
             version: remoteVersion
           }
@@ -188,12 +196,13 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
           const path = branchPath + launcherPaths.versionPath
 
           fs.writeFileSync(path, JSON.stringify(versionData))
-          event.sender.send('downloadState', { type: 'READY' })
         })
       }
     })
     console.log('Res: ', res)
     console.log('Done!')
+
+    event.sender.send('downloadState', { type: 'READY' })
   })
 }
 
