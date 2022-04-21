@@ -5,6 +5,7 @@ import { main } from './main'
 import * as isDev from 'electron-is-dev'
 import { getAppTitle, getIconByPlatform, onExit } from './helpers'
 import { URLSearchParams } from 'url'
+import { LauncherPaths } from './types'
 
 export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -119,8 +120,7 @@ const hideLoading = async (win: BrowserWindow) => {
 
 export const loadDecentralandWeb = async (win: BrowserWindow) => {
   try {
-    if (main.isDefaultWeb)
-      await showLoading(win)
+    if (main.isDefaultWeb) await showLoading(win)
 
     const stage = main.config.developerMode ? 'zone' : 'org'
     const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`)

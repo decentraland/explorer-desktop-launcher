@@ -6,6 +6,8 @@ import { autoUpdater } from 'electron-updater'
 import { parseConfig } from './cmdParser'
 import { getAppTitle } from './helpers'
 import { createWindow, hideWindowInTray, loadDecentralandWeb, onOpenUrl, showWindowAndHideTray } from './window'
+import { LauncherConfig, LauncherPaths } from './types'
+import { isTrustedCertificate } from './certificateChecker'
 
 const defaultConfig: LauncherConfig = {
   developerMode: false,
@@ -178,8 +180,10 @@ const startApp = async (): Promise<void> => {
 app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
   // On certificate error we disable default behaviour (stop loading the page)
   // and we then say "it is all fine - true" to the callback
-  event.preventDefault()
-  callback(true)
+  if (isTrustedCertificate(url, error)) {
+    event.preventDefault()
+    callback(true)
+  }
 })
 
 app.whenReady().then(async () => {

@@ -1,4 +1,4 @@
-type LauncherConfig = {
+export type LauncherConfig = {
   developerMode: boolean
   customUrl: string
   desktopBranch: string
@@ -8,7 +8,7 @@ type LauncherConfig = {
   previewMode: boolean
 }
 
-type LauncherPaths = {
+export type LauncherPaths = {
   baseUrl: string
   rendererPath: string
   versionPath: string

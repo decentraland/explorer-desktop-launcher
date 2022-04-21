@@ -6,6 +6,7 @@ import axios from 'axios'
 import { main } from './main'
 import * as isDev from 'electron-is-dev'
 import { app } from 'electron/main'
+import { LauncherPaths } from './types'
 
 let remoteVersion: string
 
