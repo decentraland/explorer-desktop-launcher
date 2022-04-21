@@ -23,7 +23,7 @@
     "concurrently": "^6.5.1",
     "cross-env": "^7.0.3",
     "electron": "^18.0.3",
-    "electron-builder": "^22.14.13",
+    "electron-builder": "^23.0.3",
     "http-server": "^13.1.0",
     "mocha": "^9.2.2",
     "spectron": "^19.0.0",
