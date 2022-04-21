@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { isTrustedCertificate } from '../../electron/certificatechecker'
+import { isTrustedCertificate } from '../../electron/certificateChecker'
 
 describe('Test helpers', () => {
   it('trusted certificate checker', () => {
