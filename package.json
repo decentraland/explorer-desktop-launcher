@@ -35,8 +35,8 @@
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "start": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://localhost:9000 && tsc -p . && electron .\"",
-    "start:local": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://localhost:9000 && tsc -p . && electron . --custom-url http://localhost:3000/?\"",
+    "start": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://127.0.0.1:9000 && tsc -p . && electron .\"",
+    "start:local": "concurrently \"cross-env http-server public -p 9000\" \"wait-on http://127.0.0.1:9000 && tsc -p . && electron . --custom-url http://localhost:3000/?\"",
     "build": "tsc -p . && electron-builder --publish never",
     "publish": "tsc -p . && electron-builder --publish always",
     "test": "mocha -r ts-node/register 'test/**/*.test.ts'"
