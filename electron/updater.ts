@@ -176,7 +176,7 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
       },
       onCompleted: (file) => {
         console.log('onCompleted:', file)
-        unzip(file.path, branchPath, () => {
+        unzip(file.path, branchPath).then(() => {
           if (fs.existsSync(file.path)) {
             fs.rmSync(file.path)
           }
