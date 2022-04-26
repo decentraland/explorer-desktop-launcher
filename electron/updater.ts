@@ -104,7 +104,7 @@ const reportFatalError = async (sender: WebContents, message: string) => {
   }
 }
 
-const reportCrash = async (sender: WebContents) => {
+const reportCrash = async (sender: WebContents, message: string) => {
   const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
   const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
   const code = `window.Rollbar.error(${data}, ${path})`
@@ -113,7 +113,7 @@ const reportCrash = async (sender: WebContents) => {
   try {
     await sender.executeJavaScript(code)
 
-    await reportFatalError(sender, 'Renderer unexpected exit')
+    await reportFatalError(sender, `Renderer unexpected exit: ${message}`)
   } catch (e) {
     console.error(`Report crash, error: ${e}`)
   }
@@ -125,7 +125,8 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          await reportCrash(event.sender)
+          const message = `Exit code ${err.code}, error message: ${err.message}`
+          await reportCrash(event.sender, message)
           ipcMain.emit('process-terminated', event, false)
           return
         }
@@ -134,18 +135,18 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
         ipcMain.emit('process-terminated', event, true)
       }
 
-      let path = '"' + rendererPath + getBranchName() + executablePath + '"'
+      let path = rendererPath + getBranchName() + executablePath
 
-      let extraParams = ` --browser false --port ${main.config.port}`
+      let params = [`--browser`, `false`, `--port`, `${main.config.port}`]
 
-      console.log('Execute path: ', path + extraParams)
+      console.log(`Execute path: ${path} params: ${params}`)
 
+      const { execFile } = require('child_process')
       if (getOSName() === 'mac') {
-        const { exec } = require('child_process')
-        exec('open -W ' + path + ' --args' + extraParams, onProcessFinish)
+        params = ['-W', path, '--args', ...params]
+        execFile('open', params, onProcessFinish)
       } else {
-        const { exec } = require('child_process')
-        exec(path + extraParams, onProcessFinish)
+        execFile(path, params, onProcessFinish)
       }
 
       ipcMain.emit('on-open-renderer', event)
