@@ -141,15 +141,19 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       console.log(`Execute path: ${path} params: ${params}`)
 
-      const { execFile } = require('child_process')
-      if (getOSName() === 'mac') {
-        params = ['-W', path, '--args', ...params]
-        execFile('open', params, onProcessFinish)
-      } else {
-        execFile(path, params, onProcessFinish)
-      }
+      if (fs.existsSync(path)) {
+        const { execFile } = require('child_process')
+        if (getOSName() === 'mac') {
+          params = ['-W', path, '--args', ...params]
+          execFile('open', params, onProcessFinish)
+        } else {
+          execFile(path, params, onProcessFinish)
+        }
 
-      ipcMain.emit('on-open-renderer', event)
+        ipcMain.emit('on-open-renderer', event)
+      } else {
+        await reportFatalError(event.sender, `Renderer not found: ${path}`)
+      }
     } catch (e) {
       console.error('Execute error: ', e)
       await reportFatalError(event.sender, JSON.stringify(e))
@@ -198,13 +202,13 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
           const path = branchPath + launcherPaths.versionPath
 
           fs.writeFileSync(path, JSON.stringify(versionData))
+
+          event.sender.send('downloadState', { type: 'READY' })
         })
       }
     })
     console.log('Res: ', res)
     console.log('Done!')
-
-    event.sender.send('downloadState', { type: 'READY' })
   })
 }
 
