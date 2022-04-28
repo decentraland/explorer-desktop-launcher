@@ -12,7 +12,7 @@ import { isTrustedCertificate } from './certificateChecker'
 const defaultConfig: LauncherConfig = {
   developerMode: false,
   customUrl: '',
-  desktopBranch: 'main',
+  desktopBranch: undefined,
   customParams: '',
   port: 7666,
   previewMode: false
@@ -169,7 +169,7 @@ const startApp = async (): Promise<void> => {
     loadDecentralandWeb(win)
   })
 
-  if (!isDev && !main.config.developerMode && !main.config.previewMode) {
+  if (!main.config.developerMode && !main.config.previewMode) {
     await checkUpdates(win)
   }
 

@@ -22,6 +22,40 @@ const getCurrentVersion = (rendererPath: string, versionPath: string): string | 
   return version
 }
 
+const isUsingRollout = (): boolean => {
+  return main.config.desktopBranch === undefined
+}
+
+const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
+  if (isUsingRollout()) {
+    // Rollout
+    const response = await axios.get('https://play.decentraland.org', {
+      headers: {
+        'x-debug-rollouts': true
+      }
+    })
+    return response.data.map['@dcl/explorer-desktop'].version
+  } else {
+    // Dev
+    const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
+
+    console.log('checkVersion', url)
+
+    const response = await axios.get(url)
+    return response.data.version
+  }
+}
+
+const isValidVersion = (version: string) => {
+  if (isUsingRollout()) {
+    const regex = /commit-[0-9a-f]{7}$/g
+    return version.match(regex)
+  } else {
+    const regex = /[0-9a-f]{40}/g
+    return version.match(regex)
+  }
+}
+
 const registerVersionEvent = (launcherPaths: LauncherPaths) => {
   ipcMain.on('checkVersion', async (event) => {
     const electronMode = `\"${main.config.developerMode || isDev ? 'development' : 'production'}\"`
@@ -29,19 +63,13 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
     const PREVIEW = await event.sender.executeJavaScript('globalThis.preview')
 
     const version = getCurrentVersion(launcherPaths.rendererPath, launcherPaths.versionPath)
-    const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
+    remoteVersion = await getRemoteVersion(launcherPaths)
 
-    console.log('checkVersion', url)
-
-    const response = await axios.get(url)
-    remoteVersion = response.data.version
-
-    const regex = /[0-9a-f]{40}/g
-    const validVersion = remoteVersion.match(regex)
+    const validVersion = isValidVersion(remoteVersion)
 
     if (!validVersion) {
       // error
-      await reportFatalError(event.sender, 'Invalid remote version')
+      await reportFatalError(event.sender, `Invalid remote version ${remoteVersion}`)
     } else if (version === remoteVersion) {
       // ready
       event.sender.send('downloadState', { type: 'READY' })
@@ -61,7 +89,11 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 }
 
 const getBranchName = () => {
-  return main.config.desktopBranch.replace(/\//gi, '-')
+  if (isUsingRollout()) {
+    return 'prod'
+  } else {
+    return main.config.desktopBranch!.replace(/\//gi, '-')
+  }
 }
 
 const getPlayerLogPath = (): string | undefined => {
@@ -160,6 +192,17 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
     }
   })
 }
+
+const getArtifactUrl = (launcherPaths: LauncherPaths) => {
+  if (isUsingRollout()) {
+    // Rollout
+    return `https://github.com/decentraland/explorer-desktop/releases/download/${remoteVersion}${launcherPaths.artifactUrl}`
+  } else {
+    // Dev
+    return launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.artifactUrl
+  }
+}
+
 const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths) => {
   //electronDl();
   ipcMain.on('download', async (event) => {
@@ -168,7 +211,7 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
       fs.rmSync(branchPath, { recursive: true })
     }
     createDirIfNotExists(branchPath)
-    const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.artifactUrl
+    const url = getArtifactUrl(launcherPaths)
     console.log('artifactUrl: ', url)
     const res = await electronDl.download(win, url, {
       directory: branchPath,

@@ -32,9 +32,9 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
   ipcMain.on('checkDeveloperMode', (event: any) => {
     console.log('checkDeveloperMode')
     event.sender.send('checkDeveloperMode', {
-      isDev: isDev || main.config.developerMode,
+      isDev: main.config.developerMode,
       previewMode: main.config.previewMode ? main.config.customUrl : undefined,
-      desktopBranch: main.config.desktopBranch,
+      desktopBranch: main.config.desktopBranch ?? 'main',
       customParams: main.config.customParams
     })
   })
@@ -43,20 +43,16 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
 
   win.setMenuBarVisibility(false)
 
-  await loadDefaultWeb(win, isDev)
+  await loadDefaultWeb(win)
 
   checkDeveloperConsole(win)
 
   return Promise.resolve(win)
 }
 
-export const loadDefaultWeb = async (win: BrowserWindow, isDev: boolean) => {
+export const loadDefaultWeb = async (win: BrowserWindow) => {
   main.isDefaultWeb = true
-  if (isDev) {
-    await win.loadURL(`http://localhost:9000/index.html`)
-  } else {
-    await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
-  }
+  await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
 }
 
 export const checkDeveloperConsole = (win: BrowserWindow) => {
@@ -195,10 +191,10 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   if (win) {
     win.setTitle(getAppTitle())
 
-    if (!isDev && !main.config.developerMode && !main.config.previewMode) {
+    if (!main.config.developerMode && !main.config.previewMode) {
       loadDecentralandWeb(win)
     } else {
-      loadDefaultWeb(win, isDev)
+      loadDefaultWeb(win)
     }
 
     checkDeveloperConsole(win)
