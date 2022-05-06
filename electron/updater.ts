@@ -80,8 +80,8 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
 
     if (validVersion && !PREVIEW) {
       const desktopVersion = main.config.desktopBranch
-        ? `\"dev-desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}\"`
-        : `\"desktop-${remoteVersion}\"`
+        ? JSON.stringify(`dev-desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}`)
+        : JSON.stringify(`desktop-${remoteVersion}`)
 
       await event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
       await event.sender.executeJavaScript(
