@@ -196,10 +196,13 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 const getArtifactUrl = (launcherPaths: LauncherPaths) => {
   if (isUsingRollout()) {
     // Rollout
-    return `https://cdn.decentraland.org/@dcl/explorer-desktop/${encodeURIComponent( remoteVersion)}${encodeURIComponent(launcherPaths.artifactUrl)}`
+    const baseUrl = 'https://cdn.decentraland.org/@dcl/explorer-desktop/'
+    return `${baseUrl}${encodeURIComponent(remoteVersion)}/${encodeURIComponent(launcherPaths.artifactUrl)}`
   } else {
     // Dev
-    return launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.artifactUrl
+    return `${launcherPaths.baseUrl}${encodeURIComponent(main.config.desktopBranch!)}/${encodeURIComponent(
+      launcherPaths.artifactUrl
+    )}`
   }
 }
 

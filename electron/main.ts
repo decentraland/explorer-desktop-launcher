@@ -70,7 +70,7 @@ const launcherPaths: LauncherPaths = {
   rendererPath: `${app.getPath('appData')}/explorer-desktop-launcher/renderer/`,
   executablePath: `/unity-renderer-${osName}`,
   versionPath: `/version.json`,
-  artifactUrl: `/unity-renderer-${osName}.zip`,
+  artifactUrl: `unity-renderer-${osName}.zip`,
   remoteVersionUrl: `/version.json`
 }
 
