@@ -118,7 +118,7 @@ const getPlayerLog = (): string => {
     try {
       const maxCharsToRead = 2000
       const data = fs.readFileSync(path, 'utf8')
-      if (data.length > maxCharsToRead) return data.substring(-maxCharsToRead)
+      if (data.length > maxCharsToRead) return data.slice(-maxCharsToRead)
       else return data
     } catch (err) {
       console.error(err)
@@ -160,7 +160,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          const message = `Exit code ${err.code}, error message: ${err.message}`
+          const message = `Exit code ${err.code.toString('hex')}, error message: ${err.message}`
           await reportCrash(event.sender, message)
           ipcMain.emit('process-terminated', event, false)
           return
