@@ -13,6 +13,7 @@ const defaultConfig: LauncherConfig = {
   developerMode: false,
   customUrl: '',
   desktopBranch: undefined,
+  customDesktopVersion: undefined,
   customParams: '',
   port: 7666,
   previewMode: false

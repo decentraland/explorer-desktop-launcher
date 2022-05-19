@@ -168,6 +168,12 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
     params.delete('DESKTOP-BRANCH')
   }
 
+  const desktopVersion: string | null = params.get('DESKTOP-VERSION')
+  if (desktopVersion != null) {
+    main.config.customDesktopVersion = desktopVersion
+    params.delete('DESKTOP-VERSION')
+  }
+
   if (params.get('DESKTOP-DEVELOPER-MODE') != null) {
     main.config.developerMode = true
     params.delete('DESKTOP-DEVELOPER-MODE')

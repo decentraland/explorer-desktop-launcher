@@ -1,11 +1,16 @@
 import { app } from 'electron'
 import { main } from './main'
+import { autoUpdater } from 'electron-updater'
 
 export const getAppTitle = (): string => {
-  let title = 'Decentraland BETA'
+  const currentVersion = autoUpdater.currentVersion.version
+  let title = `Decentraland BETA ${currentVersion}`
 
   if (main.config.desktopBranch !== main.defaultConfig.desktopBranch)
     title += ` desktop-branch=${main.config.desktopBranch}`
+
+  if (main.config.customDesktopVersion !== main.defaultConfig.customDesktopVersion)
+    title += ` desktop-version=${main.config.customDesktopVersion}`
 
   if (main.config.customParams !== main.defaultConfig.customParams) title += ` params=${main.config.customParams}`
 

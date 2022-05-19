@@ -2,6 +2,7 @@ export type LauncherConfig = {
   developerMode: boolean
   customUrl: string
   desktopBranch: string | undefined
+  customDesktopVersion: string | undefined
   customParams: string
   port: number
   remoteVersion?: string
