@@ -89,7 +89,9 @@
       "include": "electron/installer.nsh"
     },
     "appx": {
-      "applicationId": "com.decentraland.launcher"
+      "applicationId": "com.decentraland.launcher",
+      "publisher": "Decentraland Foundation",
+      "publisherDisplayName": "Decentraland Foundation"
     },
     "linux": {
       "icon": "public/app-icon.png",
