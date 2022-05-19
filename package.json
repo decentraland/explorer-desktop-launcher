@@ -90,7 +90,6 @@
     },
     "appx": {
       "applicationId": "com.decentraland.launcher",
-      "publisher": "Decentraland Foundation",
       "publisherDisplayName": "Decentraland Foundation"
     },
     "linux": {
