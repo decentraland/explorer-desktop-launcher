@@ -91,7 +91,8 @@
     "appx": {
       "applicationId": "com.decentraland.launcher",
       "identityName": "DecentralandFoundation.Decentraland",
-      "publisherDisplayName": "Decentraland Foundation"
+      "publisherDisplayName": "Decentraland Foundation",
+      "publisher": "CN=546D5DDE-76D5-4F9D-99D8-07C3235EC3A0"
     },
     "linux": {
       "icon": "public/app-icon.png",
