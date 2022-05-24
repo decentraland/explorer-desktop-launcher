@@ -38,7 +38,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         run: |
           npm run selfcertificate
-          ls -la
           npm run build
       - name: Publish
         if: ${{ github.ref == 'refs/heads/main' && matrix.os != 'windows' }}
