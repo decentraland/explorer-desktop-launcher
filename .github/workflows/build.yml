@@ -16,10 +16,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos
-            ext: dmg
-          - os: ubuntu
-            ext: AppImage
           - os: windows
             ext: exe
 
@@ -41,6 +37,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         run: |
+          npm run selfcertificate
+          ls -la
           npm run build
       - name: Publish
         if: ${{ github.ref == 'refs/heads/main' && matrix.os != 'windows' }}
