@@ -1,4 +1,4 @@
-import { main } from "./main"
+import { main } from './main'
 
 export const parseConfig = (argv: string[]) => {
   argv.shift() // Skip process name
@@ -14,6 +14,10 @@ export const parseConfig = (argv: string[]) => {
       case '--desktop-branch':
         argv.shift()
         main.config.desktopBranch = process.argv[0]
+        break
+      case '--desktop-version':
+        argv.shift()
+        main.config.customDesktopVersion = process.argv[0]
         break
     }
     argv.shift()
