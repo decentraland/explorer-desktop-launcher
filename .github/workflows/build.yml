@@ -32,16 +32,11 @@ jobs:
         run: npm install
       - name: Test
         run: npm run test
-      - name: Generate certificate
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
-        run: |
-          npm run selfcertificate
-          dir .
       - name: Build
         if: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          CSC_LINK: 'cert/self.pfx'
         run: |
           npm run build
       - name: Publish
