@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.38",
+  "version": "0.1.39",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -103,7 +103,8 @@
     "mac": {
       "icon": "public/app-icon.png",
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ]
     },
     "dmg": {
