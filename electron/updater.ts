@@ -28,13 +28,18 @@ const isUsingRollout = (): boolean => {
 
 const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
   if (isUsingRollout()) {
-    // Rollout
-    const response = await axios.get('https://play.decentraland.org', {
-      headers: {
-        'x-debug-rollouts': true
-      }
-    })
-    return response.data.map['@dcl/explorer-desktop'].version
+    if (main.config.customDesktopVersion) {
+      // Custom Desktop Version
+      return main.config.customDesktopVersion
+    } else {
+      // Rollout
+      const response = await axios.get('https://play.decentraland.org', {
+        headers: {
+          'x-debug-rollouts': true
+        }
+      })
+      return response.data.map['@dcl/explorer-desktop'].version
+    }
   } else {
     // Dev
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl

@@ -107,7 +107,8 @@
     "mac": {
       "icon": "public/app-icon.png",
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ]
     },
     "dmg": {

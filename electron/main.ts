@@ -5,7 +5,14 @@ import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
 import { parseConfig } from './cmdParser'
 import { getAppTitle } from './helpers'
-import { createWindow, hideWindowInTray, loadDecentralandWeb, onOpenUrl, showWindowAndHideTray } from './window'
+import {
+  createWindow,
+  hideWindowInTray,
+  loadDecentralandWeb,
+  onOpenUrl,
+  reportLauncherError,
+  showWindowAndHideTray
+} from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
 
@@ -13,6 +20,7 @@ const defaultConfig: LauncherConfig = {
   developerMode: false,
   customUrl: '',
   desktopBranch: undefined,
+  customDesktopVersion: undefined,
   customParams: '',
   port: 7666,
   previewMode: false
@@ -81,27 +89,43 @@ if (getOSName() === 'windows') {
 }
 
 const checkUpdates = async (win: BrowserWindow): Promise<void> => {
-  if (getOSName() === 'mac') {
-    loadDecentralandWeb(win) // Skip auto update on Mac
-  } else {
-    try {
+  try {
+    if (getOSName() === 'mac') {
+      // No updates in Mac until we signed the executable
+      const currentVersion = autoUpdater.currentVersion.version
+      autoUpdater.autoDownload = false
+      const result = await autoUpdater.checkForUpdates()
+      const lastVersion = result.updateInfo.version
+      console.log('Mac Result:', result)
+
+      if (currentVersion !== lastVersion) {
+        const macDownloadUrl =
+          'https://github.com/decentraland/explorer-desktop-launcher/releases/latest/download/Decentraland.dmg'
+        await reportLauncherError(
+          win,
+          `You're using an old version of Decentraland Desktop (${currentVersion}).
+          Please update it manually from
+          <a target="_blank" href='${macDownloadUrl}'>${macDownloadUrl}</a>`
+        )
+      } else {
+        await loadDecentralandWeb(win) // Load decentraland web to report the error
+      }
+    } else {
       const result = await autoUpdater.checkForUpdatesAndNotify()
       console.log('Result:', result)
       if (result === null || !result.downloadPromise) {
-        loadDecentralandWeb(win)
+        await loadDecentralandWeb(win)
       } else {
-        if (result.downloadPromise) {
-          await result.downloadPromise
+        await result.downloadPromise
 
-          console.log('Download completed')
-          const silent = process.platform === 'darwin' // Silent=true only on Mac
-          autoUpdater.quitAndInstall(silent, true)
-        }
+        console.log('Download completed')
+        const silent = process.platform === 'darwin' // Silent=true only on Mac
+        autoUpdater.quitAndInstall(silent, true)
       }
-    } catch (err) {
-      console.error(`Check Updates error: ${err}`)
-      loadDecentralandWeb(win) // Load current version anyway
     }
+  } catch (err) {
+    console.error(`Check Updates error: ${err}`)
+    await loadDecentralandWeb(win) // Load current version anyway
   }
   return Promise.resolve()
 }

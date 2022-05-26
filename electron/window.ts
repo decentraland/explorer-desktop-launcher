@@ -55,6 +55,12 @@ export const loadDefaultWeb = async (win: BrowserWindow) => {
   await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
 }
 
+export const reportLauncherError = async (win: BrowserWindow, message: string) => {
+  await win.loadURL(`file://${__dirname}/../../public/error.html`)
+
+  win.webContents.send('setError', { error: message })
+}
+
 export const checkDeveloperConsole = (win: BrowserWindow) => {
   if (isDev || main.config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
@@ -166,6 +172,12 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
   if (desktopBranch != null) {
     main.config.desktopBranch = desktopBranch
     params.delete('DESKTOP-BRANCH')
+  }
+
+  const desktopVersion: string | null = params.get('DESKTOP-VERSION')
+  if (desktopVersion != null) {
+    main.config.customDesktopVersion = desktopVersion
+    params.delete('DESKTOP-VERSION')
   }
 
   if (params.get('DESKTOP-DEVELOPER-MODE') != null) {
