@@ -16,6 +16,10 @@ jobs:
     strategy:
       matrix:
         include:
+          - os: macos
+            ext: dmg
+          - os: ubuntu
+            ext: AppImage
           - os: windows
             ext: exe
 
@@ -36,7 +40,6 @@ jobs:
         if: github.ref != 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-          CSC_LINK: 'cert/self.pfx'
         run: |
           npm run build
       - name: Publish
