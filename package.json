@@ -23,7 +23,6 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "concurrently": "^6.5.1",
-    "copyfiles": "^2.4.1",
     "cross-env": "^7.0.3",
     "electron": "^18.0.3",
     "electron-builder": "^23.0.3",
@@ -40,10 +39,9 @@
     "start": "tsc -p . && electron .",
     "start:dev": "tsc -p . && electron . --developer-mode",
     "start:local": "tsc -p . && electron . --custom-url http://localhost:3000/?",
-    "build": "tsc -p . && npm run copyfiles && electron-builder --publish never",
-    "publish": "tsc -p . && npm run copyfiles && electron-builder --publish always",
-    "test": "mocha -r ts-node/register 'test/**/*.test.ts'",
-    "copyfiles": "copyfiles -u 1 appx/**/*.png build/appx"
+    "build": "tsc -p . && electron-builder --publish never",
+    "publish": "tsc -p . && electron-builder --publish always",
+    "test": "mocha -r ts-node/register 'test/**/*.test.ts'"
   },
   "build": {
     "appId": "decentraland.desktop.launcher",
