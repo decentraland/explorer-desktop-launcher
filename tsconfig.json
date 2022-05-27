@@ -17,7 +17,6 @@
     "public"
   ],
   "include": [
-    "electron/**/*",
-    "test/**/*"
+    "electron/**/*"
   ]
 }

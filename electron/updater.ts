@@ -175,6 +175,12 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
         ipcMain.emit('process-terminated', event, true)
       }
 
+      // We didn't find a way to get this windows store app package path dynamically
+      if (process.windowsStore) {
+        rendererPath = process.env.LOCALAPPDATA +
+            `\\Packages\\DecentralandFoundation.Decentraland_4zmdhd0rz3xz8\\LocalCache\\Roaming\\explorer-desktop-launcher\\renderer\\`
+      }
+      
       let path = rendererPath + getBranchName() + executablePath
 
       let params = [`--browser`, `false`, `--port`, `${main.config.port}`]
