@@ -14,7 +14,8 @@
     "electron-updater": "^4.6.5",
     "find-free-port": "^2.0.0",
     "node-stream-zip": "^1.15.0",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "rollbar": "^2.25.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",

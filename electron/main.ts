@@ -15,6 +15,7 @@ import {
 } from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
+import { reportError, reportCritical, initializeRollbar } from './rollbar'
 
 const defaultConfig: LauncherConfig = {
   developerMode: false,
@@ -39,6 +40,14 @@ class MainApp {
   win: BrowserWindow | undefined
 }
 
+initializeRollbar();
+
+process.on('uncaughtException', function (error) {
+  reportCritical(error)
+  exit(1)
+});
+
+throw new Error("This is my error"); // delete me before merging
 export const main: MainApp = new MainApp()
 
 parseConfig([...process.argv])
@@ -69,7 +78,7 @@ console.log('Config:', main.config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
-  console.error('OS not supported')
+  reportError('OS not supported')
   exit(1)
 }
 
@@ -229,4 +238,6 @@ app.whenReady().then(async () => {
     //this allows exiting the launcher through command+Q or alt+f4
     main.isExitAllowed = true
   })
+}).catch(async (error) => {
+  reportError(error)
 })
