@@ -1,10 +1,11 @@
+import Rollbar = require('rollbar');
+
 export var rollbar: any;
-export var token: string = '73e7ead7a15d4de3b26cecdda99b63c2'
+export var post_server_token: string = 'db6bba90771e483389425d078bb63e74'
 
 export const initializeRollbar = () => {
-  const Rollbar = require('rollbar');
   rollbar = new Rollbar({
-    accessToken: token,
+    accessToken: post_server_token,
     captureUncaught: true,
     captureUnhandledRejections: true,
     payload: {
@@ -13,16 +14,28 @@ export const initializeRollbar = () => {
   });
 }
 
-export const reportCritical = (error: any) => {
-  console.log("Reporting CRITICAL error to rollbar!")
-  console.error(error)
-  rollbar.critical(errorToString(error));
+export const reportCritical = (error: any, callback: () => void) => {
+  var errorString = errorToString(error);
+  console.log("sending critical");
+  rollbar.critical(error, (err: any) => {
+    if (err) {
+      console.error(err)
+    } else {
+      callback();
+    }
+  });
 }
 
-export const reportError = (error: any) => {
-  console.log("Reporting error to rollbar!")
-  console.error(error)
-  rollbar.error(errorToString(error));
+export const reportError = (error: any, callback: () => void) => {
+  var errorString = errorToString(error);
+  console.log("sending error");
+  rollbar.error(error, (err: any) => {
+    if (err) {
+      console.error(err)
+    } else {
+      callback();
+    }
+  });
 }
 
 export function errorToString(error: any) {

@@ -1,10 +1,10 @@
-import { shell, app, BrowserWindow, ipcMain, Tray, Menu } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu, crashReporter } from 'electron'
 import * as isDev from 'electron-is-dev'
 import { getOSName, getFreePort } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
 import { parseConfig } from './cmdParser'
-import { getAppTitle } from './helpers'
+import { getAppTitle, getAppBasePath } from './helpers'
 import {
   createWindow,
   hideWindowInTray,
@@ -16,6 +16,7 @@ import {
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
 import { reportError, reportCritical, initializeRollbar } from './rollbar'
+import fs = require('fs');
 
 const defaultConfig: LauncherConfig = {
   developerMode: false,
@@ -40,14 +41,11 @@ class MainApp {
   win: BrowserWindow | undefined
 }
 
+// all uncaught exceptions are being sent automatically
 initializeRollbar();
 
-process.on('uncaughtException', function (error) {
-  reportCritical(error)
-  exit(1)
-});
+initializeCrashReport();
 
-throw new Error("This is my error"); // delete me before merging
 export const main: MainApp = new MainApp()
 
 parseConfig([...process.argv])
@@ -78,8 +76,7 @@ console.log('Config:', main.config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
-  reportError('OS not supported')
-  exit(1)
+  reportError('OS not supported', exit(1))
 }
 
 const launcherPaths: LauncherPaths = {
@@ -239,5 +236,14 @@ app.whenReady().then(async () => {
     main.isExitAllowed = true
   })
 }).catch(async (error) => {
-  reportError(error)
+  reportError(error, () => { })
 })
+
+function initializeCrashReport() {
+  var path = getAppBasePath();
+  if (!fs.existsSync(path)) fs.mkdir(path, () => { });
+
+  app.setPath('crashDumps', path);
+
+  crashReporter.start({ uploadToServer: false })
+}
