@@ -15,8 +15,6 @@ export const initializeRollbar = () => {
 }
 
 export const reportCritical = (error: any, callback: () => void) => {
-  var errorString = errorToString(error);
-  console.log("sending critical");
   rollbar.critical(error, (err: any) => {
     if (err) {
       console.error(err)
@@ -27,8 +25,6 @@ export const reportCritical = (error: any, callback: () => void) => {
 }
 
 export const reportError = (error: any, callback: () => void) => {
-  var errorString = errorToString(error);
-  console.log("sending error");
   rollbar.error(error, (err: any) => {
     if (err) {
       console.error(err)
@@ -36,16 +32,4 @@ export const reportError = (error: any, callback: () => void) => {
       callback();
     }
   });
-}
-
-export function errorToString(error: any) {
-  if (typeof error === 'object') {
-    if (error.message) return error.message
-    if (error.toString() === '[object Object]') {
-      return JSON.stringify(error)
-    }
-    return error.toString()
-  }
-  if (typeof error === 'string') return error
-  return Object.prototype.toString.call(error)
 }
