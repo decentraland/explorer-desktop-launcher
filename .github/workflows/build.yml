@@ -49,6 +49,19 @@ jobs:
         run: |
           npm run publish
 
+      - name: Build AppX
+        if: ${{ github.ref != 'refs/heads/main' && matrix.os == 'windows' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          npm run build:appx
+      - name: Publish AppX
+        if: ${{ github.ref == 'refs/heads/main' && matrix.os == 'windows' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          npm run publish:appx
+
       - name: Extract branch name
         uses: vazco/github-actions-branch-name@v1
         id: branch
