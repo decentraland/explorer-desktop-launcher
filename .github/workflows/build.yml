@@ -66,7 +66,6 @@ jobs:
         uses: vazco/github-actions-branch-name@v1
         id: branch
       - name: Upload artifacts
-        if: ${{ github.event.pull_request.head.repo.full_name == 'decentraland/explorer-desktop-launcher' }} # Not a fork
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
