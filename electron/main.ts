@@ -246,4 +246,9 @@ function initializeCrashReport() {
   app.setPath('crashDumps', path);
 
   crashReporter.start({ uploadToServer: false })
+
+  var lastCrashReport = crashReporter.getLastCrashReport();
+  if (lastCrashReport != null) {
+    console.log("Crash found!, date: %s id: %s", lastCrashReport.date.toString(), lastCrashReport.id);
+  }
 }
