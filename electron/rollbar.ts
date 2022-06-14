@@ -16,24 +16,18 @@ export const initializeRollbar = () => {
 
 export const reportCritical = (error: any, callback?: () => void) => {
   rollbar.critical(error, (err: any) => {
-    if (err) {
-      console.error(err)
-    } else {
-      if (callback) {
-        callback();
-      }
+    console.error(err)
+    if (callback) {
+      callback();
     }
   });
 }
 
 export const reportError = (error: any, callback?: () => void) => {
   rollbar.error(error, (err: any) => {
-    if (err) {
-      console.error(err)
-    } else {
-      if (callback) {
-        callback();
-      }
+    console.error(err)
+    if (callback) {
+      callback();
     }
   });
 }
