@@ -55,3 +55,22 @@ export const isTrustedCertificate = (url: string, error: string): boolean => {
   const regex = new RegExp('^wss://localhost:76[67][0-9]/dcl$') // Accept from 7660 to 7679
   return url.match(url) != null && error === 'net::ERR_CERT_AUTHORITY_INVALID'
 }
+
+export const getAppBasePath = (): string => {
+  var applicationFolderName = 'DecentralandLauncher';
+  //dev
+  if (process.env.RUN_ENV === 'development') return './'
+
+  if (!process.platform || !['win32', 'darwin'].includes(process.platform)) {
+    console.error(`Unsupported OS: ${process.platform}`)
+    return './'
+  }
+
+  if (process.platform === 'darwin') {
+    return `/Users/${process.env.USER}/Library/Application\ Support/${applicationFolderName}/`
+  } else if (process.platform === 'win32') {
+    return `${process.env.LOCALAPPDATA}\\${applicationFolderName}\\`
+  }
+
+  return './';
+}
