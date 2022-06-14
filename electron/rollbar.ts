@@ -14,22 +14,26 @@ export const initializeRollbar = () => {
   });
 }
 
-export const reportCritical = (error: any, callback: () => void) => {
+export const reportCritical = (error: any, callback?: () => void) => {
   rollbar.critical(error, (err: any) => {
     if (err) {
       console.error(err)
     } else {
-      callback();
+      if (callback) {
+        callback();
+      }
     }
   });
 }
 
-export const reportError = (error: any, callback: () => void) => {
+export const reportError = (error: any, callback?: () => void) => {
   rollbar.error(error, (err: any) => {
     if (err) {
       console.error(err)
     } else {
-      callback();
+      if (callback) {
+        callback();
+      }
     }
   });
 }

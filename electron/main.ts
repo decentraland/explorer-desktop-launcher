@@ -76,7 +76,7 @@ console.log('Config:', main.config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
-  reportError('OS not supported', exit(1))
+  reportError('OS not supported', () => { exit(1) })
 }
 
 const launcherPaths: LauncherPaths = {
@@ -236,7 +236,7 @@ app.whenReady().then(async () => {
     main.isExitAllowed = true
   })
 }).catch(async (error) => {
-  reportError(error, () => { })
+  reportError(error)
 })
 
 function initializeCrashReport() {
@@ -246,9 +246,4 @@ function initializeCrashReport() {
   app.setPath('crashDumps', path);
 
   crashReporter.start({ uploadToServer: false })
-
-  var lastCrashReport = crashReporter.getLastCrashReport();
-  if (lastCrashReport != null) {
-    console.log("Crash found!, date: %s id: %s", lastCrashReport.date.toString(), lastCrashReport.id);
-  }
 }
