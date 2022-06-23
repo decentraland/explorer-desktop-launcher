@@ -15,7 +15,8 @@ import {
 } from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
-import { reportError, reportCritical, initializeRollbar } from './rollbar'
+import { reportError, initializeRollbar } from './rollbar'
+import * as semver from 'semver'
 import fs = require('fs');
 
 const defaultConfig: LauncherConfig = {
@@ -98,20 +99,20 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
   try {
     if (getOSName() === 'mac') {
       // No updates in Mac until we signed the executable
-      const currentVersion = autoUpdater.currentVersion.version
+      const newVersion = autoUpdater.currentVersion.version
       autoUpdater.autoDownload = false
       const result = await autoUpdater.checkForUpdates()
-      const lastVersion = result.updateInfo.version
+      const installedVersion = result.updateInfo.version
       console.log('Mac Result:', result)
 
-      if (currentVersion !== lastVersion) {
+      if (semver.lt(installedVersion, newVersion)) {
         const macDownloadUrl =
           'https://github.com/decentraland/explorer-desktop-launcher/releases/latest/download/Decentraland.dmg'
         await reportLauncherError(
           win,
-          `You're using an old version of Decentraland Desktop (${currentVersion}).
-          Please update it manually from
-          <a target="_blank" href='${macDownloadUrl}'>${macDownloadUrl}</a>`
+          `A new version of Decentraland Desktop is available.
+          Click on update and relaunch the application to continue.`,
+          macDownloadUrl
         )
       } else {
         await loadDecentralandWeb(win) // Load decentraland web to report the error

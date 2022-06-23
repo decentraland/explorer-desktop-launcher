@@ -55,10 +55,10 @@ export const loadDefaultWeb = async (win: BrowserWindow) => {
   await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
 }
 
-export const reportLauncherError = async (win: BrowserWindow, message: string) => {
+export const reportNewLauncherVersion = async (win: BrowserWindow, updateUrl: string) => {
   await win.loadURL(`file://${__dirname}/../../public/error.html`)
 
-  win.webContents.send('setError', { error: message })
+  win.webContents.send('setUrl', { url: updateUrl })
 }
 
 export const checkDeveloperConsole = (win: BrowserWindow) => {
