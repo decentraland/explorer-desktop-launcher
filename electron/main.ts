@@ -101,11 +101,12 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
   try {
     if (getOSName() === 'mac') {
       // No updates in Mac until we signed the executable
-      const newVersion = autoUpdater.currentVersion.version
+      const installedVersion = autoUpdater.currentVersion.version
       autoUpdater.autoDownload = false
       const result = await autoUpdater.checkForUpdates()
-      const installedVersion = result.updateInfo.version
+      const newVersion = result.updateInfo.version
       console.log('Mac Result:', result)
+      console.log('Compare versions', installedVersion, 'vs', newVersion)
 
       if (semver.lt(installedVersion, newVersion)) {
         const macDownloadUrl =
