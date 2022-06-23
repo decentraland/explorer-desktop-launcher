@@ -10,14 +10,14 @@ import {
   hideWindowInTray,
   loadDecentralandWeb,
   onOpenUrl,
-  reportLauncherError,
+  reportNewLauncherVersion,
   showWindowAndHideTray
 } from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
 import { reportError, initializeRollbar } from './rollbar'
 import * as semver from 'semver'
-import fs = require('fs');
+import fs = require('fs')
 
 const defaultConfig: LauncherConfig = {
   developerMode: false,
@@ -43,9 +43,9 @@ class MainApp {
 }
 
 // all uncaught exceptions are being sent automatically
-initializeRollbar();
+initializeRollbar()
 
-initializeCrashReport();
+initializeCrashReport()
 
 export const main: MainApp = new MainApp()
 
@@ -77,7 +77,9 @@ console.log('Config:', main.config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
-  reportError('OS not supported', () => { exit(1) })
+  reportError('OS not supported', () => {
+    exit(1)
+  })
 }
 
 const launcherPaths: LauncherPaths = {
@@ -108,12 +110,7 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
       if (semver.lt(installedVersion, newVersion)) {
         const macDownloadUrl =
           'https://github.com/decentraland/explorer-desktop-launcher/releases/latest/download/Decentraland.dmg'
-        await reportLauncherError(
-          win,
-          `A new version of Decentraland Desktop is available.
-          Click on update and relaunch the application to continue.`,
-          macDownloadUrl
-        )
+        await reportNewLauncherVersion(win, macDownloadUrl)
       } else {
         await loadDecentralandWeb(win) // Load decentraland web to report the error
       }
@@ -217,34 +214,37 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
   }
 })
 
-app.whenReady().then(async () => {
-  await startApp()
+app
+  .whenReady()
+  .then(async () => {
+    await startApp()
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      startApp()
-    }
-  })
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        startApp()
+      }
+    })
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
-  })
+    app.on('window-all-closed', () => {
+      if (process.platform !== 'darwin') {
+        app.quit()
+      }
+    })
 
-  app.on('before-quit', function () {
-    //this allows exiting the launcher through command+Q or alt+f4
-    main.isExitAllowed = true
+    app.on('before-quit', function () {
+      //this allows exiting the launcher through command+Q or alt+f4
+      main.isExitAllowed = true
+    })
   })
-}).catch(async (error) => {
-  reportError(error)
-})
+  .catch(async (error) => {
+    reportError(error)
+  })
 
 function initializeCrashReport() {
-  var path = getAppBasePath();
-  if (!fs.existsSync(path)) fs.mkdir(path, () => { });
+  var path = getAppBasePath()
+  if (!fs.existsSync(path)) fs.mkdir(path, () => {})
 
-  app.setPath('crashDumps', path);
+  app.setPath('crashDumps', path)
 
   crashReporter.start({ uploadToServer: false })
 }
