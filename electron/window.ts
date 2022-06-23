@@ -56,7 +56,7 @@ export const loadDefaultWeb = async (win: BrowserWindow) => {
 }
 
 export const reportNewLauncherVersion = async (win: BrowserWindow, updateUrl: string) => {
-  await win.loadURL(`file://${__dirname}/../../public/error.html`)
+  await win.loadURL(`file://${__dirname}/../../public/new-version.html`)
 
   win.webContents.send('setUrl', { url: updateUrl })
 }
