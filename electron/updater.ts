@@ -165,7 +165,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       const onProcessFinish = async (err: any, data: any) => {
         if (err) {
           console.error('Execute error: ', err)
-          const message = `Exit code ${err.code.toString('hex')}, error message: ${err.message}`
+          const message = `Exit code ${err.code.toString(16)}, error message: ${err.message}`
           await reportCrash(event.sender, message)
           ipcMain.emit('process-terminated', event, false)
           return
