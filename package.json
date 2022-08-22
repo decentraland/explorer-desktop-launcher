@@ -112,7 +112,11 @@
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "entitlements": "entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application"
+      }
     },
     "dmg": {
       "icon": "public/installer-icon.icns",
