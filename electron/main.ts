@@ -1,4 +1,4 @@
-import { shell, app, BrowserWindow, ipcMain, Tray, Menu, crashReporter } from 'electron'
+import { shell, app, BrowserWindow, ipcMain, Tray, Menu, crashReporter, systemPreferences } from 'electron'
 import * as isDev from 'electron-is-dev'
 import { getOSName, getFreePort } from './updater'
 import { exit } from 'process'
@@ -202,6 +202,10 @@ const startApp = async (): Promise<void> => {
     await checkUpdates(win)
   }
 
+  const microphoneResult = await askForMediaAccess('microphone');
+  if (!microphoneResult) {
+    console.log('Microphone permission was not given')
+  }
   return Promise.resolve()
 }
 
@@ -248,4 +252,13 @@ function initializeCrashReport() {
   app.setPath('crashDumps', path)
 
   crashReporter.start({ uploadToServer: false })
+}
+
+const askForMediaAccess = async (mediaType: 'microphone' | 'camera') => {
+  if (systemPreferences.askForMediaAccess) {
+    // Electron currently only implements this on macOS
+    return await systemPreferences.askForMediaAccess(mediaType);
+  }
+  // For other platforms we can't reasonably do anything other than assume we have access.
+  return true;
 }
