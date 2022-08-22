@@ -254,7 +254,7 @@ function initializeCrashReport() {
   crashReporter.start({ uploadToServer: false })
 }
 
-const askForMediaAccess = async (mediaType: string) => {
+const askForMediaAccess = async (mediaType: 'microphone' | 'camera') => {
   if (systemPreferences.askForMediaAccess) {
     // Electron currently only implements this on macOS
     return await systemPreferences.askForMediaAccess(mediaType);
