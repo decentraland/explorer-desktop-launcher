@@ -125,7 +125,9 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
     if (main.isDefaultWeb) await showLoading(win)
 
     const stage = main.config.developerMode ? 'zone' : 'org'
-    const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`)
+    //const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?renderer-version=loading`)
+    //const url = new URL(main.config.customUrl || `https://play.testnet.andverse.org/?renderer-version=loading`)
+    const url = new URL(main.config.customUrl || `http://localhost:3004`)
 
     const customParamObj = new URLSearchParams(main.config.customParams)
     for (const [key, value] of Array.from(customParamObj.entries())) {

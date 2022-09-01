@@ -43,6 +43,7 @@ class MainApp {
 }
 
 // all uncaught exceptions are being sent automatically
+//所有未捕获的异常都会自动发送
 initializeRollbar()
 
 initializeCrashReport()
@@ -96,14 +97,16 @@ if (getOSName() === 'windows') {
   launcherPaths.versionPath = launcherPaths.versionPath.replace(/\//gi, '\\')
   launcherPaths.executablePath = launcherPaths.executablePath.replace(/\//gi, '\\')
 }
-
+//检查更新
 const checkUpdates = async (win: BrowserWindow): Promise<void> => {
   try {
     if (getOSName() === 'mac') {
       // No updates in Mac until we signed the executable
+      //Mac中没有更新，直到我们签署了可执行文件
+      //安装的版本 = 自动更新，当前版本 的版本
       const installedVersion = autoUpdater.currentVersion.version
       autoUpdater.autoDownload = false
-      const result = await autoUpdater.checkForUpdates()
+      const result = await autoUpdater.checkForUpdates()//自动检查更新
       const newVersion = result.updateInfo.version
       console.log('Mac Result:', result)
       console.log('Compare versions', installedVersion, 'vs', newVersion)
@@ -113,7 +116,7 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
           'https://github.com/decentraland/explorer-desktop-launcher/releases/latest/download/Decentraland.dmg'
         await reportNewLauncherVersion(win, macDownloadUrl)
       } else {
-        await loadDecentralandWeb(win) // Load decentraland web to report the error
+        await loadDecentralandWeb(win) // Load decentraland web to report the error加载decentraland网站报告错误
       }
     } else {
       const result = await autoUpdater.checkForUpdatesAndNotify()
@@ -124,13 +127,13 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
         await result.downloadPromise
 
         console.log('Download completed')
-        const silent = process.platform === 'darwin' // Silent=true only on Mac
+        const silent = process.platform === 'darwin' // Silent=true only on Mac   Silent=true仅在Mac上
         autoUpdater.quitAndInstall(silent, true)
       }
     }
   } catch (err) {
     console.error(`Check Updates error: ${err}`)
-    await loadDecentralandWeb(win) // Load current version anyway
+    await loadDecentralandWeb(win) // Load current version anyway  无论如何都要加载当前版本
   }
   return Promise.resolve()
 }
@@ -151,7 +154,7 @@ const startApp = async (): Promise<void> => {
     main.isRendererOpen = false
 
     if (reloadWebsite) {
-      // (#1457) we should reload the url
+      // (#1457) we should reload the url 我们应该重新加载url
       await loadDecentralandWeb(win)
     }
 
@@ -243,7 +246,7 @@ app
 
 function initializeCrashReport() {
   var path = getAppBasePath()
-  if (!fs.existsSync(path)) fs.mkdir(path, () => {})
+  if (!fs.existsSync(path)) fs.mkdir(path, () => { })
 
   app.setPath('crashDumps', path)
 
