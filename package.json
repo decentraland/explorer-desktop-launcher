@@ -1,8 +1,8 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.42",
+  "version": "0.1.44",
   "author": "decentraland",
-  "description": "Decentraland Desktop Launcher",
+  "description": "Andverse Desktop Launcher",
   "homepage": ".",
   "main": "build/electron/main.js",
   "private": false,
@@ -26,7 +26,7 @@
     "chai-as-promised": "^7.1.1",
     "concurrently": "^6.5.1",
     "cross-env": "^7.0.3",
-    "electron": "^18.3.0",
+    "electron": "^20.0.3",
     "electron-builder": "^23.0.3",
     "http-server": "^13.1.0",
     "mocha": "^9.2.2",
@@ -49,9 +49,9 @@
   },
   "build": {
     "appId": "decentraland.desktop.launcher",
-    "productName": "Decentraland",
+    "productName": "Andverse",
     "extends": null,
-    "artifactName": "Decentraland.${ext}",
+    "artifactName": "Andverse.${ext}",
     "compression": "maximum",
     "files": [
       "build/**/*",
@@ -61,7 +61,7 @@
     ],
     "protocols": [
       {
-        "name": "Decentraland Desktop App",
+        "name": "Andverse Desktop App",
         "schemes": [
           "dcl"
         ]
@@ -71,7 +71,7 @@
       "buildResources": "assets"
     },
     "win": {
-      "publisherName": "Decentraland Foundation",
+      "publisherName": "Andverse Foundation",
       "icon": "public/app-icon.png",
       "target": [
         "nsis"
@@ -84,8 +84,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "shortcutName": "Decentraland BETA",
-      "artifactName": "Install Decentraland.${ext}",
+      "shortcutName": "Andverse BETA",
+      "artifactName": "Install Andverse.${ext}",
       "installerIcon": "public/installer-icon.ico",
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": true,
@@ -94,8 +94,8 @@
     },
     "appx": {
       "applicationId": "com.decentraland.launcher",
-      "identityName": "DecentralandFoundation.Decentraland",
-      "publisherDisplayName": "Decentraland Foundation",
+      "identityName": "DecentralandFoundation.Andverse",
+      "publisherDisplayName": "Andverse Foundation",
       "publisher": "CN=546D5DDE-76D5-4F9D-99D8-07C3235EC3A0"
     },
     "linux": {
@@ -105,18 +105,23 @@
       ]
     },
     "appImage": {
-      "artifactName": "Decentraland.${ext}"
+      "artifactName": "Andverse.${ext}"
     },
     "mac": {
       "icon": "public/app-icon.png",
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "hardenedRuntime": false,
+      "entitlements": "entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application"
+      }
     },
     "dmg": {
       "icon": "public/installer-icon.icns",
-      "artifactName": "Decentraland.${ext}"
+      "artifactName": "Andverse.${ext}"
     },
     "publish": {
       "provider": "github",
