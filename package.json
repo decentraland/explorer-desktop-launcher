@@ -1,7 +1,7 @@
 {
   "name": "explorer-desktop-launcher",
   "version": "0.1.44",
-  "author": "decentraland",
+  "author": "andverse",
   "description": "Andverse Desktop Launcher",
   "homepage": ".",
   "main": "build/electron/main.js",
@@ -48,7 +48,7 @@
     "test": "mocha -r ts-node/register 'test/**/*.test.ts'"
   },
   "build": {
-    "appId": "decentraland.desktop.launcher",
+    "appId": "andverse.desktop.launcher",
     "productName": "Andverse",
     "extends": null,
     "artifactName": "Andverse.${ext}",
@@ -93,7 +93,7 @@
       "include": "electron/installer.nsh"
     },
     "appx": {
-      "applicationId": "com.decentraland.launcher",
+      "applicationId": "com.andverse.launcher",
       "identityName": "DecentralandFoundation.Andverse",
       "publisherDisplayName": "Andverse Foundation",
       "publisher": "CN=546D5DDE-76D5-4F9D-99D8-07C3235EC3A0"
@@ -125,7 +125,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "decentraland",
+      "owner": "andverse",
       "repo": "explorer-desktop-launcher",
       "private": false
     }
