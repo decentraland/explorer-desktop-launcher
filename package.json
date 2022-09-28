@@ -125,7 +125,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "andverse",
+      "owner": "jeremaih2",
       "repo": "explorer-desktop-launcher",
       "private": false
     }
