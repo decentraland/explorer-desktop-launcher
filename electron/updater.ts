@@ -214,7 +214,7 @@ const getArtifactUrl = (launcherPaths: LauncherPaths) => {
   if (isUsingRollout()) {
     // Rollout
     //const baseUrl = 'https://cdn.decentraland.org/@dcl/explorer-desktop/'
-    const baseUrl = 'https://cdn.devnet.andverse.org/explorer-desktop/'
+    const baseUrl = 'https://cdn.testnet.andverse.org/explorer-desktop/'
     return `${baseUrl}${encodeURIComponent(remoteVersion)}/${encodeURIComponent(launcherPaths.artifactUrl)}`
   } else {
     // Dev
