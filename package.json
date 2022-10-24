@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.44",
+  "version": "0.1.46",
   "author": "andverse",
   "description": "Andverse Desktop Launcher",
   "homepage": ".",
@@ -125,7 +125,7 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "andverse",
+      "owner": "jeremaih2",
       "repo": "explorer-desktop-launcher",
       "private": false
     }

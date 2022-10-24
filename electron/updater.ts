@@ -34,7 +34,7 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
     } else {
       // Rollout
       //const response = await axios.get('https://play.decentraland.org', {
-      const response = await axios.get('https://cdn.devnet.andverse.org/version.json', {
+      const response = await axios.get('https://cdn.testnet.andverse.org/version.json', {
         headers: {
           'x-debug-rollouts': true
         }
@@ -195,6 +195,9 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
         if (getOSName() === 'mac') {
           params = ['-W', path, '--args', ...params]
           execFile('open', params, onProcessFinish)
+
+          //params = ['+X', path]
+          //execFile('chomd', params)
         } else {
           execFile(path, params, onProcessFinish)
         }
@@ -214,7 +217,7 @@ const getArtifactUrl = (launcherPaths: LauncherPaths) => {
   if (isUsingRollout()) {
     // Rollout
     //const baseUrl = 'https://cdn.decentraland.org/@dcl/explorer-desktop/'
-    const baseUrl = 'https://cdn.devnet.andverse.org/explorer-desktop/'
+    const baseUrl = 'https://cdn.testnet.andverse.org/explorer-desktop/'
     return `${baseUrl}${encodeURIComponent(remoteVersion)}/${encodeURIComponent(launcherPaths.artifactUrl)}`
   } else {
     // Dev
@@ -248,11 +251,11 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
         console.log('onCompleted:', file)
         unzip(file.path, branchPath).then(() => {
           if (fs.existsSync(file.path)) {
-            fs.rmSync(file.path)
+            // fs.rmSync(file.path)
           }
 
           if (getOSName() === 'mac') {
-            const execPath = `${branchPath}/unity-renderer-mac.app/Contents/MacOS/Decentraland`
+            const execPath = `${branchPath}/unity-renderer-mac.app/Contents/MacOS/Andverse`
             console.log('execPath ' + execPath)
             if (fs.existsSync(execPath)) {
               fs.chmodSync(execPath, 0o755)
