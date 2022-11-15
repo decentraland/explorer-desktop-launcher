@@ -200,7 +200,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       } else {
         await reportFatalError(event.sender, `Renderer not found: ${path}`)
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Execute error: ', e)
       await reportFatalError(event.sender, e.toString())
     }
