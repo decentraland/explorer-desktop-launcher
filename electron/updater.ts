@@ -202,7 +202,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       }
     } catch (e) {
       console.error('Execute error: ', e)
-      await reportFatalError(event.sender, JSON.stringify(e))
+      await reportFatalError(event.sender, e.toString())
     }
   })
 }
