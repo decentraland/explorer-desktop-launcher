@@ -6,6 +6,11 @@ import * as isDev from 'electron-is-dev'
 import { getAppTitle, getIconByPlatform, onExit } from './helpers'
 import { URLSearchParams } from 'url'
 import { LauncherPaths } from './types'
+import { Reflector_IPC_main, l as reflector_l } from '@ipsme/reflector-electron-ipc-main';
+
+// reflector nsdnc <-> ipc
+const reflector_IPC_main_ = new Reflector_IPC_main(ipcMain);
+reflector_IPC_main_.subscribe();
 
 export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -24,6 +29,8 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
       backgroundThrottling: false
     }
   })
+
+  reflector_IPC_main_.add_window(win);
 
   win.on('page-title-updated', (evt) => {
     evt.preventDefault()
