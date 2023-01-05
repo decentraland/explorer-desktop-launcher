@@ -78,6 +78,11 @@ export const hideWindowInTray = (win: BrowserWindow) => {
 
       main.contextMenu = Menu.buildFromTemplate([
         {
+          label: 'Open',
+          type: 'normal',
+          click: () => win.show()
+        },
+        {
           label: 'Exit',
           accelerator: 'CmdOrCtrl+Q',
           type: 'normal',
@@ -87,7 +92,8 @@ export const hideWindowInTray = (win: BrowserWindow) => {
 
       main.tray.setToolTip('Decentraland Launcher')
       main.tray.setContextMenu(main.contextMenu)
-      main.tray.on('right-click', (event) => main.tray?.popUpContextMenu(main.contextMenu))
+      main.tray.on('click', () => win.show())
+      main.tray.on('right-click', () => main.tray?.popUpContextMenu(main.contextMenu))
     } catch (e) {
       throw e
     }
