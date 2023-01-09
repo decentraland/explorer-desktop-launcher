@@ -178,9 +178,9 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       // We didn't find a way to get this windows store app package path dynamically
       if (process.windowsStore) {
         rendererPath = process.env.LOCALAPPDATA +
-            `\\Packages\\DecentralandFoundation.Decentraland_4zmdhd0rz3xz8\\LocalCache\\Roaming\\explorer-desktop-launcher\\renderer\\`
+          `\\Packages\\DecentralandFoundation.Decentraland_4zmdhd0rz3xz8\\LocalCache\\Roaming\\explorer-desktop-launcher\\renderer\\`
       }
-      
+
       let path = rendererPath + getBranchName() + executablePath
 
       let params = [`--browser`, `false`, `--port`, `${main.config.port}`]
@@ -249,6 +249,12 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
 
           if (getOSName() === 'mac') {
             const execPath = `${branchPath}/unity-renderer-mac.app/Contents/MacOS/Decentraland`
+            console.log('execPath ' + execPath)
+            if (fs.existsSync(execPath)) {
+              fs.chmodSync(execPath, 0o755)
+            }
+          } else if (getOSName() === 'linux') {
+            const execPath = `${branchPath}/unity-renderer-linux`
             console.log('execPath ' + execPath)
             if (fs.existsSync(execPath)) {
               fs.chmodSync(execPath, 0o755)

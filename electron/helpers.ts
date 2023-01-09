@@ -61,7 +61,7 @@ export const getAppBasePath = (): string => {
   //dev
   if (process.env.RUN_ENV === 'development') return './'
 
-  if (!process.platform || !['win32', 'darwin'].includes(process.platform)) {
+  if (!process.platform || !['win32', 'darwin', 'linux'].includes(process.platform)) {
     console.error(`Unsupported OS: ${process.platform}`)
     return './'
   }
@@ -70,6 +70,8 @@ export const getAppBasePath = (): string => {
     return `/Users/${process.env.USER}/Library/Application\ Support/${applicationFolderName}/`
   } else if (process.platform === 'win32') {
     return `${process.env.LOCALAPPDATA}\\${applicationFolderName}\\`
+  } else if (process.platform === 'linux') {
+    return app.getPath('userData')
   }
 
   return './';
