@@ -2,6 +2,7 @@ import * as electronDl from 'electron-dl'
 import { unzip } from './decompress'
 import { BrowserWindow, ipcMain, WebContents } from 'electron'
 import * as fs from 'fs'
+import axios from 'axios'
 import { main } from './main'
 import * as isDev from 'electron-is-dev'
 import { app } from 'electron/main'
@@ -32,23 +33,21 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
       return main.config.customDesktopVersion
     } else {
       // Rollout
-      const response = await fetch('https://play.decentraland.org', {
+      const response = await axios.get('https://play.decentraland.org', {
         headers: {
-          'x-debug-rollouts': 'true'
+          'x-debug-rollouts': true
         }
       })
-
-      const body = await response.json()
-      return body.data.map['@dcl/explorer-desktop'].version
+      return response.data.map['@dcl/explorer-desktop'].version
     }
   } else {
     // Dev
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
 
     console.log('checkVersion', url)
-    const response = await fetch(url)
-    const body = await response.json()
-    return body.data.version
+
+    const response = await axios.get(url)
+    return response.data.version
   }
 }
 
