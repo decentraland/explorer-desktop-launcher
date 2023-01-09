@@ -2,7 +2,6 @@ import * as electronDl from 'electron-dl'
 import { unzip } from './decompress'
 import { BrowserWindow, ipcMain, WebContents } from 'electron'
 import * as fs from 'fs'
-import axios from 'axios'
 import { main } from './main'
 import * as isDev from 'electron-is-dev'
 import { app } from 'electron/main'
@@ -33,21 +32,23 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
       return main.config.customDesktopVersion
     } else {
       // Rollout
-      const response = await axios.get('https://play.decentraland.org', {
+      const response = await fetch('https://play.decentraland.org', {
         headers: {
-          'x-debug-rollouts': true
+          'x-debug-rollouts': 'true'
         }
       })
-      return response.data.map['@dcl/explorer-desktop'].version
+
+      const body = await response.json()
+      return body.data.map['@dcl/explorer-desktop'].version
     }
   } else {
     // Dev
     const url = launcherPaths.baseUrl + main.config.desktopBranch + launcherPaths.remoteVersionUrl
 
     console.log('checkVersion', url)
-
-    const response = await axios.get(url)
-    return response.data.version
+    const response = await fetch(url)
+    const body = await response.json()
+    return body.data.version
   }
 }
 
@@ -178,9 +179,9 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       // We didn't find a way to get this windows store app package path dynamically
       if (process.windowsStore) {
         rendererPath = process.env.LOCALAPPDATA +
-            `\\Packages\\DecentralandFoundation.Decentraland_4zmdhd0rz3xz8\\LocalCache\\Roaming\\explorer-desktop-launcher\\renderer\\`
+          `\\Packages\\DecentralandFoundation.Decentraland_4zmdhd0rz3xz8\\LocalCache\\Roaming\\explorer-desktop-launcher\\renderer\\`
       }
-      
+
       let path = rendererPath + getBranchName() + executablePath
 
       let params = [`--browser`, `false`, `--port`, `${main.config.port}`]
