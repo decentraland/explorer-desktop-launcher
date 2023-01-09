@@ -1,9 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: daily
-    allow:
-      - dependency-name: "electron"
     versioning-strategy: increase

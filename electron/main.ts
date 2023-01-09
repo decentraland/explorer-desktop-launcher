@@ -104,11 +104,11 @@ const checkUpdates = async (win: BrowserWindow): Promise<void> => {
       const installedVersion = autoUpdater.currentVersion.version
       autoUpdater.autoDownload = false
       const result = await autoUpdater.checkForUpdates()
-      const newVersion = result.updateInfo.version
+      const newVersion = result?.updateInfo.version
       console.log('Mac Result:', result)
       console.log('Compare versions', installedVersion, 'vs', newVersion)
 
-      if (semver.lt(installedVersion, newVersion)) {
+      if (newVersion && semver.lt(installedVersion, newVersion)) {
         const macDownloadUrl =
           'https://github.com/decentraland/explorer-desktop-launcher/releases/latest/download/Decentraland.dmg'
         await reportNewLauncherVersion(win, macDownloadUrl)
@@ -247,7 +247,7 @@ app
 
 function initializeCrashReport() {
   var path = getAppBasePath()
-  if (!fs.existsSync(path)) fs.mkdir(path, () => {})
+  if (!fs.existsSync(path)) fs.mkdir(path, () => { })
 
   app.setPath('crashDumps', path)
 
