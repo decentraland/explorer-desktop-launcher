@@ -138,9 +138,6 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
       url.searchParams.append(key, value)
     }
 
-    url.searchParams.append('DISABLE_ASSET_BUNDLES', '')
-    url.searchParams.append('DISABLE_WEARABLE_ASSET_BUNDLES', '')
-
     url.searchParams.append('ws', `wss://localhost:${main.config.port}/dcl`)
 
     console.log(`Opening: ${url.toString()}`)
