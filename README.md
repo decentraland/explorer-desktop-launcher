@@ -1,6 +1,6 @@
 # Decentraland Explorer Desktop Launcher
 
-A launcher to auto update the `explorer-desktop` (https://github.com/decentraland/explorer-desktop)
+A launcher to auto update the `unity-renderer` (https://github.com/decentraland/unity-renderer)
 
 ## Available Scripts
 
