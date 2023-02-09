@@ -131,7 +131,7 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
     if (main.isDefaultWeb) await showLoading(win)
 
     const stage = main.config.developerMode ? 'zone' : 'org'
-    const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?explorer-version=loading`)
+    const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?`)
 
     const customParamObj = new URLSearchParams(main.config.customParams)
     for (const [key, value] of Array.from(customParamObj.entries())) {
