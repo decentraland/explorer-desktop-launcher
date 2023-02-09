@@ -38,7 +38,7 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
           'x-debug-rollouts': true
         }
       })
-      return response.data.map['@dcl/explorer-desktop'].version
+      return response.data.map['@dcl/explorer'].version
     }
   } else {
     // Dev
@@ -52,12 +52,12 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
 }
 
 const isValidVersion = (version: string) => {
+  const versionRegex = /commit-[0-9a-f]{7}$/g
   if (isUsingRollout()) {
-    const regex = /commit-[0-9a-f]{7}$/g
-    return version.match(regex)
+    return version.match(versionRegex)
   } else {
     const regex = /[0-9a-f]{40}/g
-    return version.match(regex)
+    return version.match(regex) || version.match(versionRegex)
   }
 }
 
@@ -88,10 +88,7 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
         ? JSON.stringify(`dev-desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}`)
         : JSON.stringify(`desktop-${remoteVersion}`)
 
-      await event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/unity-renderer']['version'] = ${desktopVersion};`)
-      await event.sender.executeJavaScript(
-        `globalThis.ROLLOUTS['@dcl/explorer-desktop'] = { 'version': ${desktopVersion} };`
-      )
+      await event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/explorer'] = { 'version': ${desktopVersion} };`)
     }
   })
 }
@@ -210,7 +207,7 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 const getArtifactUrl = (launcherPaths: LauncherPaths) => {
   if (isUsingRollout()) {
     // Rollout
-    const baseUrl = 'https://cdn.decentraland.org/@dcl/explorer-desktop/'
+    const baseUrl = 'https://renderer-artifacts.decentraland.org/release-desktop/'
     return `${baseUrl}${encodeURIComponent(remoteVersion)}/${encodeURIComponent(launcherPaths.artifactUrl)}`
   } else {
     // Dev

@@ -94,12 +94,8 @@
   </div>
   <div id="dev" class="container" hidden="true">
     <div class="form">
-      <label>explorer-desktop branch:</label></br>
-      <input type="text" value="main" id="explorer-desktop-branch" /></br></br>
-
-      <label>kernel branch:</label>
-      <input onchange="checkChange(`kernel-branch`)" type="checkbox" id="check-kernel-branch" /></br>
-      <input oninput="updateUrl()" type="text" value="main" id="kernel-branch" disabled='' /></br></br>
+      <label>explorer branch:</label></br>
+      <input type="text" value="main" id="explorer-branch" /></br></br>
 
       <label>explorer-website branch:</label>
       <input onchange="checkChange(`explorer-website-branch`)" type="checkbox"
@@ -124,13 +120,11 @@
     let baseUrl = `http://play.decentraland.org/?`
 
     const updateUrl = () => {
-      const hasKernelBranch = document.getElementById("check-kernel-branch").checked
       const hasExplorerWebsiteBranch = document.getElementById("check-explorer-website-branch").checked
       const hasCustomParam = document.getElementById("check-custom-param").checked
       const hasPreviewCustomParam = document.getElementById("preview-check-custom-param").checked
       const hasCustomUrl = document.getElementById("check-custom-url").checked
 
-      const kernelBranch = document.getElementById("kernel-branch").value
       const explorerWebsiteBranch = document.getElementById("explorer-website-branch").value
       const customParam = document.getElementById("custom-param").value
       const previewCustomParam = document.getElementById("preview-custom-param").value
@@ -144,10 +138,6 @@
           hasExplorerWebsiteBranch ? `https://explorer-artifacts.decentraland.org/@dcl/explorer-website/branch/${explorerWebsiteBranch}/?`
             : baseUrl
         )
-
-        if (hasKernelBranch) {
-          newUrl.searchParams.append('kernel-branch', '')
-        }
 
         if (hasCustomParam) {
           const customParamObj = new URLSearchParams(customParam)
@@ -177,7 +167,7 @@
     }
 
     const submitForm = () => {
-      const explorerDesktopBranch = document.getElementById("explorer-desktop-branch").value
+      const explorerDesktopBranch = document.getElementById("explorer-branch").value
       const url = updateUrl()
 
       console.log(url, explorerDesktopBranch)
@@ -212,7 +202,7 @@
           document.getElementById("custom-url").value = previewMode
         }
 
-        const explorerDesktopBranchElement = document.getElementById("explorer-desktop-branch")
+        const explorerDesktopBranchElement = document.getElementById("explorer-branch")
         const customParamElement = document.getElementById("custom-param")
         const customParamCheckElement = document.getElementById("check-custom-param")
 
