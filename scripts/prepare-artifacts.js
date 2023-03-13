@@ -14,7 +14,7 @@ function copyFileSync(src, dest, mode) {
 
 if (ext === 'exe') {
   if (fs.existsSync(`dist/Install Decentraland.${ext}`)) {
-    copyFileSync(`dist/Install Decentraland.${ext}`, `output/Install Decentraland.${ext}`)
+    copyFileSync(`dist/Install Decentraland.${ext}`, `output/Install-Decentraland.${ext}`)
   }
 
   if (fs.existsSync(`dist/Decentraland.appx`)) {
