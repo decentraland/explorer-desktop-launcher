@@ -49,6 +49,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && matrix.os != 'windows' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+          EP_PRE_RELEASE: true
         run: |
           npm run publish
 
@@ -64,6 +65,7 @@ jobs:
       #   if: ${{ github.ref == 'refs/heads/main' && matrix.os == 'windows' }}
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.github_token }}
+      #     EP_PRE_RELEASE: true
       #   run: |
       #     npm run publish:appx
 
