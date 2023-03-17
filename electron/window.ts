@@ -132,6 +132,9 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
 
     const stage = main.config.developerMode ? 'zone' : 'org'
     const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?`)
+    
+    if (main.config.desktopBranch)
+      url.searchParams.append('explorer-branch', main.config.desktopBranch)    
 
     const customParamObj = new URLSearchParams(main.config.customParams)
     for (const [key, value] of Array.from(customParamObj.entries())) {
