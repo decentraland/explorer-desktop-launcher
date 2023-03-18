@@ -11,6 +11,16 @@ Runs the Electron app in the development mode.
 The Electron app will reload if you make edits in the `electron` directory.<br>
 You will also see any lint errors in the console.
 
+#### Custom arguments
+
+Use `-- <args>` to specify custom arguments
+- `--developer-mode` open the application in Developer Mode (with DevTools)
+- `--custom-url <url>` overrides the url, in Developer Mode it can be changed later
+- `--desktop-branch <branch_name> ` downloads the renderer of the specified branch and uses the corresponding browser-interface
+- `--desktop-version <version>` downloads the renderer of the specified version and uses the corresponding browser-interface
+
+e.g. `npm run start -- --developer-mode --desktop-branch main`
+
 ### `npm run build`
 
 Builds the Electron app package for production to the `dist` folder.

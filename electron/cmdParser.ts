@@ -9,15 +9,15 @@ export const parseConfig = (argv: string[]) => {
         break
       case '--custom-url':
         argv.shift()
-        main.config.customUrl = process.argv[0]
+        main.config.customUrl = argv[0]
         break
       case '--desktop-branch':
         argv.shift()
-        main.config.desktopBranch = process.argv[0]
+        main.config.desktopBranch = argv[0]
         break
       case '--desktop-version':
         argv.shift()
-        main.config.customDesktopVersion = process.argv[0]
+        main.config.customDesktopVersion = argv[0]
         break
     }
     argv.shift()
