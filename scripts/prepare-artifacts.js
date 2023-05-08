@@ -8,20 +8,23 @@ if (!fs.existsSync(dir)) {
 }
 
 function copyFileSync(src, dest, mode) {
-  console.log('coping', src, 'to', dest)
-  fs.copyFileSync(src, dest, mode)
+  if (fs.existsSync(src)) {
+    console.log('coping', src, 'to', dest)
+    fs.copyFileSync(src, dest, mode)
+  } else {
+    console.log('skipping', src, `(don't exist)`)
+  }
 }
 
 if (ext === 'exe') {
-  if (fs.existsSync(`dist/Install Decentraland.${ext}`)) {
-    copyFileSync(`dist/Install Decentraland.${ext}`, `output/Install-Decentraland.${ext}`)
-  }
-
-  if (fs.existsSync(`dist/Decentraland.appx`)) {
-    copyFileSync(`dist/Decentraland.appx`, `output/Decentraland.appx`)
-  }
+  copyFileSync(`dist/Install Decentraland.${ext}`, `output/Install-Decentraland.${ext}`)
+  copyFileSync(`dist/Install Decentraland.${ext}.blockmap`, `output/Install-Decentraland.${ext}.blockmap`)
+  copyFileSync(`dist/Decentraland.appx`, `output/Decentraland.appx`)
 } else {
   copyFileSync(`dist/Decentraland.${ext}`, `output/Decentraland.${ext}`)
+  copyFileSync(`dist/Decentraland.${ext}.blockmap`, `output/Decentraland.${ext}.blockmap`)
 }
+
+copyFileSync(`dist/latest.yml`, `output/latest.yml`)
 
 console.log('Done')
