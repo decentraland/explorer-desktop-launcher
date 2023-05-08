@@ -82,14 +82,6 @@ const registerVersionEvent = (launcherPaths: LauncherPaths) => {
       // download please
       event.sender.send('downloadState', { type: 'NEW_VERSION' })
     }
-
-    if (validVersion && !PREVIEW) {
-      const desktopVersion = main.config.desktopBranch
-        ? JSON.stringify(`dev-desktop-${main.config.desktopBranch}.commit-${remoteVersion.substring(0, 7)}`)
-        : JSON.stringify(`desktop-${remoteVersion}`)
-
-      await event.sender.executeJavaScript(`globalThis.ROLLOUTS['@dcl/explorer'] = { 'version': ${desktopVersion} };`)
-    }
   })
 }
 
