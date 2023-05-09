@@ -39,9 +39,17 @@ jobs:
         run: npm run test
 
       - name: Build
-        if: github.ref != 'refs/heads/main'
+        if: ${{github.ref != 'refs/heads/main' && matrix.os != 'macos' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          npm run build
+
+      - name: Build MacOS
+        if: ${{github.ref != 'refs/heads/main' && matrix.os == 'macos' }}
+        env:
+          CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CSC_KEY_PASSWORD }}
         run: |
           npm run build
 
