@@ -73,7 +73,7 @@ jobs:
           # you're curious
 
           echo "Notarize app"
-          # xcrun notarytool submit "dist/Decentraland.dmg" --keychain-profile "notary-profile" --wait
+          xcrun notarytool submit "dist/Decentraland.dmg" --keychain-profile "notary-profile" --wait
 
           # Finally, we need to "attach the staple" to our executable, which will allow our app to be
           # validated by macOS even when an internet connection is not available.
