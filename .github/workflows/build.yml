@@ -69,7 +69,7 @@ jobs:
           echo "Notarize app"
           xcrun altool --notarize-app \
             --primary-bundle-id Decentraland \
-            --apple-id "$MACOS_NOTARIZATION_APPLE_ID" \
+            --username "$MACOS_NOTARIZATION_APPLE_ID" \
             --team-id "$MACOS_NOTARIZATION_TEAM_ID" \
             --password "$MACOS_NOTARIZATION_PWD" \
             --file dist/Decentraland.dmg
