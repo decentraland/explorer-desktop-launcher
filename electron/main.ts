@@ -257,7 +257,11 @@ function initializeCrashReport() {
 const askForMediaAccess = async (mediaType: 'microphone' | 'camera') => {
   if (systemPreferences.askForMediaAccess) {
     // Electron currently only implements this on macOS
-    return await systemPreferences.askForMediaAccess(mediaType);
+    const previous = await systemPreferences.getMediaAccessStatus(mediaType);
+    const result = await systemPreferences.askForMediaAccess(mediaType);
+    const next = await systemPreferences.getMediaAccessStatus(mediaType);
+    console.log(`MediaAccess for ${mediaType} is went from ${previous} to ${next} (askForMediaAccess: ${result})`)
+    return result
   }
   // For other platforms we can't reasonably do anything other than assume we have access.
   return true;
