@@ -116,9 +116,7 @@
       "hardenedRuntime": true,
       "entitlements": "entitlements.mac.plist",
       "extendInfo": {
-        "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application",
-        "com.apple.security.device.microphone": true,
-        "com.apple.security.device.audio-input": true
+        "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application"
       }
     },
     "dmg": {
