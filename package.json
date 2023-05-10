@@ -113,7 +113,7 @@
         "dmg",
         "zip"
       ],
-      "hardenedRuntime": false,
+      "hardenedRuntime": true,
       "entitlements": "entitlements.mac.plist",
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application"
