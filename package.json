@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.50",
+  "version": "0.1.51",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -113,7 +113,7 @@
         "dmg",
         "zip"
       ],
-      "hardenedRuntime": false,
+      "hardenedRuntime": true,
       "entitlements": "entitlements.mac.plist",
       "extendInfo": {
         "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application"
