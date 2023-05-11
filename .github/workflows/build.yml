@@ -34,7 +34,7 @@ jobs:
           npm run build
 
       - name: Build and Release Ubuntu (AppImage)
-        if: ${{github.ref != 'refs/heads/main'}}
+        if: ${{github.ref == 'refs/heads/main'}}
         env:
           GITHUB_TOKEN: ${{secrets.github_token}}
           EP_PRE_RELEASE: true
