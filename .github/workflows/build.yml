@@ -39,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.github_token}}
           EP_PRE_RELEASE: true
         run: |
-          npm run release
+          npm run publish
 
       - name: Upload artifacts
         env:
@@ -78,6 +78,7 @@ jobs:
         env:
           CSC_LINK: ${{secrets.MACOS_CSC_LINK}}
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
+          EP_PRE_RELEASE: true
         run: |
           npm run publish
 
