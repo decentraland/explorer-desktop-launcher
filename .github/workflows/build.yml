@@ -76,6 +76,7 @@ jobs:
       - name: Build and Release MacOS (dmg)
         if: ${{github.ref == 'refs/heads/main'}}
         env:
+          GITHUB_TOKEN: ${{secrets.github_token}}
           CSC_LINK: ${{secrets.MACOS_CSC_LINK}}
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
