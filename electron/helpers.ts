@@ -4,7 +4,7 @@ import { autoUpdater } from 'electron-updater'
 
 export const getAppTitle = (): string => {
   const currentVersion = autoUpdater.currentVersion.version
-  let title = `Decentraland BETA ${currentVersion}`
+  let title = `Decentraland ${currentVersion}`
 
   if (main.config.desktopBranch !== main.defaultConfig.desktopBranch)
     title += ` desktop-branch=${main.config.desktopBranch}`
