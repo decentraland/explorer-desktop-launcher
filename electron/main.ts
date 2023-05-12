@@ -1,22 +1,13 @@
 import { shell, app, BrowserWindow, ipcMain, Tray, Menu, crashReporter, systemPreferences } from 'electron'
-import * as isDev from 'electron-is-dev'
 import { getOSName, getFreePort } from './updater'
 import { exit } from 'process'
 import { autoUpdater } from 'electron-updater'
 import { parseConfig } from './cmdParser'
 import { getAppTitle, getAppBasePath } from './helpers'
-import {
-  createWindow,
-  hideWindowInTray,
-  loadDecentralandWeb,
-  onOpenUrl,
-  reportNewLauncherVersion,
-  showWindowAndHideTray
-} from './window'
+import { createWindow, hideWindowInTray, loadDecentralandWeb, onOpenUrl, showWindowAndHideTray } from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
 import { reportError, initializeRollbar } from './rollbar'
-import * as semver from 'semver'
 import fs = require('fs')
 
 const defaultConfig: LauncherConfig = {
@@ -99,34 +90,16 @@ if (getOSName() === 'windows') {
 
 const checkUpdates = async (win: BrowserWindow): Promise<void> => {
   try {
-    if (getOSName() === 'mac') {
-      // No updates in Mac until we signed the executable
-      const installedVersion = autoUpdater.currentVersion.version
-      autoUpdater.autoDownload = false
-      const result = await autoUpdater.checkForUpdates()
-      const newVersion = result?.updateInfo.version
-      console.log('Mac Result:', result)
-      console.log('Compare versions', installedVersion, 'vs', newVersion)
-
-      if (newVersion && semver.lt(installedVersion, newVersion)) {
-        const macDownloadUrl =
-          'https://github.com/decentraland/explorer-desktop-launcher/releases/latest/download/Decentraland.dmg'
-        await reportNewLauncherVersion(win, macDownloadUrl)
-      } else {
-        await loadDecentralandWeb(win) // Load decentraland web to report the error
-      }
+    const result = await autoUpdater.checkForUpdatesAndNotify()
+    console.log('Result:', result)
+    if (result === null || !result.downloadPromise) {
+      await loadDecentralandWeb(win)
     } else {
-      const result = await autoUpdater.checkForUpdatesAndNotify()
-      console.log('Result:', result)
-      if (result === null || !result.downloadPromise) {
-        await loadDecentralandWeb(win)
-      } else {
-        await result.downloadPromise
+      await result.downloadPromise
 
-        console.log('Download completed')
-        const silent = process.platform === 'darwin' // Silent=true only on Mac
-        autoUpdater.quitAndInstall(silent, true)
-      }
+      console.log('Download completed')
+      const silent = process.platform === 'darwin' // Silent=true only on Mac
+      autoUpdater.quitAndInstall(silent, true)
     }
   } catch (err) {
     console.error(`Check Updates error: ${err}`)
@@ -202,7 +175,7 @@ const startApp = async (): Promise<void> => {
     await checkUpdates(win)
   }
 
-  const microphoneResult = await askForMediaAccess('microphone');
+  const microphoneResult = await askForMediaAccess('microphone')
   if (!microphoneResult) {
     console.log('Microphone permission was not given')
   }
@@ -247,7 +220,7 @@ app
 
 function initializeCrashReport() {
   var path = getAppBasePath()
-  if (!fs.existsSync(path)) fs.mkdir(path, () => { })
+  if (!fs.existsSync(path)) fs.mkdir(path, () => {})
 
   app.setPath('crashDumps', path)
 
@@ -257,12 +230,12 @@ function initializeCrashReport() {
 const askForMediaAccess = async (mediaType: 'microphone' | 'camera') => {
   if (systemPreferences.askForMediaAccess) {
     // Electron currently only implements this on macOS
-    const previous = await systemPreferences.getMediaAccessStatus(mediaType);
-    const result = await systemPreferences.askForMediaAccess(mediaType);
-    const next = await systemPreferences.getMediaAccessStatus(mediaType);
+    const previous = await systemPreferences.getMediaAccessStatus(mediaType)
+    const result = await systemPreferences.askForMediaAccess(mediaType)
+    const next = await systemPreferences.getMediaAccessStatus(mediaType)
     console.log(`MediaAccess for ${mediaType} is went from ${previous} to ${next} (askForMediaAccess: ${result})`)
     return result
   }
   // For other platforms we can't reasonably do anything other than assume we have access.
-  return true;
+  return true
 }
