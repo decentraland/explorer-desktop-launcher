@@ -46,6 +46,8 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != ''}}
         run: |
           node scripts/prepare-artifacts.js AppImage
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
@@ -112,6 +114,8 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != ''}}
         run: |
           node scripts/prepare-artifacts.js dmg
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
@@ -167,6 +171,8 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != ''}}
         run: |
           node scripts/prepare-artifacts.js appx
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
@@ -180,7 +186,9 @@ jobs:
       - build_ubuntu
     steps:
       - name: Comment PR
-        if: ${{github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'decentraland/explorer-desktop-launcher'}} # Not a fork
+        env:
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != '' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'decentraland/explorer-desktop-launcher'}} # Not a fork
         uses: thollander/actions-comment-pull-request@main
         with:
           message: |
