@@ -55,12 +55,6 @@ export const loadDefaultWeb = async (win: BrowserWindow) => {
   await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
 }
 
-export const reportNewLauncherVersion = async (win: BrowserWindow, updateUrl: string) => {
-  await win.loadURL(`file://${__dirname}/../../public/new-version.html`)
-
-  win.webContents.send('setUrl', { url: updateUrl })
-}
-
 export const checkDeveloperConsole = (win: BrowserWindow) => {
   if (isDev || main.config.developerMode) {
     win.webContents.openDevTools({ mode: 'detach' })
@@ -132,13 +126,11 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
 
     const stage = main.config.developerMode ? 'zone' : 'org'
     const url = new URL(main.config.customUrl || `http://play.decentraland.${stage}/?`)
-    
-    if (main.config.desktopBranch)
-      url.searchParams.append('explorer-branch', main.config.desktopBranch)
-    
-    if (main.config.customDesktopVersion)
-      url.searchParams.append('explorer-version', main.config.customDesktopVersion)
-    
+
+    if (main.config.desktopBranch) url.searchParams.append('explorer-branch', main.config.desktopBranch)
+
+    if (main.config.customDesktopVersion) url.searchParams.append('explorer-version', main.config.customDesktopVersion)
+
     const customParamObj = new URLSearchParams(main.config.customParams)
     for (const [key, value] of Array.from(customParamObj.entries())) {
       url.searchParams.append(key, value)

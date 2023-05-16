@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.51",
+  "version": "0.1.52",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -15,7 +15,6 @@
     "find-free-port": "^2.0.0",
     "node-stream-zip": "^1.15.0",
     "rollbar": "^2.26.1",
-    "semver": "^7.3.8",
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
