@@ -84,7 +84,7 @@
     },
     "nsis": {
       "oneClick": false,
-      "shortcutName": "Decentraland BETA",
+      "shortcutName": "Decentraland",
       "artifactName": "Install Decentraland.${ext}",
       "installerIcon": "public/installer-icon.ico",
       "allowToChangeInstallationDirectory": true,
