@@ -186,7 +186,9 @@ jobs:
       - build_ubuntu
     steps:
       - name: Comment PR
-        if: ${{github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'decentraland/explorer-desktop-launcher'}} # Not a fork
+        env:
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != '' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'decentraland/explorer-desktop-launcher'}} # Not a fork
         uses: thollander/actions-comment-pull-request@main
         with:
           message: |
