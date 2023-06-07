@@ -221,5 +221,3 @@ export const onOpenUrl = (data: string, win?: BrowserWindow) => {
     checkDeveloperConsole(win)
   }
 }
-
-

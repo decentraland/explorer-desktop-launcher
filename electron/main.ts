@@ -48,7 +48,6 @@ console.log('main.openingUrl: ', main.openingUrl)
 app.setAsDefaultProtocolClient('dcl')
 
 const isAppAllowed = app.requestSingleInstanceLock()
-console.log(process.env.HOSTNAME)
 if (!isAppAllowed) {
   app.quit()
 } else {
