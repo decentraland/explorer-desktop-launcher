@@ -136,12 +136,9 @@ const reportFatalError = async (sender: WebContents, message: string) => {
 const reportCrash = async (sender: WebContents, message: string) => {
   const path = JSON.stringify({ playerlogpath: getPlayerLogPath() })
   const data = JSON.stringify(`Player log:\n${getPlayerLog()}`)
-  const code = `window.Rollbar.error(${data}, ${path})`
   console.log(`reportCrash path: ${path}`)
 
   try {
-    await sender.executeJavaScript(code)
-
     await reportFatalError(sender, `Renderer unexpected exit: ${message}`)
   } catch (e) {
     console.error(`Report crash, error: ${e}`)
@@ -166,7 +163,8 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
 
       // We didn't find a way to get this windows store app package path dynamically
       if (process.windowsStore) {
-        rendererPath = process.env.LOCALAPPDATA +
+        rendererPath =
+          process.env.LOCALAPPDATA +
           `\\Packages\\DecentralandFoundation.Decentraland_4zmdhd0rz3xz8\\LocalCache\\Roaming\\explorer-desktop-launcher\\renderer\\`
       }
 
