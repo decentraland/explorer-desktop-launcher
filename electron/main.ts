@@ -65,6 +65,11 @@ const osName = getOSName()
 console.log('Config:', main.config)
 console.log('OS:', osName)
 
+if (getOSName() === null) {
+  console.error('OS not supported')
+  exit(1)
+}
+
 const launcherPaths: LauncherPaths = {
   baseUrl: `https://renderer-artifacts.decentraland.org/desktop/`,
   rendererPath: `${app.getPath('appData')}/explorer-desktop-launcher/renderer/`,
@@ -207,7 +212,7 @@ app
     })
   })
   .catch(async (error) => {
-    // Should we report the error somewhere?
+    console.error(`Error starting app: ${error}`)
   })
 
 function initializeCrashReport() {
