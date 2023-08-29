@@ -7,7 +7,6 @@ import { getAppTitle, getAppBasePath } from './helpers'
 import { createWindow, hideWindowInTray, loadDecentralandWeb, onOpenUrl, showWindowAndHideTray } from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
-import { reportError, initializeRollbar } from './rollbar'
 import fs = require('fs')
 
 const defaultConfig: LauncherConfig = {
@@ -34,7 +33,6 @@ class MainApp {
 }
 
 // all uncaught exceptions are being sent automatically
-initializeRollbar()
 
 initializeCrashReport()
 
@@ -68,9 +66,8 @@ console.log('Config:', main.config)
 console.log('OS:', osName)
 
 if (getOSName() === null) {
-  reportError('OS not supported', () => {
-    exit(1)
-  })
+  console.error('OS not supported')
+  exit(1)
 }
 
 const launcherPaths: LauncherPaths = {
@@ -215,7 +212,7 @@ app
     })
   })
   .catch(async (error) => {
-    reportError(error)
+    console.error(`Error starting app: ${error}`)
   })
 
 function initializeCrashReport() {
