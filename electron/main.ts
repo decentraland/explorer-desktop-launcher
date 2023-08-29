@@ -46,7 +46,6 @@ console.log('main.openingUrl: ', main.openingUrl)
 app.setAsDefaultProtocolClient('dcl')
 
 const isAppAllowed = app.requestSingleInstanceLock()
-
 if (!isAppAllowed) {
   app.quit()
 } else {
@@ -217,7 +216,7 @@ app
 
 function initializeCrashReport() {
   var path = getAppBasePath()
-  if (!fs.existsSync(path)) fs.mkdir(path, () => {})
+  if (!fs.existsSync(path)) fs.mkdir(path, () => { })
 
   app.setPath('crashDumps', path)
 

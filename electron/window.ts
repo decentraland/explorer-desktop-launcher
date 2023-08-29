@@ -6,6 +6,7 @@ import * as isDev from 'electron-is-dev'
 import { getAppTitle, getIconByPlatform, onExit } from './helpers'
 import { URLSearchParams } from 'url'
 import { LauncherPaths } from './types'
+import { getFeatureFlag } from './featureFlags'
 
 export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -136,8 +137,12 @@ export const loadDecentralandWeb = async (win: BrowserWindow) => {
       url.searchParams.append(key, value)
     }
 
-    url.searchParams.append('DISABLE_ASSET_BUNDLES', '')
-    url.searchParams.append('DISABLE_WEARABLE_ASSET_BUNDLES', '')
+    const enableAssetBundles = await getFeatureFlag(`explorer-ab-desktop`);
+
+    if (!enableAssetBundles) {
+      url.searchParams.append('DISABLE_ASSET_BUNDLES', '')
+      url.searchParams.append('DISABLE_WEARABLE_ASSET_BUNDLES', '')
+    }
 
     url.searchParams.append('ws', `wss://localhost:${main.config.port}/dcl`)
 
