@@ -153,18 +153,21 @@ jobs:
 
       - name: Build Windows (appx)
         if: ${{github.ref != 'refs/heads/main'}}
+        env:
+          CSC_KEY_PASSWORD: ${{secrets.CSC_KEY_PASSWORD}}
+          CSC_LINK: ${{secrets.CSC_LINK}}
         run: |
           npm run build:appx
 
       - name: Build and Publish Windows (appx) [moved to azure]
-        if: ${{false}}
-        # if: ${{github.ref == 'refs/heads/main' && matrix.os == 'windows'}}
-        # env:
-        #   GITHUB_TOKEN: ${{secrets.github_token}}
-        #   EP_PRE_RELEASE: true
+        if: ${{github.ref == 'refs/heads/main'}}
+        env:
+          CSC_KEY_PASSWORD: ${{secrets.CSC_KEY_PASSWORD}}
+          CSC_LINK: ${{secrets.CSC_LINK}}
+          GITHUB_TOKEN: ${{secrets.github_token}}
+          EP_PRE_RELEASE: true
         run: |
-          # npm run publish:appx
-          echo "Moved to Azure"
+          npm run publish:appx
 
       - name: Upload artifacts
         env:
