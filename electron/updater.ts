@@ -33,7 +33,7 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
       return main.config.customDesktopVersion
     } else {
       // Rollout
-      const response = await axios.get('https://play.decentraland.org', {
+      const response = await axios.get('https://decentraland.org/play', {
         headers: {
           'x-debug-rollouts': true
         }

@@ -84,7 +84,7 @@ We can add the following parameters to the custom protocol to change the behavio
 If you add another parameter, it will be forwarded to the final URL.
 For example, if we use `position=10,10&realm=thor` it will be similar as opening:
 
-https://play.decentraland.org/?position=10,10&realm=thor
+https://decentraland.org/play/?position=10,10&realm=thor
 
 Example: `dcl://DESKTOP-BRANCH=main&position=10,10&realm=thor`
 
