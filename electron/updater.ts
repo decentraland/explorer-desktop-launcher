@@ -38,7 +38,7 @@ const getRemoteVersion = async (launcherPaths: LauncherPaths) => {
           'x-debug-rollouts': true
         }
       })
-      return response.data.map['@dcl/explorer'].version
+      return response.data.rolloutMap['@dcl/explorer'].version
     }
   } else {
     // Dev
