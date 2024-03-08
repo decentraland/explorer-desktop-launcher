@@ -152,6 +152,20 @@ jobs:
           EP_PRE_RELEASE: true
         run: |
           npm run publish
+          
+      - name: Sign Windows Build (exe)
+        uses: sslcom/esigner-codesign@develop
+        if: ${{github.ref == 'refs/heads/main'}}
+        with:
+          command: sign
+          username: ${{ secrets.ES_USERNAME }}
+          password: ${{ secrets.ES_PASSWORD }}
+          credential_id: ${{ secrets.CREDENTIAL_ID }}
+          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
+          file_path: ${GITHUB_WORKSPACE}/dist/Install Decentraland.exe
+          output_path: ${GITHUB_WORKSPACE}/signed
+          malware_block: false
+          environment_name: PROD
 
       - name: Build Windows (appx)
         if: ${{github.ref != 'refs/heads/main'}}
