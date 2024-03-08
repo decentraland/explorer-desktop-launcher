@@ -155,7 +155,7 @@ jobs:
           
       - name: Sign Windows Build (exe)
         uses: sslcom/esigner-codesign@develop
-        if: ${{github.ref == 'refs/heads/main'}}
+        #if: ${{github.ref == 'refs/heads/main'}}
         with:
           command: sign
           username: ${{ secrets.ES_USERNAME }}
@@ -179,7 +179,7 @@ jobs:
         run: |
           npm run publish:appx
 
-      - name: Upload artifacts
+      - name: Upload artifacts appx
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
@@ -188,6 +188,17 @@ jobs:
         if: ${{env.AWS_BUCKET != ''}}
         run: |
           node scripts/prepare-artifacts.js appx
+          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
+
+      - name: Upload artifacts exe
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != ''}}
+        run: |
+          node scripts/prepare-artifacts.js exe
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
 
   deployment_notification:
