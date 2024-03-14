@@ -163,9 +163,14 @@ jobs:
           credential_id: ${{ secrets.CREDENTIAL_ID }}
           totp_secret: ${{ secrets.ES_TOTP_SECRET }}
           file_path: ${GITHUB_WORKSPACE}/dist/Install Decentraland.exe
-          output_path: ${GITHUB_WORKSPACE}/signed
+          output_path: ${GITHUB_WORKSPACE}/dist/signed
           malware_block: false
           environment_name: PROD
+
+      - name: Replace signed exe
+        #if: ${{github.ref == 'refs/heads/main'}}
+        run: |
+          Copy-Item -Path "${env:GITHUB_WORKSPACE}\dist\signed\Install Decentraland.exe" -Destination "${env:GITHUB_WORKSPACE}\dist\Install Decentraland.exe" -Force
 
       - name: Build Windows (appx)
         if: ${{github.ref != 'refs/heads/main'}}
@@ -218,7 +223,7 @@ jobs:
         with:
           message: |
             This branch can be downloaded with the following links:
-            - [Windows](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Install%20Decentraland.exe)
+            - [Windows](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Install-Decentraland.exe)
             - [Windows AppX](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.appx)
             - [Linux](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.AppImage)
             - [Mac](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.dmg)
