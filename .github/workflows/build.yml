@@ -223,7 +223,7 @@ jobs:
         with:
           message: |
             This branch can be downloaded with the following links:
-            - [Windows](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Install-Decentraland.exe)
+            - [Windows](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.head_ref}}/${{ 'Install-Decentraland.exe' | uri_encode }})
             - [Windows AppX](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.appx)
             - [Linux](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.AppImage)
             - [Mac](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.dmg)
