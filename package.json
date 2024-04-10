@@ -75,7 +75,7 @@
         "nsis"
       ],
       "verifyUpdateCodeSignature": false,
-      "signAndEditExecutable ": false,
+      "signAndEditExecutable": false,
       "signingHashAlgorithms": [
         "sha256"
       ],
