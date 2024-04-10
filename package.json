@@ -74,6 +74,7 @@
       "target": [
         "nsis"
       ],
+      "verifyUpdateCodeSignature": false,
       "signingHashAlgorithms": [
         "sha256"
       ],
