@@ -144,7 +144,7 @@ jobs:
           npm run build
 
       - name: Build and Publish Windows (exe)
-        if: ${{github.ref == 'refs/heads/main'}}
+        #if: ${{github.ref == 'refs/heads/main'}}
         env:
           CSC_KEY_PASSWORD: ${{secrets.CSC_KEY_PASSWORD}}
           CSC_LINK: ${{secrets.CSC_LINK}}
@@ -155,7 +155,7 @@ jobs:
           
       - name: Sign Windows Build (exe)
         uses: sslcom/esigner-codesign@develop
-        if: ${{github.ref == 'refs/heads/main'}}
+        #if: ${{github.ref == 'refs/heads/main'}}
         with:
           command: sign
           username: ${{ secrets.ES_USERNAME }}
@@ -168,7 +168,7 @@ jobs:
           environment_name: PROD
 
       - name: Replace signed exe
-        if: ${{github.ref == 'refs/heads/main'}}
+        #if: ${{github.ref == 'refs/heads/main'}}
         run: |
           Copy-Item -Path "${env:GITHUB_WORKSPACE}\dist\signed\Install Decentraland.exe" -Destination "${env:GITHUB_WORKSPACE}\dist\Install Decentraland.exe" -Force
 
