@@ -146,8 +146,6 @@ jobs:
       - name: Build and Publish Windows (exe)
         if: ${{github.ref == 'refs/heads/main'}}
         env:
-          CSC_KEY_PASSWORD: ${{secrets.CSC_KEY_PASSWORD}}
-          CSC_LINK: ${{secrets.CSC_LINK}}
           GITHUB_TOKEN: ${{secrets.github_token}}
           EP_PRE_RELEASE: true
         run: |
