@@ -25,7 +25,6 @@ jobs:
       - name: Install
         run: |
           npm install
-          set
 
       - name: Build Windows (exe)
         run: |
