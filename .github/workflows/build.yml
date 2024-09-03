@@ -29,13 +29,6 @@ jobs:
       - name: Build Windows (exe)
         run: |
           npm run build
-
-      - name: Build and Publish Windows (exe)
-        env:
-          GITHUB_TOKEN: ${{secrets.github_token}}
-          EP_PRE_RELEASE: true
-        run: |
-          npm run publish
           
       - name: Sign Windows Build (exe)
         uses: sslcom/esigner-codesign@develop
