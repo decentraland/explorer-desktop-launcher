@@ -165,6 +165,7 @@ jobs:
           output_path: ${GITHUB_WORKSPACE}/dist/signed
           malware_block: false
           environment_name: PROD
+          signing_method: v2
 
       - name: Replace signed exe
         if: ${{github.ref == 'refs/heads/main'}}
