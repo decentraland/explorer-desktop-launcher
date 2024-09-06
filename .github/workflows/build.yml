@@ -49,7 +49,7 @@ jobs:
           EP_PRE_RELEASE: true
         run: |
           echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + | sort -rh | head -n 10
+          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           hdiutil info
           df -h
           diskutil list
@@ -67,7 +67,7 @@ jobs:
           hdiutil info
           df -h
           echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + | sort -rh | head -n 10
+          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
