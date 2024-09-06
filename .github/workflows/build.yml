@@ -20,27 +20,23 @@ jobs:
           echo ">>>>>>>>>>>>> 10 largest files"
           sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
-          hdiutil info
-          diskutil list
-          echo "Remaining simulators:"
+          echo "List all:"
+          xcrun simctl list
+          echo "List devices:"
           xcrun simctl list devices
           echo "Listing all installed simulator runtimes..."
           xcrun simctl list runtimes
           echo "Shutting down all simulators..."
           xcrun simctl shutdown all
-          echo "Remaining simulators:"
-          xcrun simctl list devices
-          echo "Searching for large simulator .dmg files..."
-          find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -size +5G -exec du -h {} + | sort -rh
           echo "Deleting old and unused simulators..."
           xcrun simctl delete unavailable
+          echo "Remaining simulators:"
+          xcrun simctl list
+          echo "Searching for large simulator .dmg files..."
+          find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -size +5G -exec du -h {} + | sort -rh
           echo "Listing remaining large simulator files..."
           find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -exec du -h {} + | sort -rh | head -n 10
-          echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
-          hdiutil info
-          diskutil list
 
       - name: Check out Git repository
         uses: actions/checkout@v3
@@ -69,18 +65,13 @@ jobs:
           # npm run publish
           echo ">>>>>>>>>>>>>tsc -p ."
           npx tsc -p .
-          hdiutil info
           df -h
           echo ">>>>>>>>>>>>>electron-builder --publish never"
           npx electron-builder --publish never
-          hdiutil info
           df -h
           echo ">>>>>>>>>>>>>electron-builder --publish always"
           npx electron-builder --publish always
-          hdiutil info
           df -h
-          echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
