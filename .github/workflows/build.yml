@@ -48,23 +48,27 @@ jobs:
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
         run: |
+          echo ">>>>>>>>>>>>> 10 largest files"
+          find / -type f -exec du -h {} + | sort -rh | head -n 10
           hdiutil info
           df -h
           diskutil list
           # npm run publish
-          echo "tsc -p ."
+          echo ">>>>>>>>>>>>>tsc -p ."
           npx tsc -p .
           hdiutil info
           df -h
-          echo "electron-builder --publish never"
+          echo ">>>>>>>>>>>>>electron-builder --publish never"
           npx electron-builder --publish never
           hdiutil info
           df -h
-          echo "electron-builder --publish always"
+          echo ">>>>>>>>>>>>>electron-builder --publish always"
           npx electron-builder --publish always
           hdiutil info
           df -h
-
+          echo ">>>>>>>>>>>>> 10 largest files"
+          find / -type f -exec du -h {} + | sort -rh | head -n 10
+          
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
       #   env:
