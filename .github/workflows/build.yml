@@ -15,24 +15,26 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Run iOS Simulator Cleanup Script
+      - name: Cleanup old iOS Simulators
         run: |
           echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          # sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
           echo "Listing all installed iOS Simulator runtimes..."
           xcrun simctl list
-          echo "Shutting down & delete all simulators..."
+          echo "Delete shutdown & unavailable simulators..."
           xcrun simctl delete unavailable
-          # xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | awk -F '[()]' '{print $2}' | xargs -I {} xcrun simctl delete {}
           xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | grep -oE '[A-F0-9\-]{36}' | xargs -I {} xcrun simctl delete {}
           echo "Removing large simulator runtime .dmg files..."
           find /Users/runner/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
           find /private/tmp/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/Cryptex/Images/bundle/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_xrOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
           echo "Remaining simulators:"
           xcrun simctl list
           echo "Listing large simulator .dmg files..."
-          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          # sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
 
       - name: Check out Git repository
@@ -68,7 +70,7 @@ jobs:
           # df -h
           # echo ">>>>>>>>>>>>>electron-builder --publish always"
           # npx electron-builder --publish always
-          # df -h
+          df -h
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
