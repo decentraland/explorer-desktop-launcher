@@ -52,13 +52,16 @@ jobs:
           df -h
           diskutil list
           # npm run publish
+          echo "tsc -p ."
           npx tsc -p .
           hdiutil info
           df -h
-          electron-builder --publish never
+          echo "electron-builder --publish never"
+          npx electron-builder --publish never
           hdiutil info
           df -h
-          electron-builder --publish always
+          echo "electron-builder --publish always"
+          npx electron-builder --publish always
           hdiutil info
           df -h
 
