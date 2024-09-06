@@ -18,7 +18,7 @@ jobs:
       - name: Cleanup old iOS Simulators
         run: |
           echo ">>>>>>>>>>>>> 10 largest files"
-          # sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
           echo "Listing all installed iOS Simulator runtimes..."
           xcrun simctl list
@@ -33,8 +33,10 @@ jobs:
           sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
           echo "Remaining simulators:"
           xcrun simctl list
+          echo "Shutting down all running simulators..."
+          xcrun simctl shutdown all
           echo "Listing large simulator .dmg files..."
-          # sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
 
       - name: Check out Git repository
