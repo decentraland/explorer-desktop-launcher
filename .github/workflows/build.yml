@@ -23,8 +23,9 @@ jobs:
           echo "Listing all installed iOS Simulator runtimes..."
           xcrun simctl list
           echo "Shutting down & delete all simulators..."
-          xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | awk -F '[()]' '{print $2}' | xargs -I {} xcrun simctl delete {}
           xcrun simctl delete unavailable
+          # xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | awk -F '[()]' '{print $2}' | xargs -I {} xcrun simctl delete {}
+          xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | grep -oE '[A-F0-9\-]{36}' | xargs -I {} xcrun simctl delete {}
           echo "Removing large simulator runtime .dmg files..."
           sudo find / -type f -name "*.dmg" -exec rm -f {} \;
           echo "Remaining simulators:"
