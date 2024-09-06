@@ -17,9 +17,6 @@ jobs:
     steps:
       - name: Cleanup old iOS Simulators
         run: |
-          echo "Shutting down all running simulators..."
-          xcrun simctl shutdown all
-          xcrun simctl delete all
           echo "Removing large simulator runtime .dmg files..."
           find /Users/runner/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
           find /private/tmp/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
@@ -28,7 +25,10 @@ jobs:
           sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
           # echo "Shutting down all running simulators..."
           # xcrun simctl shutdown all
-
+          echo "Shutting down all running simulators..."
+          xcrun simctl shutdown all
+          xcrun simctl delete all
+          
       - name: Check out Git repository
         uses: actions/checkout@v3
 
