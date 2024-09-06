@@ -23,8 +23,8 @@ jobs:
           # echo "Listing all installed iOS Simulator runtimes..."
           # xcrun simctl list
           echo "Delete shutdown & unavailable simulators..."
-          xcrun simctl delete unavailable
-          df -h
+          # xcrun simctl delete unavailable
+          # df -h
           xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | grep -oE '[A-F0-9\-]{36}' | xargs -I {} xcrun simctl delete {}
           df -h
           echo "Removing large simulator runtime .dmg files..."
