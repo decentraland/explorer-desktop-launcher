@@ -18,7 +18,7 @@ jobs:
       - name: Run iOS Simulator Cleanup Script
         run: |
           echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
           hdiutil info
           diskutil list
@@ -37,7 +37,7 @@ jobs:
           echo "Listing remaining large simulator files..."
           find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -exec du -h {} + | sort -rh | head -n 10
           echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
           hdiutil info
           diskutil list
@@ -80,7 +80,7 @@ jobs:
           hdiutil info
           df -h
           echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
