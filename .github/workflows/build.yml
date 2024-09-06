@@ -30,7 +30,7 @@ jobs:
           xcrun simctl shutdown all
           xcrun simctl delete all
           df -h
-          sudo find /System/Volumes/Data -type f -exec du -h {} + | sort -rh | head -n 10
+          sudo find /System/Volumes/Data -type f -size +100M -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
 
       - name: Check out Git repository
         uses: actions/checkout@v3
