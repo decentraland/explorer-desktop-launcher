@@ -52,7 +52,7 @@ jobs:
           df -h
           diskutil list
           # npm run publish
-          tsc -p .
+          npx tsc -p .
           hdiutil info
           df -h
           electron-builder --publish never
