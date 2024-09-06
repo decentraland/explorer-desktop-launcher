@@ -15,6 +15,33 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Run iOS Simulator Cleanup Script
+        run: |
+          echo ">>>>>>>>>>>>> 10 largest files"
+          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          df -h
+          hdiutil info
+          diskutil list
+          echo "Remaining simulators:"
+          xcrun simctl list devices
+          echo "Listing all installed simulator runtimes..."
+          xcrun simctl list runtimes
+          echo "Shutting down all simulators..."
+          xcrun simctl shutdown all
+          echo "Remaining simulators:"
+          xcrun simctl list devices
+          echo "Searching for large simulator .dmg files..."
+          find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -size +5G -exec du -h {} + | sort -rh
+          echo "Deleting old and unused simulators..."
+          xcrun simctl delete unavailable
+          echo "Listing remaining large simulator files..."
+          find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -exec du -h {} + | sort -rh | head -n 10
+          echo ">>>>>>>>>>>>> 10 largest files"
+          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          df -h
+          hdiutil info
+          diskutil list
+
       - name: Check out Git repository
         uses: actions/checkout@v3
 
@@ -25,24 +52,11 @@ jobs:
 
       - name: Install
         run: |
-          echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
-          df -h
           npm install
-          df -h
 
       - name: Test
         run: |
-          df -h
           npm run test
-          df -h
-          echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
-
-      # - name: Build MacOS (dmg)
-      #   if: ${{github.ref != 'refs/heads/main'}}
-      #   run: |
-      #     npm run build
 
       - name: Build and Release MacOS (dmg)
         # if: ${{github.ref == 'refs/heads/main'}}
@@ -52,11 +66,6 @@ jobs:
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
         run: |
-          echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
-          hdiutil info
-          df -h
-          diskutil list
           # npm run publish
           echo ">>>>>>>>>>>>>tsc -p ."
           npx tsc -p .
