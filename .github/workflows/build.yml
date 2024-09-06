@@ -53,7 +53,9 @@ jobs:
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
         run: |
+          df -h
           npm run publish
+          df -h
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
