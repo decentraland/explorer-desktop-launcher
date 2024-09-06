@@ -17,26 +17,34 @@ jobs:
     steps:
       - name: Cleanup old iOS Simulators
         run: |
-          echo ">>>>>>>>>>>>> 10 largest files"
-          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          # echo ">>>>>>>>>>>>> 10 largest files"
+          # sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
-          echo "Listing all installed iOS Simulator runtimes..."
-          xcrun simctl list
+          # echo "Listing all installed iOS Simulator runtimes..."
+          # xcrun simctl list
           echo "Delete shutdown & unavailable simulators..."
           xcrun simctl delete unavailable
+          df -h
           xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | grep -oE '[A-F0-9\-]{36}' | xargs -I {} xcrun simctl delete {}
+          df -h
           echo "Removing large simulator runtime .dmg files..."
           find /Users/runner/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          df -h
           find /private/tmp/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          df -h
           sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/Cryptex/Images/bundle/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          df -h
           sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_xrOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          df -h
           sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
-          echo "Remaining simulators:"
-          xcrun simctl list
+          df -h
+          # echo "Remaining simulators:"
+          # xcrun simctl list
           echo "Shutting down all running simulators..."
           xcrun simctl shutdown all
-          echo "Listing large simulator .dmg files..."
-          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+          df -h
+          # echo "Listing large simulator .dmg files..."
+          # sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
 
       - name: Check out Git repository
