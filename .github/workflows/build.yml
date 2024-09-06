@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Cleanup old iOS Simulators
         run: |
+          df -h
           echo "Removing large simulator runtime .dmg files..."
           find /Users/runner/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
           find /private/tmp/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
@@ -28,7 +29,8 @@ jobs:
           echo "Shutting down all running simulators..."
           xcrun simctl shutdown all
           xcrun simctl delete all
-          
+          df -h
+
       - name: Check out Git repository
         uses: actions/checkout@v3
 
@@ -53,7 +55,9 @@ jobs:
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
         run: |
+          df -h
           npm run publish
+          df -h
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
