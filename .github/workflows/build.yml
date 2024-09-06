@@ -19,17 +19,18 @@ jobs:
         run: |
           df -h
           echo "Removing large simulator runtime .dmg files..."
-          find /Users/runner/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
-          find /private/tmp/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
-          sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/Cryptex/Images/bundle/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
-          sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_xrOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
-          sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +14 -exec rm -f {} \;
+          find /Users/runner/ -type f -name "*.dmg" -mtime +7 -exec rm -f {} \;
+          find /private/tmp/ -type f -name "*.dmg" -mtime +7 -exec rm -f {} \;
+          sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_xrOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +7 -exec rm -f {} \;
+          sudo find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime/ -type f -name "*.dmg" -mtime +7 -exec rm -f {} \;
+          sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/ -name "*.dmg" -mtime +7 -exec rm -f {} \;
           # echo "Shutting down all running simulators..."
           # xcrun simctl shutdown all
           echo "Shutting down all running simulators..."
           xcrun simctl shutdown all
           xcrun simctl delete all
           df -h
+          sudo find /System/Volumes/Data -type f -exec du -h {} + | sort -rh | head -n 10
 
       - name: Check out Git repository
         uses: actions/checkout@v3
