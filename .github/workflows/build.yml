@@ -51,7 +51,16 @@ jobs:
           hdiutil info
           df -h
           diskutil list
-          npm run publish
+          # npm run publish
+          tsc -p .
+          hdiutil info
+          df -h
+          electron-builder --publish never
+          hdiutil info
+          df -h
+          electron-builder --publish always
+          hdiutil info
+          df -h
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
