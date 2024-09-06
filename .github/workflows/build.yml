@@ -25,6 +25,8 @@ jobs:
 
       - name: Install
         run: |
+          echo ">>>>>>>>>>>>> 10 largest files"
+          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
           npm install
           df -h
@@ -34,6 +36,8 @@ jobs:
           df -h
           npm run test
           df -h
+          echo ">>>>>>>>>>>>> 10 largest files"
+          sudo find / -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
 
       # - name: Build MacOS (dmg)
       #   if: ${{github.ref != 'refs/heads/main'}}
