@@ -20,22 +20,17 @@ jobs:
           echo ">>>>>>>>>>>>> 10 largest files"
           sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
-          echo "List all:"
+          echo "Listing all installed iOS Simulator runtimes..."
           xcrun simctl list
-          echo "List devices:"
-          xcrun simctl list devices
-          echo "Listing all installed simulator runtimes..."
-          xcrun simctl list runtimes
-          echo "Shutting down all simulators..."
-          xcrun simctl shutdown all
-          echo "Deleting old and unused simulators..."
+          echo "Shutting down & delete all simulators..."
+          xcrun simctl list devices | grep -E '(Shutdown|Unavailable)' | awk -F '[()]' '{print $2}' | xargs -I {} xcrun simctl delete {}
           xcrun simctl delete unavailable
+          echo "Removing large simulator runtime .dmg files..."
+          sudo find / -type f -name "*.dmg" -exec rm -f {} \;
           echo "Remaining simulators:"
           xcrun simctl list
-          echo "Searching for large simulator .dmg files..."
-          find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -size +5G -exec du -h {} + | sort -rh
-          echo "Listing remaining large simulator files..."
-          find /System/Volumes/Data/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime -type f -name "*.dmg" -exec du -h {} + | sort -rh | head -n 10
+          echo "Listing large simulator .dmg files..."
+          sudo find / -type f -name "*.dmg" -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
           df -h
 
       - name: Check out Git repository
@@ -62,16 +57,16 @@ jobs:
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
         run: |
-          # npm run publish
-          echo ">>>>>>>>>>>>>tsc -p ."
-          npx tsc -p .
-          df -h
-          echo ">>>>>>>>>>>>>electron-builder --publish never"
-          npx electron-builder --publish never
-          df -h
-          echo ">>>>>>>>>>>>>electron-builder --publish always"
-          npx electron-builder --publish always
-          df -h
+          npm run publish
+          # echo ">>>>>>>>>>>>>tsc -p ."
+          # npx tsc -p .
+          # df -h
+          # echo ">>>>>>>>>>>>>electron-builder --publish never"
+          # npx electron-builder --publish never
+          # df -h
+          # echo ">>>>>>>>>>>>>electron-builder --publish always"
+          # npx electron-builder --publish always
+          # df -h
 
       # - name: Notarize MacOS (dmg)
       #   if: ${{github.ref == 'refs/heads/main'}}
