@@ -18,6 +18,7 @@ jobs:
       - name: Cleanup iOS Simulators
         run: |
           df -h
+          rm -rf /private/var/folders/py/lcjn3y352g1106vf1rqk521r0000gn/T/t-G7ouNl/0.dmg
           echo "Removing large simulator runtime .dmg files..."
           find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
           find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
