@@ -18,7 +18,6 @@ jobs:
       - name: Cleanup iOS Simulators
         run: |
           df -h
-          sudo rm -rf /private/var/folders/*
           echo "Removing large simulator runtime .dmg files..."
           find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
           find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
