@@ -53,6 +53,8 @@
     "compression": "maximum",
     "files": [
       "build/**/*",
+      "!**/node_modules/**",
+      "!**/*.map",
       "public/**/*",
       "public/systray/iOS/**/*",
       "public/systray/Windows/**/*"

@@ -42,12 +42,6 @@ jobs:
       - name: Test
         run: |
           npm run test
-          df -h
-          du -sh node_modules
-          find . -name "*.map" -exec du -ch {} + | grep total$
-          du -sh test/
-          find . -name "*.spec.js" -or -name "*.test.js" -exec du -ch {} + | grep total$
-          find . -name "*.log" -exec du -ch {} + | grep total$
 
       - name: Build and Release MacOS (dmg)
         # if: ${{github.ref == 'refs/heads/main'}}
