@@ -54,5 +54,8 @@ jobs:
           DEBUG: electron-builder
         run: |
           df -h
+          ulimit -n
+          ulimit -n 8192
+          ulimit -n
           npm run publish
           df -h
