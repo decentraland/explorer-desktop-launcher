@@ -113,6 +113,7 @@
         "dmg",
         "zip"
       ],
+      "format": "UDRW",
       "hardenedRuntime": true,
       "entitlements": "entitlements.mac.plist",
       "extendInfo": {
@@ -120,7 +121,6 @@
       }
     },
     "dmg": {
-      "noResize": true,
       "icon": "public/installer-icon.icns",
       "artifactName": "Decentraland.${ext}"
     },
