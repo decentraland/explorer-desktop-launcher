@@ -15,16 +15,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Cleanup iOS Simulators
-        run: |
-          df -h
-          du -sh node_modules
-          find . -name "*.map" -exec du -ch {} + | grep total$
-          du -sh test/
-          find . -name "*.spec.js" -or -name "*.test.js" -exec du -ch {} + | grep total$
-          find . -name "*.log" -exec du -ch {} + | grep total$
-
-
+      # - name: Cleanup iOS Simulators
+      #   run: |
       #     echo "Removing large simulator runtime .dmg files..."
       #     find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
       #     find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
