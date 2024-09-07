@@ -41,7 +41,7 @@
     "start:local": "tsc -p . && electron . --custom-url http://localhost:3000/?",
     "build": "tsc -p . && electron-builder --publish never",
     "build:appx": "tsc -p . && electron-builder --windows appx --publish never",
-    "publish": "tsc -p . && electron-builder --publish always",
+    "publish": "tsc -p . && electron-builder --publish always --log-level debug",
     "publish:appx": "tsc -p . && electron-builder --windows appx --publish always",
     "test": "mocha -r ts-node/register 'test/**/*.test.ts'"
   },
