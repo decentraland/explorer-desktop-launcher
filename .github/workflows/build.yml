@@ -29,10 +29,7 @@ jobs:
           xcrun simctl delete all
           df -h
           # sudo find /System/Volumes/Data -type f -size +500M -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
-          ulimit -n
-          ulimit -n 8192
-          ulimit -n
-
+        
       - name: Check out Git repository
         uses: actions/checkout@v3
 
@@ -59,3 +56,13 @@ jobs:
           df -h
           npm run publish
           df -h
+
+      - name: Check DMG size
+        run: |
+          dmg_path=$(find dist -name "*.dmg")
+          if [ -n "$dmg_path" ]; then
+            echo "DMG found: $dmg_path"
+            du -h "$dmg_path"
+          else
+            echo "DMG not found!"
+          fi
