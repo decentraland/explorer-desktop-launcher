@@ -15,9 +15,16 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # - name: Cleanup iOS Simulators
-      #   run: |
-      #     df -h
+      - name: Cleanup iOS Simulators
+        run: |
+          df -h
+          du -sh node_modules
+          find . -name "*.map" -exec du -ch {} + | grep total$
+          du -sh test/
+          find . -name "*.spec.js" -or -name "*.test.js" -exec du -ch {} + | grep total$
+          find . -name "*.log" -exec du -ch {} + | grep total$
+
+
       #     echo "Removing large simulator runtime .dmg files..."
       #     find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
       #     find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
@@ -41,7 +48,14 @@ jobs:
         run: npm install
 
       - name: Test
-        run: npm run test
+        run: |
+          npm run test
+          df -h
+          du -sh node_modules
+          find . -name "*.map" -exec du -ch {} + | grep total$
+          du -sh test/
+          find . -name "*.spec.js" -or -name "*.test.js" -exec du -ch {} + | grep total$
+          find . -name "*.log" -exec du -ch {} + | grep total$
 
       - name: Build and Release MacOS (dmg)
         # if: ${{github.ref == 'refs/heads/main'}}
