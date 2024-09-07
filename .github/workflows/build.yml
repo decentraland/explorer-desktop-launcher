@@ -50,6 +50,7 @@ jobs:
           CSC_LINK: ${{secrets.MACOS_CSC_LINK}}
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
+          DEBUG: electron-builder
         run: |
           df -h
           npm run publish
