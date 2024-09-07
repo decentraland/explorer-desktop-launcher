@@ -120,6 +120,7 @@
       }
     },
     "dmg": {
+      "size": 125829120,
       "icon": "public/installer-icon.icns",
       "artifactName": "Decentraland.${ext}"
     },

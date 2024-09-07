@@ -15,19 +15,19 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Cleanup iOS Simulators
-        run: |
-          df -h
-          echo "Removing large simulator runtime .dmg files..."
-          find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
-          find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
-          sudo find /System/Volumes/Data/System/Library/AssetsV2/ -type f -name "*.dmg" -exec rm -f {} \;
-          sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/ -name "*.dmg" -exec rm -f {} \;
-          echo "Shutting down all simulators..."
-          xcrun simctl shutdown all
-          xcrun simctl delete all
-          df -h
-          # sudo find /System/Volumes/Data -type f -size +500M -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+      # - name: Cleanup iOS Simulators
+      #   run: |
+      #     df -h
+      #     echo "Removing large simulator runtime .dmg files..."
+      #     find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
+      #     find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
+      #     sudo find /System/Volumes/Data/System/Library/AssetsV2/ -type f -name "*.dmg" -exec rm -f {} \;
+      #     sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/ -name "*.dmg" -exec rm -f {} \;
+      #     echo "Shutting down all simulators..."
+      #     xcrun simctl shutdown all
+      #     xcrun simctl delete all
+      #     df -h
+      #     # sudo find /System/Volumes/Data -type f -size +500M -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
         
       - name: Check out Git repository
         uses: actions/checkout@v3
