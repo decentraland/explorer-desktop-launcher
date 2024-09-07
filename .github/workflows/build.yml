@@ -1,4 +1,4 @@
-name: Build
+name: Build TEST
 
 on:
   workflow_dispatch:
@@ -11,52 +11,23 @@ on:
       - created
 
 jobs:
-  build_ubuntu:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install
-        run: npm install
-
-      - name: Test
-        run: npm run test
-
-      - name: Build Ubuntu (AppImage)
-        if: ${{github.ref != 'refs/heads/main'}}
-        run: |
-          npm run build
-
-      - name: Build and Release Ubuntu (AppImage)
-        if: ${{github.ref == 'refs/heads/main'}}
-        env:
-          GITHUB_TOKEN: ${{secrets.github_token}}
-          EP_PRE_RELEASE: true
-        run: |
-          npm run publish
-
-      - name: Upload artifacts
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_BUCKET: ${{secrets.S3_BUCKET}}
-        if: ${{env.AWS_BUCKET != ''}}
-        run: |
-          node scripts/prepare-artifacts.js AppImage
-          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
-
   build_macos:
     runs-on: macos-latest
 
     steps:
+      # - name: Cleanup iOS Simulators
+      #   run: |
+      #     echo "Removing large simulator runtime .dmg files..."
+      #     find /Users/runner/ -type f -name "*.dmg" -exec rm -f {} \;
+      #     find /private/tmp/ -type f -name "*.dmg" -exec rm -f {} \;
+      #     sudo find /System/Volumes/Data/System/Library/AssetsV2/ -type f -name "*.dmg" -exec rm -f {} \;
+      #     sudo find /System/Volumes/Data/Library/Developer/CoreSimulator/ -name "*.dmg" -exec rm -f {} \;
+      #     echo "Shutting down all simulators..."
+      #     xcrun simctl shutdown all
+      #     xcrun simctl delete all
+      #     df -h
+      #     # sudo find /System/Volumes/Data -type f -size +500M -exec du -h {} + 2>/dev/null | sort -rh | head -n 10
+        
       - name: Check out Git repository
         uses: actions/checkout@v3
 
@@ -69,162 +40,28 @@ jobs:
         run: npm install
 
       - name: Test
-        run: npm run test
-
-      - name: Build MacOS (dmg)
-        if: ${{github.ref != 'refs/heads/main'}}
         run: |
-          npm run build
+          npm run test
 
       - name: Build and Release MacOS (dmg)
-        if: ${{github.ref == 'refs/heads/main'}}
+        # if: ${{github.ref == 'refs/heads/main'}}
         env:
           GITHUB_TOKEN: ${{secrets.github_token}}
           CSC_LINK: ${{secrets.MACOS_CSC_LINK}}
           CSC_KEY_PASSWORD: ${{secrets.MACOS_CSC_KEY_PASSWORD}}
           EP_PRE_RELEASE: true
+          DEBUG: electron-builder
         run: |
+          df -h
           npm run publish
+          df -h
 
-      - name: Notarize MacOS (dmg)
-        if: ${{github.ref == 'refs/heads/main'}}
-        env:
-          MACOS_NOTARIZATION_APPLE_ID: ${{secrets.MACOS_NOTARIZATION_APPLE_ID}}
-          MACOS_NOTARIZATION_TEAM_ID: ${{secrets.MACOS_NOTARIZATION_TEAM_ID}}
-          MACOS_NOTARIZATION_PWD: ${{secrets.MACOS_NOTARIZATION_PWD}}
+      - name: Check DMG size
         run: |
-          # Store the notarization credentials to prevent the UI password dialog for blocking the CI
-          echo "Create keychain profile"
-          xcrun notarytool store-credentials "notary-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
-
-          # Send the notarization request to the Apple's Notarization service and wait for the result.
-          echo "Notarize app"
-          xcrun notarytool submit "dist/Decentraland.dmg" --keychain-profile "notary-profile" --wait
-
-          # Attach the staple to the executable, this allow the app to be validated by macOS
-          # even when an internet connection is not available.
-          echo "Attach staple"
-          xcrun stapler staple "dist/Decentraland.dmg"
-
-          # Validate the staple attached to the executable.
-          echo "Validate staple"
-          xcrun stapler validate "dist/Decentraland.dmg"
-
-      - name: Upload artifacts
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_BUCKET: ${{secrets.S3_BUCKET}}
-        if: ${{env.AWS_BUCKET != ''}}
-        run: |
-          node scripts/prepare-artifacts.js dmg
-          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
-
-  build_windows:
-    runs-on: windows-latest
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js, NPM and Yarn
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install
-        run: npm install
-
-      - name: Test
-        run: npm run test
-
-      - name: Build Windows (exe)
-        if: ${{github.ref != 'refs/heads/main'}}
-        run: |
-          npm run build
-
-      - name: Build and Publish Windows (exe)
-        if: ${{github.ref == 'refs/heads/main'}}
-        env:
-          GITHUB_TOKEN: ${{secrets.github_token}}
-          EP_PRE_RELEASE: true
-        run: |
-          npm run publish
-          
-      - name: Sign Windows Build (exe)
-        uses: sslcom/esigner-codesign@develop
-        if: ${{github.ref == 'refs/heads/main'}}
-        with:
-          command: sign
-          username: ${{ secrets.ES_USERNAME }}
-          password: ${{ secrets.ES_PASSWORD }}
-          credential_id: ${{ secrets.CREDENTIAL_ID }}
-          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
-          file_path: ${GITHUB_WORKSPACE}/dist/Install Decentraland.exe
-          output_path: ${GITHUB_WORKSPACE}/dist/signed
-          malware_block: false
-          environment_name: PROD
-          signing_method: v2
-
-      - name: Replace signed exe
-        if: ${{github.ref == 'refs/heads/main'}}
-        run: |
-          Copy-Item -Path "${env:GITHUB_WORKSPACE}\dist\signed\Install Decentraland.exe" -Destination "${env:GITHUB_WORKSPACE}\dist\Install Decentraland.exe" -Force
-
-      - name: Build Windows (appx)
-        if: ${{github.ref != 'refs/heads/main'}}
-        run: |
-          npm run build:appx
-
-      - name: Build and Publish Windows (appx) [moved to azure]
-        if: ${{github.ref == 'refs/heads/main'}}
-        env:
-          GITHUB_TOKEN: ${{secrets.github_token}}
-          EP_PRE_RELEASE: true
-        run: |
-          npm run publish:appx
-
-      - name: Upload artifacts appx
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_BUCKET: ${{secrets.S3_BUCKET}}
-        if: ${{env.AWS_BUCKET != ''}}
-        run: |
-          node scripts/prepare-artifacts.js appx
-          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
-
-      - name: Upload artifacts exe
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_BUCKET: ${{secrets.S3_BUCKET}}
-        if: ${{env.AWS_BUCKET != ''}}
-        run: |
-          node scripts/prepare-artifacts.js exe
-          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
-
-  deployment_notification:
-    runs-on: ubuntu-latest
-    name: Decentraland Unity-Renderer Deployment Notification
-    needs:
-      - build_macos
-      - build_windows
-      - build_ubuntu
-    steps:
-      - name: Comment PR
-        env:
-          AWS_BUCKET: ${{secrets.S3_BUCKET}}
-        if: ${{env.AWS_BUCKET != '' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'decentraland/explorer-desktop-launcher'}} # Not a fork
-        uses: thollander/actions-comment-pull-request@main
-        with:
-          message: |
-            This branch can be downloaded with the following links:
-            - [Windows](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Install-Decentraland.exe)
-            - [Windows AppX](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.appx)
-            - [Linux](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.AppImage)
-            - [Mac](https://renderer-artifacts.decentraland.org/launcher-branch/${{github.ref_name}}/Decentraland.dmg)
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          dmg_path=$(find dist -name "*.dmg")
+          if [ -n "$dmg_path" ]; then
+            echo "DMG found: $dmg_path"
+            du -h "$dmg_path"
+          else
+            echo "DMG not found!"
+          fi

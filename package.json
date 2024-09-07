@@ -120,6 +120,7 @@
       }
     },
     "dmg": {
+      "format": "UDZO",
       "icon": "public/installer-icon.icns",
       "artifactName": "Decentraland.${ext}"
     },
