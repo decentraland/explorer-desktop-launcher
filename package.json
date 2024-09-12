@@ -1,7 +1,10 @@
 {
   "name": "explorer-desktop-launcher",
   "version": "0.1.56",
-  "author": "decentraland",
+  "author": {
+    "email": "hello@decentraland.org",
+    "name": "Decentraland Foundation",
+    "url": "https://decentraland.org"
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
   "main": "build/electron/main.js",
@@ -9,9 +12,10 @@
   "dependencies": {
     "axios": "^1.2.2",
     "decompress-zip": "^0.3.3",
-    "electron-dl": "^3.5.0",
+    "electron-dl": "^4.0.0",
+    "electron-log": "^5.1.5",
+    "electron-updater": "^6.3.1",
     "electron-is-dev": "^2.0.0",
-    "electron-updater": "^5.3.0",
     "find-free-port": "^2.0.0",
     "node-stream-zip": "^1.15.0",
     "web-vitals": "^1.1.2"
@@ -23,9 +27,9 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "concurrently": "^8.0.1",
-    "cross-env": "^7.0.3",
-    "electron": "^22.0.0",
-    "electron-builder": "^23.6.0",
+    "cross-env": "7.0.3",
+    "electron": "31.0.2",
+    "electron-builder": "24.13.3",
     "http-server": "^14.1.1",
     "mocha": "^10.2.0",
     "spectron": "^19.0.0",
