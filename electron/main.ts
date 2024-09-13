@@ -7,7 +7,7 @@ import { getAppTitle, getAppBasePath } from './helpers'
 import { createWindow, hideWindowInTray, loadDecentralandWeb, onOpenUrl, showWindowAndHideTray } from './window'
 import { LauncherConfig, LauncherPaths } from './types'
 import { isTrustedCertificate } from './certificateChecker'
-import fs = require('fs')
+import * as fs from 'fs'
 
 const defaultConfig: LauncherConfig = {
   developerMode: false,
@@ -217,7 +217,7 @@ app
 
 function initializeCrashReport() {
   var path = getAppBasePath()
-  if (!fs.existsSync(path)) fs.mkdir(path, () => { })
+  if (!fs.existsSync(path)) fs.mkdir(path, () => {})
 
   app.setPath('crashDumps', path)
 
