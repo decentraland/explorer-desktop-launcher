@@ -31,6 +31,8 @@ jobs:
 
       - name: Build Ubuntu (AppImage)
         if: ${{github.ref != 'refs/heads/main'}}
+        env:
+          MODE: production
         run: |
           npm run build
 
@@ -73,6 +75,8 @@ jobs:
 
       - name: Build MacOS (dmg)
         if: ${{github.ref != 'refs/heads/main'}}
+        env:
+          MODE: production
         run: |
           npm run build
 
@@ -141,6 +145,8 @@ jobs:
 
       - name: Build Windows (exe)
         if: ${{github.ref != 'refs/heads/main'}}
+        env:
+          MODE: production
         run: |
           npm run build
 
@@ -174,6 +180,8 @@ jobs:
 
       - name: Build Windows (appx)
         if: ${{github.ref != 'refs/heads/main'}}
+        env:
+          MODE: production
         run: |
           npm run build:appx
 

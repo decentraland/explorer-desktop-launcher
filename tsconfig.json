@@ -6,7 +6,7 @@
     "moduleResolution": "Node",
     "strict": true,
     "outDir": "dist",
-    "rootDir": "electron",
+    "rootDir": ".",
     "noEmitOnError": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": [

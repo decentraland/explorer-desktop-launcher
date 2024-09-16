@@ -11,7 +11,7 @@ export default defineConfig({
     ssr: true,
     sourcemap: true,
     target: 'node20',
-    outDir: 'dist',
+    outDir: 'dist/electron',
     minify: false,
     lib: {
       entry: path.resolve(__dirname, 'electron/index.ts'),

@@ -5,7 +5,7 @@
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/electron/index.js",
   "private": false,
   "dependencies": {
     "axios": "^1.7.7",
@@ -41,9 +41,9 @@
   "scripts": {
     "selfcertificate": "electron-builder create-self-signed-cert -p self",
     "postinstall": "electron-builder install-app-deps",
-    "start": "npm run build && electron dist/index.js",
-    "start:dev": "npm run build && electron dist/index.js --developer-mode",
-    "start:local": "npm run build && electron dist/index.js --custom-url http://localhost:3000/?",
+    "start": "npm run build && electron dist/electron/index.js",
+    "start:dev": "npm run build && electron dist/electron/index.js --developer-mode",
+    "start:local": "npm run build && electron dist/electron/index.js --custom-url http://localhost:3000/?",
     "build": "rm -rf dist && vite build --config vite.config.main.ts && vite build --config vite.config.preload.ts",
     "build:installer": "npm run build && electron-builder --publish never",
     "build:appx": "npm run build && electron-builder --windows appx --publish never",
@@ -58,7 +58,7 @@
     "artifactName": "Decentraland.${ext}",
     "compression": "maximum",
     "files": [
-      "build/**/*",
+      "dist/**/*",
       "public/**/*",
       "public/systray/iOS/**/*",
       "public/systray/Windows/**/*"
