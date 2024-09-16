@@ -5,9 +5,10 @@
     "sourceMap": true,
     "moduleResolution": "Node",
     "strict": true,
-    "outDir": "build",
-    "rootDir": ".",
+    "outDir": "dist",
+    "rootDir": "electron",
     "noEmitOnError": true,
+    "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types"
     ]
