@@ -18,13 +18,8 @@
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.4",
-    "@types/chai-as-promised": "^7.1.5",
-    "@types/electron": "^1.6.10",
     "@types/node": "^22.5.4",
     "@types/semver": "^7.5.8",
-    "chai": "^4.3.7",
-    "chai-as-promised": "^7.1.1",
     "concurrently": "^8.0.1",
     "cross-env": "^7.0.3",
     "electron": "^31.0.2",
