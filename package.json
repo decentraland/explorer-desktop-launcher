@@ -5,7 +5,7 @@
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
   "type": "module",
-  "main": "build/electron/main.js",
+  "main": "dist/index.js",
   "private": false,
   "dependencies": {
     "axios": "^1.7.7",
@@ -13,13 +13,14 @@
     "electron-dl": "^4.0.0",
     "electron-is-dev": "^2.0.0",
     "electron-updater": "^6.3.1",
-    "find-free-port": "^2.0.0",
     "node-stream-zip": "^1.15.0",
+    "portfinder": "^1.0.32",
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
+    "@types/electron": "^1.6.10",
     "@types/mocha": "^10.0.1",
     "@types/node": "^22.5.4",
     "@types/semver": "^7.5.8",
@@ -34,18 +35,21 @@
     "spectron": "^19.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.6.2",
+    "unplugin-auto-expose": "^0.3.0",
+    "vite": "^5.4.5",
     "wait-on": "^7.0.1"
   },
   "scripts": {
     "selfcertificate": "electron-builder create-self-signed-cert -p self",
     "postinstall": "electron-builder install-app-deps",
-    "start": "tsc -p . && electron .",
-    "start:dev": "tsc -p . && electron . --developer-mode",
-    "start:local": "tsc -p . && electron . --custom-url http://localhost:3000/?",
-    "build": "tsc -p . && electron-builder --publish never",
-    "build:appx": "tsc -p . && electron-builder --windows appx --publish never",
-    "publish": "tsc -p . && electron-builder --publish always",
-    "publish:appx": "tsc -p . && electron-builder --windows appx --publish always",
+    "start": "npm run build && electron dist/index.js",
+    "start:dev": "npm run build && electron dist/index.js --developer-mode",
+    "start:local": "npm run build && electron dist/index.js --custom-url http://localhost:3000/?",
+    "build": "rm -rf dist && vite build --config vite.config.main.ts && vite build --config vite.config.preload.ts",
+    "build:installer": "npm run build && electron-builder --publish never",
+    "build:appx": "npm run build && electron-builder --windows appx --publish never",
+    "publish": "npm run build && electron-builder --publish always",
+    "publish:appx": "npm run build && electron-builder --windows appx --publish always",
     "test": "mocha -r ts-node/register 'test/**/*.test.ts'"
   },
   "build": {
