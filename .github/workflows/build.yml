@@ -52,7 +52,7 @@ jobs:
           AWS_BUCKET: ${{secrets.S3_BUCKET}}
         if: ${{env.AWS_BUCKET != ''}}
         run: |
-          node scripts/prepare-artifacts.js AppImage
+          node scripts/prepare-artifacts.cjs AppImage
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
 
   build_macos:
@@ -122,7 +122,7 @@ jobs:
           AWS_BUCKET: ${{secrets.S3_BUCKET}}
         if: ${{env.AWS_BUCKET != ''}}
         run: |
-          node scripts/prepare-artifacts.js dmg
+          node scripts/prepare-artifacts.cjs dmg
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
 
   build_windows:
@@ -201,7 +201,7 @@ jobs:
           AWS_BUCKET: ${{secrets.S3_BUCKET}}
         if: ${{env.AWS_BUCKET != ''}}
         run: |
-          node scripts/prepare-artifacts.js appx
+          node scripts/prepare-artifacts.cjs appx
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
 
       - name: Upload artifacts exe
@@ -212,7 +212,7 @@ jobs:
           AWS_BUCKET: ${{secrets.S3_BUCKET}}
         if: ${{env.AWS_BUCKET != ''}}
         run: |
-          node scripts/prepare-artifacts.js exe
+          node scripts/prepare-artifacts.cjs exe
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
 
   deployment_notification:
