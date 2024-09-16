@@ -1,11 +1,12 @@
-import * as electronDl from 'electron-dl'
-import { unzip } from './decompress'
-import { BrowserWindow, ipcMain, WebContents } from 'electron'
-import * as fs from 'fs'
+import fs from 'fs'
+import { app, BrowserWindow, ipcMain, WebContents } from 'electron'
+import { download } from 'electron-dl'
+import { execFile } from 'child_process'
 import axios from 'axios'
+import isDev from 'electron-is-dev'
+import { unzip } from './decompress'
 import { main } from './main'
-import * as isDev from 'electron-is-dev'
-import { app } from 'electron/main'
+import { getOSName, getOSExtension } from './helpers'
 import { LauncherPaths } from './types'
 
 let remoteVersion: string
@@ -175,7 +176,6 @@ const registerExecuteProcessEvent = (rendererPath: string, executablePath: strin
       console.log(`Execute path: ${path} params: ${params}`)
 
       if (fs.existsSync(path)) {
-        const { execFile } = require('child_process')
         if (getOSName() === 'mac') {
           params = ['-W', path, '--args', ...params]
           execFile('open', params, onProcessFinish)
@@ -208,7 +208,6 @@ const getArtifactUrl = (launcherPaths: LauncherPaths) => {
 }
 
 const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths) => {
-  //electronDl();
   ipcMain.on('download', async (event) => {
     const branchPath = launcherPaths.rendererPath + getBranchName()
     if (fs.existsSync(branchPath)) {
@@ -217,7 +216,7 @@ const registerDownloadEvent = (win: BrowserWindow, launcherPaths: LauncherPaths)
     createDirIfNotExists(branchPath)
     const url = getArtifactUrl(launcherPaths)
     console.log('artifactUrl: ', url)
-    const res = await electronDl.download(win, url, {
+    const res = await download(win, url, {
       directory: branchPath,
       onStarted: (item) => {
         console.log('onStarted:', item)
@@ -293,40 +292,4 @@ export const registerUpdaterEvents = (win: BrowserWindow, launcherPaths: Launche
   } catch (e) {
     console.error('registerUpdaterEvents error: ', e)
   }
-}
-
-export const getOSName = (): string | null => {
-  switch (process.platform) {
-    case 'darwin':
-      return 'mac'
-    case 'linux':
-      return 'linux'
-    case 'win32':
-      return 'windows'
-    default:
-      return null
-  }
-}
-
-export const getOSExtension = (): string | null => {
-  switch (process.platform) {
-    case 'darwin':
-      return '.app'
-    case 'linux':
-      return ''
-    case 'win32':
-      return '.exe'
-    default:
-      return null
-  }
-}
-
-export const getFreePort = (): Promise<number> => {
-  return new Promise<number>((resolve, reject) => {
-    var fp = require('find-free-port')
-    fp(7666, 7766, (err: any, freePort: number) => {
-      if (err) reject(err)
-      resolve(freePort)
-    })
-  })
 }
