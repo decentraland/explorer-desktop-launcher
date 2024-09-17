@@ -178,6 +178,17 @@ jobs:
         run: |
           Copy-Item -Path "${env:GITHUB_WORKSPACE}\dist\signed\Install Decentraland.exe" -Destination "${env:GITHUB_WORKSPACE}\dist\Install Decentraland.exe" -Force
 
+      - name: Upload artifacts exe
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_BUCKET: ${{secrets.S3_BUCKET}}
+        if: ${{env.AWS_BUCKET != ''}}
+        run: |
+          node scripts/prepare-artifacts.cjs exe
+          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
+
       - name: Build Windows (appx)
         if: ${{github.ref != 'refs/heads/main'}}
         env:
@@ -202,17 +213,6 @@ jobs:
         if: ${{env.AWS_BUCKET != ''}}
         run: |
           node scripts/prepare-artifacts.cjs appx
-          npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
-
-      - name: Upload artifacts exe
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_BUCKET: ${{secrets.S3_BUCKET}}
-        if: ${{env.AWS_BUCKET != ''}}
-        run: |
-          node scripts/prepare-artifacts.cjs exe
           npx @dcl/cdn-uploader@next --bucket ${{secrets.S3_BUCKET}} --local-folder output --bucket-folder "launcher-branch/${{github.ref_name}}"
 
   deployment_notification:
