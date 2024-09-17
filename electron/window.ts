@@ -1,11 +1,14 @@
 import path from 'path'
+import { URLSearchParams, fileURLToPath } from 'url'
 import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron'
 import isDev from 'electron-is-dev'
-import { URLSearchParams } from 'url'
 import { main } from './main'
 import { registerUpdaterEvents } from './updater'
 import { getAppTitle, getIconByPlatform, onExit } from './helpers'
 import { LauncherPaths } from './types'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -19,7 +22,7 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
       nodeIntegrationInWorker: false,
       nodeIntegrationInSubFrames: false,
       contextIsolation: true,
-      preload: path.join(app.getAppPath(), '/preload/preload.cjs'),
+      preload: path.join(__dirname, 'preload/preload.cjs'),
       webSecurity: true,
       backgroundThrottling: false
     }
@@ -52,7 +55,7 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
 
 export const loadDefaultWeb = async (win: BrowserWindow) => {
   main.isDefaultWeb = true
-  await win.loadURL(`file://${app.getAppPath()}/index.html#v${app.getVersion()}`)
+  await win.loadURL(`file://${path.join(__dirname, 'index.html')}#v${app.getVersion()}`)
 }
 
 export const checkDeveloperConsole = (win: BrowserWindow) => {
@@ -65,7 +68,7 @@ export const checkDeveloperConsole = (win: BrowserWindow) => {
 
 export const hideWindowInTray = (win: BrowserWindow) => {
   if (main.tray == null) {
-    const iconPath = path.join(app.getAppPath(), 'systray', getIconByPlatform())
+    const iconPath = path.join(__dirname, 'systray', getIconByPlatform())
 
     try {
       main.tray = new Tray(iconPath)
