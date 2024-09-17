@@ -17,6 +17,7 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
     height: 849, // 790+59 border
     minWidth: 1006,
     minHeight: 849,
+    icon: path.join(__dirname, 'systray', getIconByPlatform()),
     webPreferences: {
       nodeIntegration: false,
       nodeIntegrationInWorker: false,
