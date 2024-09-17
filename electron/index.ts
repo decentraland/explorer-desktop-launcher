@@ -2,17 +2,17 @@ import fs from 'fs'
 import { exit } from 'process'
 import { shell, app, BrowserWindow, ipcMain, crashReporter, systemPreferences } from 'electron'
 import updater from 'electron-updater'
+import { main } from './main'
 import { parseConfig } from './cmdParser'
-import { getAppTitle, getAppBasePath, getFreePort, getOSName } from './helpers'
 import { createWindow, hideWindowInTray, loadDecentralandWeb, onOpenUrl, showWindowAndHideTray } from './window'
 import { isTrustedCertificate } from './certificateChecker'
-import { main } from './main'
+import { getAppTitle, getAppBasePath, getFreePort, getOSName } from './helpers'
 import { LauncherPaths } from './types'
-
-parseConfig([...process.argv])
 
 // all uncaught exceptions are being sent automatically
 initializeCrashReport()
+
+parseConfig([...process.argv])
 
 main.openingUrl = process.argv.find((arg) => arg.startsWith('dcl://'))
 console.log('main.openingUrl: ', main.openingUrl)

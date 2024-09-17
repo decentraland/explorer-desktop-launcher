@@ -1,6 +1,6 @@
 {
   "name": "explorer-desktop-launcher",
-  "version": "0.1.56",
+  "version": "0.1.57",
   "author": "decentraland",
   "description": "Decentraland Desktop Launcher",
   "homepage": ".",
@@ -36,9 +36,9 @@
   "scripts": {
     "selfcertificate": "electron-builder create-self-signed-cert -p self",
     "postinstall": "electron-builder install-app-deps",
-    "start": "npm run build && electron dist/electron/index.js",
-    "start:dev": "npm run build && electron dist/electron/index.js --developer-mode",
-    "start:local": "npm run build && electron dist/electron/index.js --custom-url http://localhost:3000/?",
+    "start": "npm run build && electron .",
+    "start:dev": "npm run build && electron . --developer-mode",
+    "start:local": "npm run build && electron . --custom-url http://localhost:3000/?",
     "build": "rm -rf dist && vite build --config vite.config.main.ts && vite build --config vite.config.preload.ts",
     "build:installer": "npm run build && electron-builder --publish never",
     "build:appx": "npm run build && electron-builder --windows appx --publish never",

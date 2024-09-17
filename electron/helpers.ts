@@ -6,7 +6,6 @@ import { main } from './main'
 export const getAppTitle = (): string => {
   const currentVersion = updater.autoUpdater.currentVersion.version
   let title = `Decentraland ${currentVersion}`
-  console.log({ title, currentVersion })
 
   if (main.config.desktopBranch !== main.defaultConfig.desktopBranch)
     title += ` desktop-branch=${main.config.desktopBranch}`
@@ -19,9 +18,9 @@ export const getAppTitle = (): string => {
   return title
 }
 
-export const getFreePort = async (startPort: number = 7666, stopPort?: number): Promise<number> => {
+export const getFreePort = async (): Promise<number> => {
   try {
-    const resolvedPort = await getPortPromise({ startPort: startPort, stopPort: stopPort })
+    const resolvedPort = await getPortPromise({ port: 7666, stopPort: 7679 })
     return resolvedPort
   } catch (error) {
     throw error
