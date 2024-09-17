@@ -34,7 +34,7 @@ jobs:
         env:
           MODE: production
         run: |
-          npm run build
+          npm run build:installer
 
       - name: Build and Release Ubuntu (AppImage)
         if: ${{github.ref == 'refs/heads/main'}}
@@ -78,7 +78,7 @@ jobs:
         env:
           MODE: production
         run: |
-          npm run build
+          npm run build:installer
 
       - name: Build and Release MacOS (dmg)
         if: ${{github.ref == 'refs/heads/main'}}
@@ -148,7 +148,7 @@ jobs:
         env:
           MODE: production
         run: |
-          npm run build
+          npm run build:installer
 
       - name: Build and Publish Windows (exe)
         if: ${{github.ref == 'refs/heads/main'}}
