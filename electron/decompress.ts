@@ -1,4 +1,4 @@
-import * as StreamZip from 'node-stream-zip'
+import StreamZip from 'node-stream-zip'
 
 export const unzip = async (zipFilePath: string, destinationPath: string) => {
   const zip = new StreamZip.async({ file: zipFilePath })

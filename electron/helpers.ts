@@ -1,9 +1,10 @@
 import { app } from 'electron'
+import updater from 'electron-updater'
+import { getPortPromise } from 'portfinder'
 import { main } from './main'
-import { autoUpdater } from 'electron-updater'
 
 export const getAppTitle = (): string => {
-  const currentVersion = autoUpdater.currentVersion.version
+  const currentVersion = updater.autoUpdater.currentVersion.version
   let title = `Decentraland ${currentVersion}`
 
   if (main.config.desktopBranch !== main.defaultConfig.desktopBranch)
@@ -17,14 +18,13 @@ export const getAppTitle = (): string => {
   return title
 }
 
-export const getFreePort = (): Promise<number> => {
-  return new Promise<number>((resolve, reject) => {
-    var fp = require('find-free-port')
-    fp(7666, 7679, (err: any, freePort: number) => {
-      if (err) reject(err)
-      resolve(freePort)
-    })
-  })
+export const getFreePort = async (): Promise<number> => {
+  try {
+    const resolvedPort = await getPortPromise({ port: 7666, stopPort: 7679 })
+    return resolvedPort
+  } catch (error) {
+    throw error
+  }
 }
 
 export const getIconByPlatform = () => {
@@ -57,7 +57,7 @@ export const isTrustedCertificate = (url: string, error: string): boolean => {
 }
 
 export const getAppBasePath = (): string => {
-  var applicationFolderName = 'DecentralandLauncher';
+  var applicationFolderName = 'DecentralandLauncher'
   //dev
   if (process.env.RUN_ENV === 'development') return './'
 
@@ -74,5 +74,31 @@ export const getAppBasePath = (): string => {
     return app.getPath('userData')
   }
 
-  return './';
+  return './'
+}
+
+export const getOSName = (): string | null => {
+  switch (process.platform) {
+    case 'darwin':
+      return 'mac'
+    case 'linux':
+      return 'linux'
+    case 'win32':
+      return 'windows'
+    default:
+      return null
+  }
+}
+
+export const getOSExtension = (): string | null => {
+  switch (process.platform) {
+    case 'darwin':
+      return '.app'
+    case 'linux':
+      return ''
+    case 'win32':
+      return '.exe'
+    default:
+      return null
+  }
 }

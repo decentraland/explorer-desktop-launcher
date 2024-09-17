@@ -1,11 +1,14 @@
+import path from 'path'
+import { URLSearchParams, fileURLToPath } from 'url'
 import { app, BrowserWindow, ipcMain, Menu, Tray } from 'electron'
-import { registerUpdaterEvents } from './updater'
-import * as path from 'path'
+import isDev from 'electron-is-dev'
 import { main } from './main'
-import * as isDev from 'electron-is-dev'
+import { registerUpdaterEvents } from './updater'
 import { getAppTitle, getIconByPlatform, onExit } from './helpers'
-import { URLSearchParams } from 'url'
 import { LauncherPaths } from './types'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export const createWindow = async (title: string, launcherPaths: LauncherPaths): Promise<BrowserWindow> => {
   const win = new BrowserWindow({
@@ -14,12 +17,13 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
     height: 849, // 790+59 border
     minWidth: 1006,
     minHeight: 849,
+    icon: path.join(__dirname, 'systray', getIconByPlatform()),
     webPreferences: {
       nodeIntegration: false,
       nodeIntegrationInWorker: false,
       nodeIntegrationInSubFrames: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload/preload.cjs'),
       webSecurity: true,
       backgroundThrottling: false
     }
@@ -52,7 +56,7 @@ export const createWindow = async (title: string, launcherPaths: LauncherPaths):
 
 export const loadDefaultWeb = async (win: BrowserWindow) => {
   main.isDefaultWeb = true
-  await win.loadURL(`file://${__dirname}/../../public/index.html#v${app.getVersion()}`)
+  await win.loadURL(`file://${path.join(__dirname, 'index.html')}#v${app.getVersion()}`)
 }
 
 export const checkDeveloperConsole = (win: BrowserWindow) => {
@@ -65,7 +69,7 @@ export const checkDeveloperConsole = (win: BrowserWindow) => {
 
 export const hideWindowInTray = (win: BrowserWindow) => {
   if (main.tray == null) {
-    const iconPath = path.join(path.dirname(__dirname), '../public/systray', getIconByPlatform())
+    const iconPath = path.join(__dirname, 'systray', getIconByPlatform())
 
     try {
       main.tray = new Tray(iconPath)

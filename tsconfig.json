@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "esnext",
+    "module": "esnext",
     "sourceMap": true,
+    "moduleResolution": "Node",
     "strict": true,
-    "outDir": "build",
+    "outDir": "dist",
     "rootDir": ".",
     "noEmitOnError": true,
+    "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "./node_modules/@types"
     ]
