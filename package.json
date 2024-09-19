@@ -43,6 +43,7 @@
     "build:installer": "npm run build && electron-builder --publish never",
     "build:appx": "npm run build && electron-builder --windows appx --publish never",
     "publish": "npm run build && electron-builder --publish always",
+    "publishonly": "electron-builder --publish always",
     "publish:appx": "npm run build && electron-builder --windows appx --publish always",
     "test": "vitest run"
   },
