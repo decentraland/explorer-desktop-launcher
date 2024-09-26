@@ -40,97 +40,11 @@
     "start:dev": "npm run build && electron . --developer-mode",
     "start:local": "npm run build && electron . --custom-url http://localhost:3000/?",
     "build": "rm -rf dist && vite build --config vite.config.main.ts && vite build --config vite.config.preload.ts",
-    "build:installer": "npm run build && electron-builder --publish never",
-    "build:appx": "npm run build && electron-builder --windows appx --publish never",
-    "publish": "npm run build && electron-builder --publish always",
-    "publishonly": "electron-builder --publish always",
+    "build:installer": "npm run build && electron-builder --config electron-builder.cjs --publish never",
+    "build:appx": "npm run build && electron-builder --config electron-builder.cjs --windows appx --publish never",
+    "publish": "npm run build && electron-builder --config electron-builder.cjs --publish always",
     "publish:appx": "npm run build && electron-builder --windows appx --publish always",
     "test": "vitest run"
-  },
-  "build": {
-    "appId": "decentraland.desktop.launcher",
-    "productName": "Decentraland",
-    "extends": null,
-    "artifactName": "Decentraland.${ext}",
-    "compression": "maximum",
-    "files": [
-      "dist/**/*",
-      "public/**/*",
-      "public/systray/iOS/**/*",
-      "public/systray/Windows/**/*"
-    ],
-    "protocols": [
-      {
-        "name": "Decentraland Desktop App",
-        "schemes": [
-          "dcl"
-        ]
-      }
-    ],
-    "directories": {
-      "buildResources": "assets"
-    },
-    "win": {
-      "publisherName": "Decentraland Foundation",
-      "icon": "public/app-icon.png",
-      "target": [
-        "nsis"
-      ],
-      "verifyUpdateCodeSignature": false,
-      "signAndEditExecutable": true,
-      "signingHashAlgorithms": [
-        "sha256"
-      ],
-      "rfc3161TimeStampServer": "http://ts.ssl.com",
-      "timeStampServer": "http://ts.ssl.com"
-    },
-    "nsis": {
-      "oneClick": false,
-      "shortcutName": "Decentraland",
-      "artifactName": "Install Decentraland.${ext}",
-      "installerIcon": "public/installer-icon.ico",
-      "allowToChangeInstallationDirectory": true,
-      "deleteAppDataOnUninstall": true,
-      "perMachine": true,
-      "include": "electron/installer.nsh"
-    },
-    "appx": {
-      "applicationId": "com.decentraland.launcher",
-      "identityName": "DecentralandFoundation.Decentraland",
-      "publisherDisplayName": "Decentraland Foundation",
-      "publisher": "CN=546D5DDE-76D5-4F9D-99D8-07C3235EC3A0"
-    },
-    "linux": {
-      "icon": "public/app-icon.png",
-      "target": [
-        "AppImage"
-      ]
-    },
-    "appImage": {
-      "artifactName": "Decentraland.${ext}"
-    },
-    "mac": {
-      "icon": "public/app-icon.png",
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "hardenedRuntime": true,
-      "entitlements": "entitlements.mac.plist",
-      "extendInfo": {
-        "NSMicrophoneUsageDescription": "Need microphone access to use voice chat in the application"
-      }
-    },
-    "dmg": {
-      "icon": "public/installer-icon.icns",
-      "artifactName": "Decentraland.${ext}"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "decentraland",
-      "repo": "explorer-desktop-launcher",
-      "private": false
-    }
   },
   "browserslist": {
     "production": [
