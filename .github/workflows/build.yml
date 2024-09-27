@@ -144,38 +144,48 @@ jobs:
         run: npm run test
 
       - name: Build Windows (exe)
+        run: npm run build
         env:
           MODE: production
-        run: |
-          npm run build:installer
-          
-      - name: Sign Windows Build (exe)
-        uses: sslcom/esigner-codesign@develop
-        if: ${{github.ref == 'refs/heads/main'}}
+
+      # Download 'SSLcom/esigner-codesign' to a folder called 'esigner-codesign' in the root of the project
+      - name: Checkout esigner-codesign repository (Windows)
+        uses: actions/checkout@v3
         with:
-          command: sign
-          username: ${{ secrets.ES_USERNAME }}
-          password: ${{ secrets.ES_PASSWORD }}
-          credential_id: ${{ secrets.CREDENTIAL_ID }}
-          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
-          file_path: ${GITHUB_WORKSPACE}/dist/Install Decentraland.exe
-          output_path: ${GITHUB_WORKSPACE}/dist/signed
-          malware_block: false
-          environment_name: PROD
-          signing_method: v2
+          repository: 'SSLcom/esigner-codesign'
+          path: esigner-codesign
 
-      - name: Replace signed exe
-        if: ${{github.ref == 'refs/heads/main'}}
-        run: |
-          Copy-Item -Path "${env:GITHUB_WORKSPACE}\dist\signed\Install Decentraland.exe" -Destination "${env:GITHUB_WORKSPACE}\dist\Install Decentraland.exe" -Force
-
-      - name: Publish Windows (exe)
-        if: ${{github.ref == 'refs/heads/main'}}
+      - name: Publish
+        # I use this action because it is capable of retrying multiple times if there are any issues with the distribution server
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 6
+          retry_wait_seconds: 15
+          retry_on: error
+          shell: 'bash'
+          command: npx electron-builder --config electron-builder.cjs --publish always
         env:
-          GITHUB_TOKEN: ${{secrets.github_token}}
-          EP_PRE_RELEASE: true
-        run: |
-          npm run publishonly
+          # Code Signing params
+          # See https://www.electron.build/code-signing
+          CSC_LINK: ${{ secrets.MACOS_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CSC_KEY_PASSWORD }}
+          # Publishing artifacts
+          GH_TOKEN: ${{ secrets.github_token }} # GitHub token, automatically provided (No need to define this secret in the repo settings)
+          EP_PRE_RELEASE: true # Publish as pre-release
+          # The following are the parameters required by the esigner-codesign action to work, we must explicitly pass in even the optional ones since we're not using the action directly, but from the checked out repo
+          CODE_SIGN_SCRIPT_PATH: "${{ github.workspace }}\\esigner-codesign\\dist\\index.js"
+          INPUT_COMMAND: 'sign'
+          INPUT_FILE_PATH: "${{ github.workspace }}\\dist\\Decentraland Launcher-win-x64.exe"
+          INPUT_OVERRIDE: 'true'
+          INPUT_MALWARE_BLOCK: 'false'
+          INPUT_CLEAN_LOGS: 'false'
+          INPUT_JVM_MAX_MEMORY: '1024M'
+          INPUT_ENVIRONMENT_NAME: 'PROD'
+          INPUT_USERNAME: ${{ secrets.ES_USERNAME }}
+          INPUT_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          INPUT_TOTP_SECRET: ${{ secrets.ES_TOTP_SECRET }}
+          INPUT_CREDENTIAL_ID: ${{ secrets.WINDOWS_CREDENTIAL_ID_SIGNER }}
 
       - name: Upload artifacts exe
         env:
